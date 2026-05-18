@@ -764,10 +764,10 @@ function toast(m,t='s'){const c=document.getElementById('toast-c');const el=docu
 // SCORE 
 function calcScore(c){
  let s=0;
- if(c.purchases&&c.purchases.length>0){s+=30;const total=c.purchases.reduce((a,p)=>a+(parseFloat(p.amount)||0),0);if(total>500)s+=20;else if(total>200)s+=10;if(c.purchases.length>3)s+=20;else if(c.purchases.length>1)s+=10;}
- if(c.observations&&c.observations.length>0)s+=10;
+ const cpurch=c.purchases||[];if(cpurch.length>0){s+=30;const total=cpurch.reduce((a,p)=>a+(parseFloat(p.amount)||0),0);if(total>500)s+=20;else if(total>200)s+=10;if(cpurch.length>3)s+=20;else if(cpurch.length>1)s+=10;}
+ if((c.observations||[]).length>0)s+=10;
  if(c.phone)s+=5;if(c.birthDate)s+=5;if(c.tags&&c.tags.length>0)s+=10;
- const lastP=c.purchases&&c.purchases.length?c.purchases.reduce((mx,p)=>p.date>mx?p.date:mx,''):null;
+ const lastP=cpurch.length?cpurch.reduce((mx,p)=>p.date>mx?p.date:mx,''):null;
  if(lastP){const days=Math.floor((new Date()-new Date(lastP))/86400000);if(days<30)s+=0;else if(days<90)s-=10;else s-=20;}
  return Math.max(0,Math.min(100,s));
 }
@@ -806,7 +806,7 @@ function filterClients(){
  const sf=document.getElementById('s-status')?.value||'';
  const of=document.getElementById('s-origin')?.value||'';
  let c=gC();
- if(q)c=c.filter(x=>x.name.toLowerCase().includes(q)||(x.phone||'').includes(q)||(x.tags||[]).some(t=>t.toLowerCase().includes(q)));
+ if(q)c=c.filter(x=>x.name.toLowerCase().includes(q)||(x.phone||'').includes(q)||(x.tags||[]).some(t=>(t||'').toLowerCase().includes(q)));
  if(sf)c=c.filter(x=>x.status===sf);
  if(of)c=c.filter(x=>x.origin===of);
  renderCTable(c,'clients-list');
@@ -889,7 +889,7 @@ function showDetail(id){
  ${(c.channels||[]).length?`<div class="card card-sm"><div class="fsec-t" style="margin-bottom:7px">Canal de Compra</div><div style="display:flex;flex-wrap:wrap;gap:5px">${c.channels.map(x=>`<span class="badge bg-b">${x}</span>`).join('')}</div></div>`:''}
  ${(c.tags||[]).length?`<div class="card card-sm"><div class="fsec-t" style="margin-bottom:7px">Tags de Produto</div><div style="display:flex;flex-wrap:wrap;gap:5px">${c.tags.map(t=>`<span class="badge bg-g">${t}</span>`).join('')}</div></div>`:''}
  ${totalSpent>0?`<div class="card card-sm" style="border-color:rgba(45,106,79,.2);background:var(--green-l)"><div class="fsec-t" style="margin-bottom:5px">Total Gasto</div><div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--green)">R$ ${totalSpent.toFixed(2).replace('.',',')}</div><div style="font-size:11px;color:var(--text2)">${sortPurch.length} compra${sortPurch.length!==1?'s':''} · ticket médio R$ ${sortPurch.length?(totalSpent/sortPurch.length).toFixed(2).replace('.',','):'0'}</div></div>`:''}
- ${c.reminder?`<div class="card card-sm" style="${remDue?'border-color:rgba(165,90,245,.3);background:var(--purple-l)':''}"><div class="fsec-t" style="margin-bottom:5px"> Lembrete</div><div style="font-size:13px;font-weight:600">${fD(c.reminder)}</div><div style="font-size:11px;color:var(--text2);margin-top:2px">${remDue?'Vencido ou hoje':'Agendado'}</div></div>`:''}
+ ${c.reminder?`<div class="card card-sm" style="${remDue?'border-color:rgba(165,90,245,.3);background:var(--purple-l)':''}"><div class="fsec-t" style="margin-bottom:5px"> Lembrete</div><div style="font-size:13px;font-weight:600">${fD((c.reminder||'').split('T')[0]||c.reminder)}</div><div style="font-size:11px;color:var(--text2);margin-top:2px">${remDue?'Vencido ou hoje':'Agendado'}</div></div>`:''}
  </div>
  <div class="dc">
  <div class="card card-sm">
@@ -907,7 +907,7 @@ function showDetail(id){
  <button class="btn btn-o btn-sm" onclick="openContactModal('${c.id}')">+ Registrar</button>
  </div>
  ${!sortCont.length?'<div class="empty" style="padding:18px"><div class="empty-i" style="font-size:22px"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.89 10.09"/></svg></div><div class="empty-d">Nenhum contato registrado</div></div>':
- `<div class="tl">${sortCont.map(ct=>`<div class="tl-i"><div class="tl-dot" style="background:var(--blue)"></div><div><div class="tl-text"><strong>${CTL[ct.type]||ct.type}</strong> — ${CRL[ct.result]||ct.result}</div>${ct.observations?`<div style="font-size:12px;color:var(--text2);margin-top:2px">${ct.observations}</div>`:''}${ct.nextContact?`<div style="font-size:11px;color:var(--purple);margin-top:2px"> Próximo: ${fD(ct.nextContact)}</div>`:''}<div class="tl-date">${fDT(ct.createdAt)}${ct.salesperson?' · '+ct.salesperson:''}</div></div></div>`).join('')}</div>`}
+ `<div class="tl">${sortCont.map(ct=>`<div class="tl-i"><div class="tl-dot" style="background:var(--blue)"></div><div><div class="tl-text"><strong>${CTL[ct.type]||ct.type}</strong> — ${CRL[ct.result]||ct.result}</div>${ct.observations?`<div style="font-size:12px;color:var(--text2);margin-top:2px">${ct.observations}</div>`:''}${(ct.next_contact||ct.nextContact)?`<div style="font-size:11px;color:var(--purple);margin-top:2px">Proximo: ${fD(ct.next_contact||ct.nextContact)}</div>`:''}<div class="tl-date">${fDT(ct.created_at||ct.createdAt)}${ct.salesperson?' · '+ct.salesperson:''}</div></div></div>`).join('')}</div>`}
  </div>
 
  <div class="card card-sm">
@@ -920,7 +920,7 @@ function showDetail(id){
  <div style="display:flex;gap:7px;margin-top:7px"><button class="btn btn-p btn-sm" onclick="saveObs('${c.id}')">Salvar</button><button class="btn btn-g btn-sm" onclick="hideObsForm('${c.id}')">Cancelar</button></div>
  </div>
  ${!sortObs.length?'<div class="empty" style="padding:18px"><div class="empty-i" style="font-size:22px"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="empty-d">Nenhuma observação ainda</div></div>':
- `<div class="tl">${sortObs.map(o=>`<div class="tl-i"><div class="tl-dot"></div><div><div class="tl-text">${o.text}</div><div class="tl-date">${fDT(o.createdAt)}</div></div></div>`).join('')}</div>`}
+ `<div class="tl">${sortObs.map(o=>`<div class="tl-i"><div class="tl-dot"></div><div><div class="tl-text">${o.text}</div><div class="tl-date">${fDT(o.created_at||o.createdAt)}</div></div></div>`).join('')}</div>`}
  </div>
  </div>
  </div>
@@ -940,10 +940,10 @@ function saveObs(cid){
 }
 
 // OPPORTUNITIES 
-function getBD(c){const m=new Date().getMonth()+1;return c.filter(x=>x.birthDate&&parseInt(x.birthDate.split('-')[1])===m)}
+function getBD(c){const m=new Date().getMonth()+1;return c.filter(x=>{const bd=x.birth_date||x.birthDate;return bd&&parseInt(bd.split('-')[1])===m})}
 function getIA(c){const d=new Date();d.setDate(d.getDate()-60);return c.filter(x=>x.purchases&&x.purchases.length&&new Date(x.purchases.reduce((mx,p)=>p.date>mx?p.date:mx,''))<d)}
 function getPS(c){const d=new Date();d.setDate(d.getDate()-7);return c.filter(x=>x.purchases&&x.purchases.length&&new Date(x.purchases.reduce((mx,p)=>p.date>mx?p.date:mx,''))>=d)}
-function getReminders(c){const t=new Date().toISOString().split('T')[0];return c.filter(x=>x.reminder&&x.reminder<=t)}
+function getReminders(c){const t=new Date().toISOString().split('T')[0];return c.filter(x=>(x.reminder)&&(x.reminder.split('T')[0]||x.reminder)<=t)}
 
 function renderOppList(items,cid,subFn){
  const el=document.getElementById(cid);if(!el)return;
@@ -979,7 +979,7 @@ function filterByTag(){
  const q=(document.getElementById('tag-q')?.value||'').toLowerCase().trim();
  const el=document.getElementById('tag-results');
  if(!q){el.innerHTML=`<div class="empty"><div class="empty-i"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></div><div class="empty-d">Digite uma tag para buscar</div></div>`;return}
- renderCTable(gC().filter(c=>(c.tags||[]).some(t=>t.toLowerCase().includes(q))),'tag-results');
+ renderCTable(_clients.filter(c=>(c.tags||[]).some(t=>(t||'').toLowerCase().includes(q))),'tag-results');
 }
 
 // MESSAGES 
@@ -1047,7 +1047,7 @@ function renderSP(){
  const sps=gSP();const el=document.getElementById('sp-list');const log=gLog();
  if(!sps.length){el.innerHTML=`<div class="empty"><div class="empty-i"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div class="empty-t">Nenhuma vendedora</div><div class="empty-d">Adicione sua equipe</div></div>`;return}
  el.innerHTML=sps.map(s=>{
- const sent=log.filter(l=>l.salespersonId===s.id).length;
+ const sent=log.filter(l=>l.salesperson===s.name).length;
  return`<div style="display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid var(--border)">
  <div style="display:flex;align-items:center;gap:10px">
  <div class="av-sm" style="background:var(--green-l);color:var(--green)">${ini(s.name)}</div>
@@ -1075,12 +1075,12 @@ function renderReports(){
  const year=parseInt(document.getElementById('rep-year')?.value||new Date().getFullYear());
  let clients=gC();
  let filtClients=clients;
- if(month>0){filtClients=clients.filter(c=>{const d=new Date(c.createdAt);return d.getMonth()+1===month&&d.getFullYear()===year});}
- else{filtClients=clients.filter(c=>new Date(c.createdAt).getFullYear()===year);}
+ if(month>0){filtClients=clients.filter(c=>{const d=new Date(c.created_at||c.createdAt);return d.getMonth()+1===month&&d.getFullYear()===year});}
+ else{filtClients=clients.filter(c=>new Date(c.created_at||c.createdAt).getFullYear()===year);}
  
  let log=gLog();
- if(month>0){log=log.filter(l=>{const d=new Date(l.sentAt);return d.getMonth()+1===month&&d.getFullYear()===year});}
- else{log=log.filter(l=>new Date(l.sentAt).getFullYear()===year);}
+ if(month>0){log=log.filter(l=>{const d=new Date(l.sent_at||l.sentAt);return d.getMonth()+1===month&&d.getFullYear()===year});}
+ else{log=log.filter(l=>new Date(l.sent_at||l.sentAt).getFullYear()===year);}
 
  const sps=gSP();
  const total=filtClients.length;
@@ -1095,7 +1095,7 @@ function renderReports(){
  const byType={aniversario:0,pos_venda:0,inativos:0,outro:0};
  log.forEach(l=>{if(byType[l.msgType]!==undefined)byType[l.msgType]++});
 
- const spStats=sps.map(s=>({name:s.name,count:log.filter(l=>l.salespersonId===s.id).length})).sort((a,b)=>b.count-a.count);
+ const spStats=sps.map(s=>({name:s.name,count:log.filter(l=>(l.salesperson===s.name)).length})).sort((a,b)=>b.count-a.count);
 
  // Score distribution
  const scoreA=clients.filter(c=>calcScore(c)>=70).length;
@@ -1172,14 +1172,14 @@ function expCSV(){
  const rows=[['Nome','Telefone','Nascimento','Endereço','Cidade','Bairro','Origem','Status','Fidelidade','Estilo','Pagamento','Canais','Tags','Score','Obs','Compras','Total Gasto','Criado em']];
  c.forEach(x=>{
  const total=(x.purchases||[]).reduce((a,p)=>a+(parseFloat(p.amount)||0),0);
- rows.push([x.name,x.phone||'',x.birthDate||'',x.address||'',x.city||'',x.region||'',x.origin||'',x.status||'',x.loyalty||'',x.style||'',(x.paymentMethods||[]).join(';'),(x.channels||[]).join(';'),(x.tags||[]).join(';'),calcScore(x),(x.observations||[]).map(o=>o.text).join(' | '),(x.purchases||[]).length,total.toFixed(2),x.createdAt?.split('T')[0]||'']);
+ rows.push([x.name,x.phone||'',x.birth_date||'',x.address||'',x.city||'',x.region||'',x.origin||'',x.status||'',x.loyalty||'',x.style||'',(x.payment_methods||[]).join(';'),(x.channels||[]).join(';'),(x.tags||[]).join(';'),calcScore(x),'',0,0,x.created_at?.split('T')[0]||'']);
  });
  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
  dl(`clientes_${new Date().toISOString().split('T')[0]}.csv`,'data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv));
  toast(`${c.length} clientes exportadas!`);
 }
 function expJSON(){
- const data={clientes:gC(),vendedoras:gSP(),mensagens:gM(),envios:gLog(),exportedAt:new Date().toISOString(),loja:CU.store};
+ const data={clientes:_clients,vendedoras:_sp,mensagens:_msgs,envios:_log,exportedAt:new Date().toISOString(),loja:CU.store};
  dl(`backup_${new Date().toISOString().split('T')[0]}.json`,'data:application/json,'+encodeURIComponent(JSON.stringify(data,null,2)));
  toast('Backup exportado!');
 }
