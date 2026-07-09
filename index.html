@@ -8,6 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
 
+
 :root{
  --bg:#f0f2f0;--bg2:#fff;--bg3:#f7f9f7;
  --dark:#1a2218;--dark2:#243020;
@@ -308,9 +309,13 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
  .stats-grid{grid-template-columns:1fr 1fr}
 }
 
+
+.perda-item{display:flex;align-items:flex-start;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border);gap:10px}
+.perda-item:last-child{border-bottom:none}
 </style>
 </head>
 <body>
+
 
 
 <!-- AUTH -->
@@ -666,12 +671,60 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
  </div>
 </div>
 
+<!-- FLUXO DO DIA -->
+<div id="page-fluxo" class="page">
+  <div class="ph">
+    <div><h1 class="pt">Fluxo do Dia</h1><p class="ps" id="fluxo-date-label">Hoje</p></div>
+    <input type="date" id="fluxo-date" class="fsel" onchange="renderFluxo()">
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px">
+    <div class="card" style="text-align:center;padding:24px 16px">
+      <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px">Loja Fisica</div>
+      <div style="font-family:'Syne',sans-serif;font-size:56px;font-weight:700;line-height:1;margin-bottom:6px" id="count-fisico">0</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:18px">pessoas atendidas</div>
+      <div style="display:flex;gap:12px;justify-content:center">
+        <button style="width:52px;height:52px;border-radius:50%;background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);font-size:24px;font-weight:700;cursor:pointer" onclick="changeCount('fisico',-1)">-</button>
+        <button style="width:52px;height:52px;border-radius:50%;background:var(--green);border:none;color:#fff;font-size:24px;font-weight:700;cursor:pointer" onclick="changeCount('fisico',1)">+</button>
+      </div>
+    </div>
+    <div class="card" style="text-align:center;padding:24px 16px">
+      <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px">Online</div>
+      <div style="font-family:'Syne',sans-serif;font-size:56px;font-weight:700;line-height:1;margin-bottom:6px" id="count-online">0</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:18px">mensagens recebidas</div>
+      <div style="display:flex;gap:12px;justify-content:center">
+        <button style="width:52px;height:52px;border-radius:50%;background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);font-size:24px;font-weight:700;cursor:pointer" onclick="changeCount('online',-1)">-</button>
+        <button style="width:52px;height:52px;border-radius:50%;background:var(--blue);border:none;color:#fff;font-size:24px;font-weight:700;cursor:pointer" onclick="changeCount('online',1)">+</button>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:20px"><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px" id="fluxo-stats"></div></div>
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="font-weight:700;font-family:'Syne',sans-serif">Registro de Perdas</div>
+      <button class="btn btn-o btn-sm" onclick="openPerdaForm()">+ Registrar</button>
+    </div>
+    <div id="perda-form" style="display:none;background:var(--bg3);border-radius:var(--rs);padding:14px;margin-bottom:14px">
+      <div class="fgrid" style="margin-bottom:10px">
+        <div class="fg"><label class="fl">O que buscava *</label><input type="text" id="perda-produto" class="fi" placeholder="Ex: calca preta G, vestido social..."></div>
+        <div class="fg"><label class="fl">Motivo da perda</label><input type="text" id="perda-motivo" class="fi" placeholder="Ex: nao tinha o tamanho, achou caro..."></div>
+        <div class="fg"><label class="fl">Canal</label><select id="perda-canal" class="fi"><option value="fisico">Loja Fisica</option><option value="online">Online</option></select></div>
+        <div class="fg"><label class="fl">Vincular cliente (opcional)</label><select id="perda-cliente" class="fi"><option value="">Sem vinculo</option></select></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-p btn-sm" onclick="savePerda()">Salvar</button>
+        <button class="btn btn-g btn-sm" onclick="closePerdaForm()">Cancelar</button>
+      </div>
+    </div>
+    <div id="perdas-list"><div class="empty"><div class="empty-d">Nenhuma perda registrada</div></div></div>
+  </div>
+</div>
+
 <div class="tc" id="toast-c"></div>
-
-
-</body>
-</html>
 <script>
+// CONFIG SUPABASE
+var _sb = supabase.createClient('https://ihpfexmourrvixtsxhrt.supabase.co', 'sb_publishable_M7vZQ1VPi_7BP3HQAp-ngA_cMB22bEG');
+
+
 
 // ── CONFIG SUPABASE ──
 const _sb = supabase.createClient('https://ihpfexmourrvixtsxhrt.supabase.co', 'sb_publishable_M7vZQ1VPi_7BP3HQAp-ngA_cMB22bEG');
@@ -1483,6 +1536,166 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   checkSession();
 });
+
+
+// ── FLUXO DO DIA ──
+var _fluxoData = {};
+
+function getTodayStr() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function getFluxoDate() {
+  var inp = document.getElementById('fluxo-date');
+  return (inp && inp.value) ? inp.value : getTodayStr();
+}
+
+function getFluxoDay(date) {
+  return _fluxoData[date] || {fisico:0, online:0, perdas:[], id:null};
+}
+
+async function loadFluxoFromDB() {
+  if (!CU) return;
+  try {
+    var res = await _sb.from('daily_flow').select('*').eq('store_id', CU.id);
+    _fluxoData = {};
+    var rows = res.data || [];
+    rows.forEach(function(row) {
+      _fluxoData[row.date] = {
+        fisico: row.fisico || 0,
+        online: row.online || 0,
+        perdas: row.perdas || [],
+        id: row.id
+      };
+    });
+  } catch(e) { console.log('fluxo load err', e); }
+}
+
+async function saveFluxoToDB(date) {
+  var day = getFluxoDay(date);
+  var row = {store_id:CU.id, date:date, fisico:day.fisico, online:day.online, perdas:day.perdas};
+  try {
+    if (day.id) {
+      await _sb.from('daily_flow').update(row).eq('id', day.id);
+    } else {
+      var res = await _sb.from('daily_flow').insert(row).select().single();
+      if (res.data) {
+        if (!_fluxoData[date]) _fluxoData[date] = {fisico:0, online:0, perdas:[]};
+        _fluxoData[date].id = res.data.id;
+      }
+    }
+  } catch(e) { console.log('fluxo save err', e); }
+}
+
+function renderFluxo() {
+  var date = getFluxoDate();
+  var day = getFluxoDay(date);
+
+  var label = document.getElementById('fluxo-date-label');
+  if (label) {
+    label.textContent = date === getTodayStr() ? 'Hoje - ' + fD(date) : fD(date);
+  }
+
+  var cF = document.getElementById('count-fisico');
+  var cO = document.getElementById('count-online');
+  if (cF) cF.textContent = day.fisico;
+  if (cO) cO.textContent = day.online;
+
+  var clientes = gC();
+  var vendas = clientes.filter(function(cl) {
+    return (cl.purchases || []).some(function(p) { return p.date === date; });
+  });
+  var total = day.fisico + day.online;
+  var conv = total > 0 ? Math.round((vendas.length / total) * 100) : 0;
+
+  var statsEl = document.getElementById('fluxo-stats');
+  if (statsEl) {
+    statsEl.innerHTML =
+      '<div class="ri"><div class="rv">' + total + '</div><div class="rl">Total Atendimentos</div></div>' +
+      '<div class="ri"><div class="rv" style="color:var(--green)">' + vendas.length + '</div><div class="rl">Vendas no Dia</div></div>' +
+      '<div class="ri"><div class="rv" style="color:var(--blue)">' + conv + '%</div><div class="rl">Taxa de Conversao</div></div>' +
+      '<div class="ri"><div class="rv" style="color:var(--red)">' + (day.perdas || []).length + '</div><div class="rl">Perdas Registradas</div></div>';
+  }
+
+  var perdasEl = document.getElementById('perdas-list');
+  if (perdasEl) {
+    var perdas = day.perdas || [];
+    if (!perdas.length) {
+      perdasEl.innerHTML = '<div class="empty"><div class="empty-d">Nenhuma perda registrada</div></div>';
+    } else {
+      perdasEl.innerHTML = perdas.map(function(p, i) {
+        return '<div class="perda-item">' +
+          '<div>' +
+            '<div style="font-weight:600;font-size:13px">' + p.produto + '</div>' +
+            (p.motivo ? '<div style="font-size:12px;color:var(--text2);margin-top:2px">' + p.motivo + '</div>' : '') +
+            (p.clienteNome ? '<div style="font-size:11px;color:var(--text3);margin-top:2px">Cliente: ' + p.clienteNome + '</div>' : '') +
+          '</div>' +
+          '<div style="display:flex;align-items:center;gap:6px">' +
+            '<span style="background:var(--red-l);color:var(--red);padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600">' + (p.canal === 'online' ? 'Online' : 'Fisica') + '</span>' +
+            '<button class="btn btn-d btn-xs" onclick="removePerda(\'' + date + '\',' + i + ')">x</button>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+  }
+
+  // Popular select de clientes
+  var sel = document.getElementById('perda-cliente');
+  if (sel) {
+    sel.innerHTML = '<option value="">Sem vinculo</option>' +
+      gC().map(function(cl) { return '<option value="' + cl.id + '">' + cl.name + '</option>'; }).join('');
+  }
+}
+
+async function renderFluxo_page() {
+  var dateInp = document.getElementById('fluxo-date');
+  if (dateInp && !dateInp.value) dateInp.value = getTodayStr();
+  await loadFluxoFromDB();
+  renderFluxo();
+}
+
+async function changeCount(tipo, delta) {
+  var date = getFluxoDate();
+  if (!_fluxoData[date]) _fluxoData[date] = {fisico:0, online:0, perdas:[], id:null};
+  _fluxoData[date][tipo] = Math.max(0, (_fluxoData[date][tipo] || 0) + delta);
+  renderFluxo();
+  await saveFluxoToDB(date);
+}
+
+function openPerdaForm() {
+  document.getElementById('perda-form').style.display = 'block';
+  document.getElementById('perda-produto').focus();
+}
+
+function closePerdaForm() {
+  document.getElementById('perda-form').style.display = 'none';
+  document.getElementById('perda-produto').value = '';
+  document.getElementById('perda-motivo').value = '';
+}
+
+async function savePerda() {
+  var produto = document.getElementById('perda-produto').value.trim();
+  if (!produto) { toast('Informe o que a cliente buscava', 'e'); return; }
+  var motivo = document.getElementById('perda-motivo').value.trim();
+  var canal = document.getElementById('perda-canal').value;
+  var clienteId = document.getElementById('perda-cliente').value;
+  var clienteNome = clienteId ? (gC().find(function(cl) { return cl.id === clienteId; }) || {}).name || '' : '';
+  var date = getFluxoDate();
+  if (!_fluxoData[date]) _fluxoData[date] = {fisico:0, online:0, perdas:[], id:null};
+  if (!_fluxoData[date].perdas) _fluxoData[date].perdas = [];
+  _fluxoData[date].perdas.push({produto:produto, motivo:motivo, canal:canal, clienteId:clienteId, clienteNome:clienteNome, hora:new Date().toISOString()});
+  await saveFluxoToDB(date);
+  closePerdaForm();
+  renderFluxo();
+  toast('Perda registrada!');
+}
+
+async function removePerda(date, idx) {
+  if (!_fluxoData[date] || !_fluxoData[date].perdas) return;
+  _fluxoData[date].perdas.splice(idx, 1);
+  await saveFluxoToDB(date);
+  renderFluxo();
+}
 
 </script>
 </body>
