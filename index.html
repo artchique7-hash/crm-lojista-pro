@@ -278,6 +278,9 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 
 /* REMINDER */
 .reminder-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;background:var(--purple-l);color:var(--purple)}
+.perda-item{display:flex;align-items:flex-start;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border);gap:10px}
+.perda-item:last-child{border-bottom:none}
+.perda-tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;background:var(--red-l);color:var(--red)}
 
 /* RESPONSIVE */
 @media(max-width:768px){
@@ -695,6 +698,7 @@ async function loadAll() {
   _sp = s.data || [];
   _msgs = m.data || [];
   _log = l.data || [];
+  await loadFluxoFromDB();
   updateBadges();
 }
 
@@ -790,7 +794,7 @@ function showPage(p) {
   const bni=document.querySelectorAll('.bn-i');
   if (bnMap[p]!==undefined && bni[bnMap[p]]) bni[bnMap[p]].classList.add('active');
   closeSB();
-  const R={dashboard:renderDash,clients:renderClients,birthdays:renderBirthdays,inactive:renderInactive,postsale:renderPostSale,reminders:renderReminders,filter:renderFilter,messages:renderMsgs,salespeople:renderSP,reports:renderReports,export:renderExport};
+  const R={dashboard:renderDash,clients:renderClients,birthdays:renderBirthdays,inactive:renderInactive,postsale:renderPostSale,reminders:renderReminders,filter:renderFilter,fluxo:renderFluxo_page,messages:renderMsgs,salespeople:renderSP,reports:renderReports,export:renderExport};
   if (R[p]) R[p]();
 }
 function toggleSB() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sb-overlay').classList.toggle('open'); }
@@ -1303,6 +1307,161 @@ function updateBadges(){
   const bd=getBD(c); document.getElementById('sb-bd').textContent=bd.length; document.getElementById('sb-bd').style.display=bd.length?'inline':'none';
   const ia=getIA(c); document.getElementById('sb-in').textContent=ia.length; document.getElementById('sb-in').style.display=ia.length?'inline':'none';
   const rem=getReminders(c); document.getElementById('sb-rem').textContent=rem.length; document.getElementById('sb-rem').style.display=rem.length?'inline':'none';
+}
+
+// ── FLUXO DO DIA ──
+let _fluxoData = {}; // {date: {fisico, online, perdas:[]}}
+
+function getTodayStr(){return new Date().toISOString().split('T')[0];}
+
+function getFluxoKey(){
+  const d = document.getElementById('fluxo-date');
+  return d ? d.value || getTodayStr() : getTodayStr();
+}
+
+function getFluxoDay(date){
+  return _fluxoData[date] || {fisico:0, online:0, perdas:[]};
+}
+
+async function loadFluxoFromDB(){
+  if(!CU) return;
+  const {data} = await _sb.from('daily_flow').select('*').eq('store_id', CU.id);
+  _fluxoData = {};
+  (data||[]).forEach(row => {
+    _fluxoData[row.date] = {
+      fisico: row.fisico||0,
+      online: row.online||0,
+      perdas: row.perdas||[],
+      id: row.id
+    };
+  });
+}
+
+async function saveFluxoToDB(date){
+  const day = getFluxoDay(date);
+  const existing = day.id;
+  const row = {store_id:CU.id, date, fisico:day.fisico, online:day.online, perdas:day.perdas};
+  if(existing){
+    await _sb.from('daily_flow').update(row).eq('id', existing);
+  } else {
+    const {data} = await _sb.from('daily_flow').insert(row).select().single();
+    if(data) _fluxoData[date].id = data.id;
+  }
+}
+
+function renderFluxo(){
+  const date = getFluxoKey();
+  const day = getFluxoDay(date);
+  
+  // Atualizar label data
+  const label = document.getElementById('fluxo-date-label');
+  if(label){
+    const hoje = getTodayStr();
+    if(date === hoje) label.textContent = 'Hoje - '+fD(date);
+    else label.textContent = fD(date);
+  }
+
+  // Contadores
+  const cF = document.getElementById('count-fisico');
+  const cO = document.getElementById('count-online');
+  if(cF) cF.textContent = day.fisico;
+  if(cO) cO.textContent = day.online;
+
+  // Taxa de conversao
+  const clientes = gC();
+  const dateClients = clientes.filter(cl => (cl.created_at||'').startsWith(date));
+  const vendas = clientes.filter(cl => (cl.purchases||[]).some(p => p.date === date));
+  const total = day.fisico + day.online;
+  const conv = total > 0 ? Math.round((vendas.length / total) * 100) : 0;
+
+  const statsEl = document.getElementById('conversao-stats');
+  if(statsEl) statsEl.innerHTML =
+    '<div class="ri"><div class="rv">'+(day.fisico+day.online)+'</div><div class="rl">Total Atendimentos</div></div>'+
+    '<div class="ri"><div class="rv" style="color:var(--green)">'+vendas.length+'</div><div class="rl">Vendas no Dia</div></div>'+
+    '<div class="ri"><div class="rv" style="color:var(--blue)">'+conv+'%</div><div class="rl">Taxa de Conversao</div></div>'+
+    '<div class="ri"><div class="rv" style="color:var(--red)">'+(day.perdas||[]).length+'</div><div class="rl">Perdas Registradas</div></div>';
+
+  // Perdas
+  const perdasEl = document.getElementById('perdas-list');
+  if(perdasEl){
+    const perdas = day.perdas || [];
+    if(!perdas.length){
+      perdasEl.innerHTML = '<div class="empty"><div class="empty-d">Nenhuma perda registrada</div></div>';
+    } else {
+      perdasEl.innerHTML = perdas.map((p,i) =>
+        '<div class="perda-item">'+
+          '<div>'+
+            '<div style="font-weight:600;font-size:13px">'+p.produto+'</div>'+
+            '<div style="font-size:12px;color:var(--text2);margin-top:2px">'+p.motivo+'</div>'+
+            (p.clienteNome?'<div style="font-size:11px;color:var(--text3);margin-top:2px">Cliente: '+p.clienteNome+'</div>':'')+
+          '</div>'+
+          '<div style="display:flex;align-items:center;gap:6px">'+
+            '<span class="perda-tag">'+(p.canal==='online'?'Online':'Fisica')+'</span>'+
+            '<button class="btn btn-d btn-xs" onclick="removePerda(''+date+'','+i+')">x</button>'+
+          '</div>'+
+        '</div>'
+      ).join('');
+    }
+  }
+}
+
+async function loadFluxo(){
+  await loadFluxoFromDB();
+  renderFluxo();
+  // Popular select de clientes
+  const sel = document.getElementById('perda-cliente');
+  if(sel){
+    sel.innerHTML = '<option value="">Sem vinculo</option>'+
+      gC().map(cl=>'<option value="'+cl.id+'">'+cl.name+'</option>').join('');
+  }
+}
+
+async function changeCount(tipo, delta){
+  const date = getFluxoKey();
+  if(!_fluxoData[date]) _fluxoData[date] = {fisico:0, online:0, perdas:[]};
+  _fluxoData[date][tipo] = Math.max(0, (_fluxoData[date][tipo]||0) + delta);
+  renderFluxo();
+  await saveFluxoToDB(date);
+}
+
+function openPerdaForm(){
+  document.getElementById('perda-form').style.display='block';
+  document.getElementById('perda-produto').focus();
+}
+function closePerdaForm(){
+  document.getElementById('perda-form').style.display='none';
+  document.getElementById('perda-produto').value='';
+  document.getElementById('perda-motivo').value='';
+}
+
+async function savePerda(){
+  const produto = document.getElementById('perda-produto').value.trim();
+  const motivo = document.getElementById('perda-motivo').value.trim();
+  if(!produto){toast('Informe o que a cliente buscava','e');return;}
+  const date = getFluxoKey();
+  const clienteId = document.getElementById('perda-cliente').value;
+  const clienteNome = clienteId ? gC().find(cl=>cl.id===clienteId)?.name||'' : '';
+  const canal = document.getElementById('perda-canal').value;
+  if(!_fluxoData[date]) _fluxoData[date] = {fisico:0, online:0, perdas:[]};
+  if(!_fluxoData[date].perdas) _fluxoData[date].perdas = [];
+  _fluxoData[date].perdas.push({produto, motivo, clienteId, clienteNome, canal, hora:new Date().toISOString()});
+  await saveFluxoToDB(date);
+  closePerdaForm();
+  renderFluxo();
+  toast('Perda registrada!');
+}
+
+async function removePerda(date, idx){
+  if(!_fluxoData[date]||!_fluxoData[date].perdas)return;
+  _fluxoData[date].perdas.splice(idx,1);
+  await saveFluxoToDB(date);
+  renderFluxo();
+}
+
+function renderFluxo_page(){
+  const dateInp = document.getElementById('fluxo-date');
+  if(dateInp && !dateInp.value) dateInp.value = getTodayStr();
+  loadFluxo();
 }
 
 // ── INIT ──
