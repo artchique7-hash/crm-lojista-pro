@@ -1446,17 +1446,20 @@ function renderFluxo() {
     if (!perdas.length) {
       pl.innerHTML = '<div class="empty"><div class="empty-d">Nenhuma perda registrada</div></div>';
     } else {
-      pl.innerHTML = perdas.map(function(p, i) {
-        return '<div class="perda-item">' +
-          '<div><div style="font-weight:600;font-size:13px">' + p.produto + '</div>' +
-          (p.motivo ? '<div style="font-size:12px;color:var(--text2);margin-top:2px">' + p.motivo + '</div>' : '') +
-          (p.clienteNome ? '<div style="font-size:11px;color:var(--text3);margin-top:2px">Cliente: ' + p.clienteNome + '</div>' : '') +
-          '</div>' +
-          '<div style="display:flex;align-items:center;gap:6px">' +
-          '<span class="perda-tag">' + (p.canal === 'online' ? 'Online' : 'Fisica') + '</span>' +
-          '<button class="btn btn-d btn-xs" onclick="removePerda('' + date + '',' + i + ')">x</button>' +
-          '</div></div>';
-      }).join('');
+      var html = '';
+      perdas.forEach(function(p, i) {
+        html += '<div class="perda-item">';
+        html += '<div>';
+        html += '<div style="font-weight:600;font-size:13px">' + p.produto + '</div>';
+        if (p.motivo) html += '<div style="font-size:12px;color:var(--text2);margin-top:2px">' + p.motivo + '</div>';
+        if (p.clienteNome) html += '<div style="font-size:11px;color:var(--text3);margin-top:2px">Cliente: ' + p.clienteNome + '</div>';
+        html += '</div>';
+        html += '<div style="display:flex;align-items:center;gap:6px">';
+        html += '<span class="perda-tag">' + (p.canal === 'online' ? 'Online' : 'Fisica') + '</span>';
+        html += '<button class="btn btn-d btn-xs" data-date="' + date + '" data-idx="' + i + '" onclick="removePerdaBtn(this)">x</button>';
+        html += '</div></div>';
+      });
+      pl.innerHTML = html;
     }
   }
 
@@ -1512,6 +1515,12 @@ function removePerda(date, idx) {
   _fluxo[date].perdas.splice(idx, 1);
   saveFluxoToDB(date);
   renderFluxo();
+}
+
+function removePerdaBtn(btn) {
+  var date = btn.getAttribute('data-date');
+  var idx = parseInt(btn.getAttribute('data-idx'));
+  removePerda(date, idx);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
