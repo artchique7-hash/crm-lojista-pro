@@ -602,6 +602,15 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
     <button class="fb fb-minus" onclick="changeCount('fisico',-1)">-</button>
     <button class="fb fb-plus-g" onclick="changeCount('fisico',1)">+</button>
    </div>
+   <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border)">
+    <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Vendas realizadas</div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:10px">
+     <button class="fb fb-minus" style="width:38px;height:38px;font-size:18px" onclick="changeCount('vendas_fisico',-1)">-</button>
+     <div class="fluxo-num" id="count-vendas-fisico" style="font-size:36px;min-width:40px">0</div>
+     <button class="fb fb-plus-g" style="width:38px;height:38px;font-size:18px" onclick="changeCount('vendas_fisico',1)">+</button>
+    </div>
+    <div style="margin-top:10px;font-size:12px;font-weight:600;color:var(--green)" id="conv-fisico-label">Conversao: -</div>
+   </div>
   </div>
   <div class="card fluxo-counter">
    <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px">Online</div>
@@ -610,6 +619,15 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
    <div class="fluxo-btns">
     <button class="fb fb-minus" onclick="changeCount('online',-1)">-</button>
     <button class="fb fb-plus-b" onclick="changeCount('online',1)">+</button>
+   </div>
+   <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border)">
+    <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Vendas realizadas</div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:10px">
+     <button class="fb fb-minus" style="width:38px;height:38px;font-size:18px" onclick="changeCount('vendas_online',-1)">-</button>
+     <div class="fluxo-num" id="count-vendas-online" style="font-size:36px;min-width:40px">0</div>
+     <button class="fb fb-plus-b" style="width:38px;height:38px;font-size:18px" onclick="changeCount('vendas_online',1)">+</button>
+    </div>
+    <div style="margin-top:10px;font-size:12px;font-weight:600;color:var(--blue)" id="conv-online-label">Conversao: -</div>
    </div>
   </div>
  </div>
@@ -624,7 +642,12 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
     <div class="fg"><label class="fl">O que buscava *</label><input type="text" id="perda-produto" class="fi" placeholder="Ex: calca preta G, vestido social..."></div>
     <div class="fg"><label class="fl">Motivo da perda</label><input type="text" id="perda-motivo" class="fi" placeholder="Ex: nao tinha o tamanho, achou caro..."></div>
     <div class="fg"><label class="fl">Canal</label><select id="perda-canal" class="fi"><option value="fisico">Loja Fisica</option><option value="online">Online</option></select></div>
-    <div class="fg"><label class="fl">Vincular cliente</label><select id="perda-cliente" class="fi"><option value="">Sem vinculo</option></select></div>
+    <div class="fg"><label class="fl">Vincular cliente</label>
+     <div style="display:flex;gap:7px;align-items:center">
+      <select id="perda-cliente" class="fi" style="flex:1"><option value="">Sem vinculo</option></select>
+      <button class="btn btn-o btn-sm" onclick="abrirModalClienteRapido()" style="white-space:nowrap;flex-shrink:0">+ Novo</button>
+     </div>
+    </div>
    </div>
    <div style="display:flex;gap:8px">
     <button class="btn btn-p btn-sm" onclick="savePerda()">Salvar</button>
@@ -1883,6 +1906,200 @@ function enviarCaptacao() {
     btn.disabled = false;
     errEl.textContent = 'Erro ao enviar. Tente novamente.';
     errEl.style.display = 'block';
+  });
+}
+
+
+// ── MELHORIAS FLUXO + PERDAS ──
+
+// Atualizar renderFluxo para incluir vendas e conversoes por canal
+var _origRenderFluxo = renderFluxo;
+function renderFluxo() {
+  var inp = document.getElementById('fluxo-date');
+  if (inp && !inp.value) inp.value = getTodayStr();
+  var date = getFluxoDate();
+  var day = getFluxoDay(date);
+
+  var label = document.getElementById('fluxo-date-label');
+  if (label) label.textContent = date === getTodayStr() ? 'Hoje - ' + fD(date) : fD(date);
+
+  // Contadores principais
+  var cF = document.getElementById('count-fisico');
+  var cO = document.getElementById('count-online');
+  if (cF) cF.textContent = day.fisico;
+  if (cO) cO.textContent = day.online;
+
+  // Vendas
+  var vF = day.vendas_fisico || 0;
+  var vO = day.vendas_online || 0;
+  var cvF = document.getElementById('count-vendas-fisico');
+  var cvO = document.getElementById('count-vendas-online');
+  if (cvF) cvF.textContent = vF;
+  if (cvO) cvO.textContent = vO;
+
+  // Conversoes por canal
+  var convFisico = day.fisico > 0 ? Math.round((vF / day.fisico) * 100) : 0;
+  var convOnline = day.online > 0 ? Math.round((vO / day.online) * 100) : 0;
+  var convTotal = (day.fisico + day.online) > 0 ? Math.round(((vF + vO) / (day.fisico + day.online)) * 100) : 0;
+
+  var lF = document.getElementById('conv-fisico-label');
+  var lO = document.getElementById('conv-online-label');
+  if (lF) lF.textContent = 'Conversao: ' + convFisico + '%';
+  if (lO) lO.textContent = 'Conversao: ' + convOnline + '%';
+
+  // Stats gerais
+  var total = day.fisico + day.online;
+  var totalVendas = vF + vO;
+  var stats = document.getElementById('fluxo-stats');
+  if (stats) stats.innerHTML =
+    '<div class="ri"><div class="rv">' + total + '</div><div class="rl">Total Atendimentos</div></div>' +
+    '<div class="ri"><div class="rv" style="color:var(--green)">' + totalVendas + '</div><div class="rl">Total Vendas</div></div>' +
+    '<div class="ri"><div class="rv" style="color:var(--blue)">' + convTotal + '%</div><div class="rl">Conversao Geral</div></div>' +
+    '<div class="ri"><div class="rv" style="color:var(--green)">' + convFisico + '%</div><div class="rl">Conv. Fisica</div></div>' +
+    '<div class="ri"><div class="rv" style="color:var(--blue)">' + convOnline + '%</div><div class="rl">Conv. Online</div></div>' +
+    '<div class="ri"><div class="rv" style="color:var(--red)">' + (day.perdas||[]).length + '</div><div class="rl">Perdas</div></div>';
+
+  // Perdas
+  var perdas = day.perdas || [];
+  var pl = document.getElementById('perdas-list');
+  if (pl) {
+    if (!perdas.length) {
+      pl.innerHTML = '<div class="empty"><div class="empty-d">Nenhuma perda registrada</div></div>';
+    } else {
+      var html = '';
+      perdas.forEach(function(p, i) {
+        html += '<div class="perda-item">';
+        html += '<div>';
+        html += '<div style="font-weight:600;font-size:13px">' + p.produto + '</div>';
+        if (p.motivo) html += '<div style="font-size:12px;color:var(--text2);margin-top:2px">' + p.motivo + '</div>';
+        if (p.clienteNome) html += '<div style="font-size:11px;color:var(--text3);margin-top:2px">Cliente: ' + p.clienteNome + '</div>';
+        html += '</div>';
+        html += '<div style="display:flex;align-items:center;gap:6px">';
+        html += '<span class="perda-tag">' + (p.canal === 'online' ? 'Online' : 'Fisica') + '</span>';
+        html += '<button class="btn btn-d btn-xs" data-date="' + date + '" data-idx="' + i + '" onclick="removePerdaBtn(this)">x</button>';
+        html += '</div></div>';
+      });
+      pl.innerHTML = html;
+    }
+  }
+
+  // Select de clientes
+  var sel = document.getElementById('perda-cliente');
+  if (sel) {
+    sel.innerHTML = '<option value="">Sem vinculo</option>' +
+      gC().map(function(cl) { return '<option value="' + cl.id + '">' + cl.name + (cl.phone ? ' - ' + cl.phone : '') + '</option>'; }).join('');
+  }
+
+  // Grafico produtos
+  var prodChart = document.getElementById('perda-chart');
+  if (prodChart) {
+    var allPerdas = [];
+    Object.values(_fluxo).forEach(function(d) { (d.perdas||[]).forEach(function(p){ allPerdas.push(p); }); });
+    if (!allPerdas.length) {
+      prodChart.innerHTML = '<div class="empty" style="padding:16px"><div class="empty-d">Nenhuma perda registrada ainda</div></div>';
+    } else {
+      var counts = {};
+      allPerdas.forEach(function(p) { var k = p.produto.toLowerCase().trim(); counts[k] = (counts[k]||0)+1; });
+      var sorted = Object.entries(counts).sort(function(a,b){ return b[1]-a[1]; }).slice(0,10);
+      var max = sorted[0][1];
+      prodChart.innerHTML = sorted.map(function(e) {
+        return '<div class="br" style="margin-bottom:8px"><div class="bl" style="width:120px;font-size:12px;color:var(--text2)">' + e[0] + '</div><div class="bt"><div class="bf" style="width:' + Math.round(e[1]/max*100) + '%"></div></div><div class="bv" style="font-size:12px;font-weight:600;min-width:20px">' + e[1] + '</div></div>';
+      }).join('');
+    }
+  }
+}
+
+// Estender changeCount para incluir vendas_fisico e vendas_online
+var _origChangeCount = changeCount;
+function changeCount(tipo, delta) {
+  var date = getFluxoDate();
+  if (!_fluxo[date]) _fluxo[date] = {fisico:0, online:0, vendas_fisico:0, vendas_online:0, perdas:[], id:null};
+  if (_fluxo[date][tipo] === undefined) _fluxo[date][tipo] = 0;
+  _fluxo[date][tipo] = Math.max(0, (_fluxo[date][tipo] || 0) + delta);
+  renderFluxo();
+  saveFluxoToDB(date);
+}
+
+// Estender saveFluxoToDB para incluir vendas
+var _origSaveFluxo = saveFluxoToDB;
+function saveFluxoToDB(date) {
+  var day = getFluxoDay(date);
+  var row = {
+    store_id: CU.id, date: date,
+    fisico: day.fisico, online: day.online,
+    perdas: day.perdas,
+    fisico_vendas: day.vendas_fisico || 0,
+    online_vendas: day.vendas_online || 0
+  };
+  if (day.id) {
+    _sb.from('daily_flow').update(row).eq('id', day.id).then(function(){});
+  } else {
+    _sb.from('daily_flow').insert(row).select().single().then(function(res) {
+      if (res.data) {
+        if (!_fluxo[date]) _fluxo[date] = {fisico:0, online:0, vendas_fisico:0, vendas_online:0, perdas:[]};
+        _fluxo[date].id = res.data.id;
+      }
+    });
+  }
+}
+
+// Estender loadFluxoFromDB para incluir vendas
+function loadFluxoFromDB() {
+  if (!CU) return Promise.resolve();
+  return _sb.from('daily_flow').select('*').eq('store_id', CU.id).then(function(res) {
+    _fluxo = {};
+    (res.data || []).forEach(function(row) {
+      _fluxo[row.date] = {
+        fisico: row.fisico || 0,
+        online: row.online || 0,
+        vendas_fisico: row.fisico_vendas || 0,
+        vendas_online: row.online_vendas || 0,
+        perdas: row.perdas || [],
+        id: row.id
+      };
+    });
+  }).catch(function(e) { console.log('fluxo load err', e); });
+}
+
+// Modal cliente rapido para perdas
+function abrirModalClienteRapido() {
+  document.getElementById('cr-nome').value = '';
+  document.getElementById('cr-phone').value = '';
+  document.getElementById('modal-cliente-rapido').classList.add('open');
+  setTimeout(function(){ document.getElementById('cr-nome').focus(); }, 100);
+}
+
+function fecharModalClienteRapido() {
+  document.getElementById('modal-cliente-rapido').classList.remove('open');
+}
+
+function salvarClienteRapido() {
+  var nome = document.getElementById('cr-nome').value.trim();
+  if (!nome) { toast('Informe o nome da cliente', 'e'); return; }
+  var phone = document.getElementById('cr-phone').value.trim() || null;
+  var btn = document.querySelector('#modal-cliente-rapido .btn-p');
+  btn.textContent = 'Salvando...'; btn.disabled = true;
+  _sb.from('clients').insert({
+    store_id: CU.id, name: nome, phone: phone,
+    status: 'ainda_nao_comprou', loyalty: 'regular',
+    origin: null, payment_methods: [], channels: [], tags: []
+  }).select().single().then(function(res) {
+    btn.textContent = 'Salvar e Vincular'; btn.disabled = false;
+    if (res.error || !res.data) { toast('Erro ao salvar', 'e'); return; }
+    // Adicionar ao array local imediatamente
+    _clients.unshift(res.data);
+    // Atualizar select de perdas
+    var sel = document.getElementById('perda-cliente');
+    if (sel) {
+      var opt = document.createElement('option');
+      opt.value = res.data.id;
+      opt.textContent = nome + (phone ? ' - ' + phone : '');
+      opt.selected = true;
+      sel.insertBefore(opt, sel.options[1]);
+      sel.value = res.data.id;
+    }
+    fecharModalClienteRapido();
+    toast(nome + ' cadastrada e vinculada!');
   });
 }
 
