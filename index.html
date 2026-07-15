@@ -567,8 +567,13 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 
  <div id="page-reports" class="page">
  <div class="ph">
- <div><h1 class="pt">Relatórios</h1><p class="ps">Visão completa da operação</p></div>
+ <div><h1 class="pt">Inteligencia Comercial</h1><p class="ps">Analise seus dados e tome decisoes com clareza</p></div>
  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+ <div style="display:flex;gap:6px;background:var(--bg4);border-radius:var(--rs);padding:4px" id="rep-period-tabs">
+  <button class="btn btn-sm" id="tab-hoje" onclick="setRepPeriod('hoje')" style="padding:6px 14px;font-size:12px">Hoje</button>
+  <button class="btn btn-sm" id="tab-semana" onclick="setRepPeriod('semana')" style="padding:6px 14px;font-size:12px">Esta Semana</button>
+  <button class="btn btn-sm" id="tab-mes" onclick="setRepPeriod('mes')" style="padding:6px 14px;font-size:12px">Este Mes</button>
+ </div>
  <select class="fsel" id="rep-month" onchange="renderReports()">
  <option value="0">Todos os meses</option>
  <option value="1">Janeiro</option><option value="2">Fevereiro</option><option value="3">Março</option>
@@ -1340,65 +1345,276 @@ async function saveSP(){
 async function delSP(id){if(!confirm('Excluir?'))return;await _sb.from('salespeople').delete().eq('id',id);toast('Excluida.');await loadAll();renderSP();}
 
 // ── REPORTS ──
-function renderReports(){
-  const month=parseInt(document.getElementById('rep-month')?.value||0);
-  const year=parseInt(document.getElementById('rep-year')?.value||new Date().getFullYear());
-  let clients=gC(), filtClients=clients, log=gLog();
-  if(month>0){
-    filtClients=clients.filter(c=>{const d=new Date(c.created_at);return d.getMonth()+1===month&&d.getFullYear()===year;});
-    log=log.filter(l=>{const d=new Date(l.sent_at);return d.getMonth()+1===month&&d.getFullYear()===year;});
-  } else {
-    filtClients=clients.filter(c=>new Date(c.created_at).getFullYear()===year);
-    log=log.filter(l=>new Date(l.sent_at).getFullYear()===year);
-  }
-  const sps=gSP();
-  const total=filtClients.length;
-  const compraram=filtClients.filter(c=>c.purchases&&c.purchases.length>0).length;
-  const nao=filtClients.filter(c=>!c.purchases||!c.purchases.length).length;
-  const ativas=filtClients.filter(c=>c.status==='ativa').length;
-  const byOrigin={instagram:0,whatsapp:0,loja_fisica:0,anuncio:0,indicacao:0,site:0,outro:0};
-  filtClients.forEach(c=>{if(c.origin&&byOrigin[c.origin]!==undefined)byOrigin[c.origin]++;});
-  const maxO=Math.max(...Object.values(byOrigin),1);
-  const byType={aniversario:0,pos_venda:0,inativos:0,outro:0};
-  log.forEach(l=>{const t=l.message_type;if(byType[t]!==undefined)byType[t]++;});
-  const spStats=sps.map(s=>({name:s.name,count:log.filter(l=>l.salesperson===s.name).length})).sort((a,b)=>b.count-a.count);
-  const scoreA=clients.filter(c=>calcScore(c)>=70).length, scoreB=clients.filter(c=>calcScore(c)>=45&&calcScore(c)<70).length;
-  const scoreC=clients.filter(c=>calcScore(c)>=25&&calcScore(c)<45).length, scoreD=clients.filter(c=>calcScore(c)<25).length;
-
-  document.getElementById('rep-container').innerHTML=
-    '<div style="margin-bottom:20px"><h3 style="font-size:13px;font-weight:700;color:var(--text2);margin-bottom:12px">Clientes '+(month>0?'no periodo':'no ano')+'</h3>'+
-    '<div class="rg">'+
-      '<div class="ri"><div class="rv">'+total+'</div><div class="rl">Novos Cadastros</div></div>'+
-      '<div class="ri"><div class="rv" style="color:var(--green)">'+compraram+'</div><div class="rl">Compraram</div></div>'+
-      '<div class="ri"><div class="rv" style="color:var(--gold)">'+nao+'</div><div class="rl">Nao Compraram</div></div>'+
-      '<div class="ri"><div class="rv" style="color:var(--blue)">'+ativas+'</div><div class="rl">Ativas</div></div>'+
-      '<div class="ri"><div class="rv">'+getBD(clients).length+'</div><div class="rl">Aniversariantes Mes</div></div>'+
-      '<div class="ri"><div class="rv" style="color:var(--red)">'+getIA(clients).length+'</div><div class="rl">Inativas 60d+</div></div>'+
-      '<div class="ri"><div class="rv">'+log.length+'</div><div class="rl">Msgs Enviadas</div></div>'+
-      '<div class="ri"><div class="rv">'+getReminders(clients).length+'</div><div class="rl">Lembretes Vencidos</div></div>'+
-    '</div></div>'+
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">'+
-      '<div class="card"><div style="font-size:13px;font-weight:700;margin-bottom:12px;border-bottom:1px solid var(--border);padding-bottom:8px">Origem dos Clientes</div><div class="bc">'+
-        Object.entries(byOrigin).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).map(([k,v])=>'<div class="br"><div class="bl">'+(OL[k]||k)+'</div><div class="bt"><div class="bf" style="width:'+Math.round(v/maxO*100)+'%"></div></div><div class="bv">'+v+'</div></div>').join('')+
-      '</div></div>'+
-      '<div class="card"><div style="font-size:13px;font-weight:700;margin-bottom:12px;border-bottom:1px solid var(--border);padding-bottom:8px">Mensagens por Tipo</div><div class="bc">'+
-        Object.entries(byType).map(([k,v])=>'<div class="br"><div class="bl">'+(MTL[k]||k)+'</div><div class="bt"><div class="bf" style="width:'+(log.length?Math.round(v/log.length*100):0)+'%"></div></div><div class="bv">'+v+'</div></div>').join('')+
-      '</div></div>'+
-    '</div>'+
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">'+
-      '<div class="card"><div style="font-size:13px;font-weight:700;margin-bottom:12px;border-bottom:1px solid var(--border);padding-bottom:8px">Score de Engajamento</div><div class="bc">'+
-        '<div class="br"><div class="bl" style="color:var(--green)">A (70+)</div><div class="bt"><div class="bf" style="width:'+(clients.length?Math.round(scoreA/clients.length*100):0)+'%;background:var(--green)"></div></div><div class="bv">'+scoreA+'</div></div>'+
-        '<div class="br"><div class="bl" style="color:var(--blue)">B (45-69)</div><div class="bt"><div class="bf" style="width:'+(clients.length?Math.round(scoreB/clients.length*100):0)+'%;background:var(--blue)"></div></div><div class="bv">'+scoreB+'</div></div>'+
-        '<div class="br"><div class="bl" style="color:var(--gold)">C (25-44)</div><div class="bt"><div class="bf" style="width:'+(clients.length?Math.round(scoreC/clients.length*100):0)+'%;background:var(--gold)"></div></div><div class="bv">'+scoreC+'</div></div>'+
-        '<div class="br"><div class="bl" style="color:var(--red)">D (0-24)</div><div class="bt"><div class="bf" style="width:'+(clients.length?Math.round(scoreD/clients.length*100):0)+'%;background:var(--red)"></div></div><div class="bv">'+scoreD+'</div></div>'+
-      '</div></div>'+
-      (sps.length?'<div class="card"><div style="font-size:13px;font-weight:700;margin-bottom:12px;border-bottom:1px solid var(--border);padding-bottom:8px">Ranking Vendedoras</div>'+
-        spStats.map((s,i)=>'<div style="display:flex;align-items:center;gap:10px;margin-bottom:9px"><div style="font-weight:700;font-size:14px;color:var(--text3);width:18px">'+(i+1)+'</div><div class="av-sm" style="background:var(--green-l);color:var(--green)">'+ini(s.name)+'</div><div style="flex:1"><div style="font-size:13px;font-weight:500">'+s.name+'</div><div style="font-size:11px;color:var(--text3)">'+s.count+' msgs</div></div><div class="bt" style="max-width:70px"><div class="bf" style="width:'+(spStats[0].count?Math.round(s.count/spStats[0].count*100):0)+'%"></div></div></div>').join('')+
-      '</div>':'<div></div>')+
-    '</div>';
+function setRepPeriod(period) {
+  var now = new Date();
+  var month = now.getMonth() + 1;
+  var year = now.getFullYear();
+  // Atualizar tabs visuais
+  ['hoje','semana','mes'].forEach(function(p) {
+    var el = document.getElementById('tab-' + p);
+    if (!el) return;
+    if (p === period) {
+      el.classList.remove('btn-g'); el.classList.add('btn-p');
+    } else {
+      el.classList.remove('btn-p'); el.classList.add('btn-g');
+    }
+  });
+  document.getElementById('rep-month').value = period === 'mes' ? month : 0;
+  renderReports(period);
 }
 
-// ── EXPORT ──
+function renderReports(period) {
+  var month = parseInt(document.getElementById('rep-month')?.value || 0);
+  var year = parseInt(document.getElementById('rep-year')?.value || new Date().getFullYear());
+  var clients = gC();
+  var filtClients = clients;
+  var log = gLog().slice();
+  var now = new Date();
+
+  // Filtro por periodo
+  var dataInicio = null, dataFim = null;
+  if (period === 'hoje') {
+    var hoje = now.toISOString().split('T')[0];
+    dataInicio = dataFim = hoje;
+  } else if (period === 'semana') {
+    var dow = now.getDay();
+    var seg = new Date(now); seg.setDate(now.getDate() - dow + (dow === 0 ? -6 : 1));
+    dataInicio = seg.toISOString().split('T')[0];
+    dataFim = now.toISOString().split('T')[0];
+  } else if (month > 0) {
+    dataInicio = year + '-' + String(month).padStart(2,'0') + '-01';
+    var lastDay = new Date(year, month, 0).getDate();
+    dataFim = year + '-' + String(month).padStart(2,'0') + '-' + String(lastDay).padStart(2,'0');
+  }
+
+  if (dataInicio) {
+    filtClients = clients.filter(function(cl) {
+      var d = (cl.created_at||'').split('T')[0];
+      return d >= dataInicio && d <= dataFim;
+    });
+    log = log.filter(function(l) {
+      var d = (l.sent_at||'').split('T')[0];
+      return d >= dataInicio && d <= dataFim;
+    });
+  } else if (month > 0) {
+    filtClients = clients.filter(function(cl) {
+      var d = new Date(cl.created_at); return d.getMonth()+1===month && d.getFullYear()===year;
+    });
+    log = log.filter(function(l) {
+      var d = new Date(l.sent_at); return d.getMonth()+1===month && d.getFullYear()===year;
+    });
+  } else {
+    filtClients = clients.filter(function(cl) {
+      return new Date(cl.created_at).getFullYear() === year;
+    });
+    log = log.filter(function(l) {
+      return new Date(l.sent_at).getFullYear() === year;
+    });
+  }
+
+  var sps = gSP();
+
+  // ── FLUXO FILTRADO ──
+  var fluxoDias = Object.entries(_fluxo).filter(function(e) {
+    if (dataInicio) return e[0] >= dataInicio && e[0] <= dataFim;
+    if (month > 0) {
+      var d = new Date(e[0]); return d.getMonth()+1===month && d.getFullYear()===year;
+    }
+    return new Date(e[0]).getFullYear() === year;
+  }).map(function(e) { return Object.assign({date: e[0]}, e[1]); });
+
+  var totalFisico = 0, totalOnline = 0, totalVendasF = 0, totalVendasO = 0;
+  var todasPerdas = [];
+  fluxoDias.forEach(function(d) {
+    totalFisico += d.fisico || 0;
+    totalOnline += d.online || 0;
+    totalVendasF += d.vendas_fisico || 0;
+    totalVendasO += d.vendas_online || 0;
+    (d.perdas || []).forEach(function(p) { todasPerdas.push(p); });
+  });
+  var totalAtt = totalFisico + totalOnline;
+  var totalVendas = totalVendasF + totalVendasO;
+  var convFisico = totalFisico > 0 ? Math.round((totalVendasF/totalFisico)*100) : 0;
+  var convOnline = totalOnline > 0 ? Math.round((totalVendasO/totalOnline)*100) : 0;
+  var convGeral = totalAtt > 0 ? Math.round((totalVendas/totalAtt)*100) : 0;
+
+  // ── COMPARATIVO SEMANAL (só no modo mês) ──
+  var semanasHTML = '';
+  if (month > 0 || (!dataInicio && !dataFim)) {
+    var m = month > 0 ? month : now.getMonth()+1;
+    var y = year;
+    var semanas = [];
+    for (var s = 1; s <= 5; s++) {
+      var dias = fluxoDias.filter(function(d) {
+        var dt = new Date(d.date + 'T12:00:00');
+        if (dt.getMonth()+1 !== m) return false;
+        var dom = dt.getDate();
+        var inicio = (s-1)*7 + 1;
+        var fim = s*7;
+        return dom >= inicio && dom <= fim;
+      });
+      if (!dias.length) continue;
+      var sAtt = 0, sVendas = 0;
+      dias.forEach(function(d) { sAtt += (d.fisico||0)+(d.online||0); sVendas += (d.vendas_fisico||0)+(d.vendas_online||0); });
+      var sConv = sAtt > 0 ? Math.round((sVendas/sAtt)*100) : 0;
+      semanas.push({n:s, att:sAtt, vendas:sVendas, conv:sConv});
+    }
+    if (semanas.length) {
+      var melhorConv = semanas.reduce(function(mx,s){ return s.conv>mx.conv?s:mx; }, semanas[0]);
+      var menorConv = semanas.reduce(function(mn,s){ return s.conv<mn.conv?s:mn; }, semanas[0]);
+      var maiorMov = semanas.reduce(function(mx,s){ return s.att>mx.att?s:mx; }, semanas[0]);
+      semanasHTML =
+        '<div class="card" style="margin-bottom:18px">' +
+        '<div style="font-family:\'Syne\',sans-serif;font-weight:700;font-size:15px;margin-bottom:16px;display:flex;align-items:center;gap:8px">' +
+        '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>' +
+        'Comparativo Semanal</div>' +
+        '<div style="overflow-x:auto"><table class="ct" style="min-width:380px">' +
+        '<thead><tr><th>Semana</th><th>Atendimentos</th><th>Vendas</th><th>Conversao</th></tr></thead><tbody>' +
+        semanas.map(function(s) {
+          var destaque = s.n === melhorConv.n ? 'style="background:var(--green-l)"' : '';
+          return '<tr ' + destaque + '><td style="font-weight:600">Semana ' + s.n + (s.n === melhorConv.n ? ' <span class="badge bg-g" style="font-size:10px;margin-left:4px">Melhor</span>' : '') + (s.n === menorConv.n && semanas.length>1 ? ' <span class="badge bg-r" style="font-size:10px;margin-left:4px">Atencao</span>' : '') + '</td><td>' + s.att + '</td><td>' + s.vendas + '</td><td><strong>' + s.conv + '%</strong></td></tr>';
+        }).join('') +
+        '</tbody></table></div>' +
+        '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-top:14px">' +
+        '<div class="ri"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">Maior Movimento</div><div style="font-weight:700;color:var(--green)">Semana ' + maiorMov.n + '</div><div style="font-size:12px;color:var(--text2)">' + maiorMov.att + ' atendimentos</div></div>' +
+        '<div class="ri"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">Maior Conversao</div><div style="font-weight:700;color:var(--blue)">Semana ' + melhorConv.n + '</div><div style="font-size:12px;color:var(--text2)">' + melhorConv.conv + '%</div></div>' +
+        (semanas.length > 1 ? '<div class="ri"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">Menor Conversao</div><div style="font-weight:700;color:var(--red)">Semana ' + menorConv.n + '</div><div style="font-size:12px;color:var(--text2)">' + menorConv.conv + '%</div></div>' : '') +
+        '</div></div>';
+    }
+  }
+
+  // ── PRODUTOS MAIS PROCURADOS ──
+  var prodCounts = {};
+  todasPerdas.forEach(function(p) {
+    if (!p.produto) return;
+    var k = p.produto.toLowerCase().trim();
+    prodCounts[k] = (prodCounts[k]||0) + 1;
+  });
+  var prodSorted = Object.entries(prodCounts).sort(function(a,b){ return b[1]-a[1]; }).slice(0,10);
+  var prodMax = prodSorted.length ? prodSorted[0][1] : 1;
+  var prodHTML = prodSorted.length ?
+    '<div class="bc">' + prodSorted.map(function(e) {
+      return '<div class="br"><div class="bl" style="text-transform:capitalize">' + e[0] + '</div>' +
+        '<div class="bt"><div class="bf" style="width:' + Math.round(e[1]/prodMax*100) + '%"></div></div>' +
+        '<div class="bv">' + e[1] + '</div></div>';
+    }).join('') + '</div>' :
+    '<div class="empty"><div class="empty-d">Nenhuma perda registrada no periodo</div></div>';
+
+  // ── MOTIVOS DE PERDA ──
+  var motivoCounts = {};
+  todasPerdas.forEach(function(p) {
+    if (!p.motivo) return;
+    var k = p.motivo.toLowerCase().trim();
+    motivoCounts[k] = (motivoCounts[k]||0) + 1;
+  });
+  var motivoSorted = Object.entries(motivoCounts).sort(function(a,b){ return b[1]-a[1]; }).slice(0,8);
+  var motivoTotal = motivoSorted.reduce(function(s,e){ return s+e[1]; }, 0);
+  var motivoHTML = motivoSorted.length ?
+    '<div class="bc">' + motivoSorted.map(function(e) {
+      var pct = motivoTotal > 0 ? Math.round((e[1]/motivoTotal)*100) : 0;
+      return '<div class="br"><div class="bl" style="text-transform:capitalize">' + e[0] + '</div>' +
+        '<div class="bt"><div class="bf" style="width:' + pct + '%;background:var(--red)"></div></div>' +
+        '<div class="bv" style="min-width:44px;text-align:right;font-size:11px">' + e[1] + ' (' + pct + '%)</div></div>';
+    }).join('') + '</div>' :
+    '<div class="empty"><div class="empty-d">Nenhum motivo registrado no periodo</div></div>';
+
+  // ── CLIENTES ──
+  var compraram = filtClients.filter(function(cl){ return cl.purchases&&cl.purchases.length>0; }).length;
+  var nao = filtClients.filter(function(cl){ return !cl.purchases||!cl.purchases.length; }).length;
+  var byOrigin = {instagram:0,whatsapp:0,loja_fisica:0,anuncio:0,indicacao:0,captacao:0,site:0,outro:0};
+  filtClients.forEach(function(cl){ if(cl.origin&&byOrigin[cl.origin]!==undefined) byOrigin[cl.origin]++; });
+  var maxO = Math.max.apply(null, Object.values(byOrigin).concat([1]));
+  var byType = {aniversario:0,pos_venda:0,inativos:0,outro:0};
+  log.forEach(function(l){ var t=l.message_type; if(byType[t]!==undefined) byType[t]++; });
+  var spStats = sps.map(function(s){ return {name:s.name, count:log.filter(function(l){ return l.salesperson===s.name; }).length}; }).sort(function(a,b){ return b.count-a.count; });
+
+  // ── PERDAS OPORTUNIDADES ──
+  var captadosDePerdas = todasPerdas.filter(function(p){ return p.clienteId; }).length;
+
+  // ── RENDER ──
+  document.getElementById('rep-container').innerHTML =
+
+    // RESUMO COMERCIAL - FLUXO
+    '<div class="card" style="margin-bottom:18px;background:var(--dark-grad);color:#fff">' +
+    '<div style="font-family:\'Syne\',sans-serif;font-weight:700;font-size:16px;margin-bottom:18px;display:flex;align-items:center;gap:9px">' +
+    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>' +
+    'Resumo Comercial</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">' +
+    // Fisica
+    '<div style="background:rgba(255,255,255,.07);border-radius:var(--rs);padding:16px;border:1px solid rgba(255,255,255,.08)">' +
+    '<div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Loja Fisica</div>' +
+    '<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;color:rgba(255,255,255,.6)">Atendimentos</span><span style="font-weight:700">' + totalFisico + '</span></div>' +
+    '<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;color:rgba(255,255,255,.6)">Vendas</span><span style="font-weight:700;color:#6ee7a0">' + totalVendasF + '</span></div>' +
+    '<div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:rgba(255,255,255,.6)">Conversao</span><span style="font-weight:700;color:' + (convFisico>=30?'#6ee7a0':'#fbbf24') + '">' + convFisico + '%</span></div>' +
+    '</div>' +
+    // Online
+    '<div style="background:rgba(255,255,255,.07);border-radius:var(--rs);padding:16px;border:1px solid rgba(255,255,255,.08)">' +
+    '<div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Online</div>' +
+    '<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;color:rgba(255,255,255,.6)">Atendimentos</span><span style="font-weight:700">' + totalOnline + '</span></div>' +
+    '<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;color:rgba(255,255,255,.6)">Vendas</span><span style="font-weight:700;color:#93c5fd">' + totalVendasO + '</span></div>' +
+    '<div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:rgba(255,255,255,.6)">Conversao</span><span style="font-weight:700;color:' + (convOnline>=30?'#93c5fd':'#fbbf24') + '">' + convOnline + '%</span></div>' +
+    '</div>' +
+    // Geral
+    '<div style="background:rgba(160,120,48,.15);border-radius:var(--rs);padding:16px;border:1px solid rgba(196,152,64,.2)">' +
+    '<div style="font-size:10px;font-weight:700;color:var(--gold-b);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Total Geral</div>' +
+    '<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;color:rgba(255,255,255,.6)">Atendimentos</span><span style="font-weight:700">' + totalAtt + '</span></div>' +
+    '<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;color:rgba(255,255,255,.6)">Vendas</span><span style="font-weight:700;color:var(--gold-b)">' + totalVendas + '</span></div>' +
+    '<div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:rgba(255,255,255,.6)">Conversao</span><span style="font-family:\'Syne\',sans-serif;font-size:18px;font-weight:700;color:var(--gold-b)">' + convGeral + '%</span></div>' +
+    '</div>' +
+    '</div></div>' +
+
+    // COMPARATIVO SEMANAL
+    semanasHTML +
+
+    // CLIENTES
+    '<div style="margin-bottom:18px"><h3 style="font-size:13px;font-weight:700;color:var(--text2);margin-bottom:12px;display:flex;align-items:center;gap:6px">' +
+    '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> Clientes no Periodo</h3>' +
+    '<div class="rg">' +
+    '<div class="ri"><div class="rv">' + filtClients.length + '</div><div class="rl">Novos Cadastros</div></div>' +
+    '<div class="ri"><div class="rv" style="color:var(--green)">' + compraram + '</div><div class="rl">Compraram</div></div>' +
+    '<div class="ri"><div class="rv" style="color:var(--gold)">' + nao + '</div><div class="rl">Nao Compraram</div></div>' +
+    '<div class="ri"><div class="rv">' + log.length + '</div><div class="rl">Msgs Enviadas</div></div>' +
+    '<div class="ri"><div class="rv" style="color:var(--red)">' + todasPerdas.length + '</div><div class="rl">Perdas Registradas</div></div>' +
+    '<div class="ri"><div class="rv" style="color:var(--blue)">' + captadosDePerdas + '</div><div class="rl">Clientes via Perda</div></div>' +
+    '</div></div>' +
+
+    // PRODUTOS + MOTIVOS
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px">' +
+    '<div class="card">' +
+    '<div style="font-family:\'Syne\',sans-serif;font-weight:700;font-size:14px;margin-bottom:14px;display:flex;align-items:center;gap:7px">' +
+    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>' +
+    'Produtos Mais Procurados</div>' +
+    prodHTML +
+    '</div>' +
+    '<div class="card">' +
+    '<div style="font-family:\'Syne\',sans-serif;font-weight:700;font-size:14px;margin-bottom:14px;display:flex;align-items:center;gap:7px">' +
+    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' +
+    'Motivos de Perda</div>' +
+    motivoHTML +
+    '</div></div>' +
+
+    // ORIGEM + MENSAGENS
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px">' +
+    '<div class="card"><div style="font-size:13px;font-weight:700;margin-bottom:12px;border-bottom:1px solid var(--border);padding-bottom:8px">Origem dos Clientes</div><div class="bc">' +
+    Object.entries(byOrigin).filter(function(e){ return e[1]>0; }).sort(function(a,b){ return b[1]-a[1]; }).map(function(e){
+      var labels = {instagram:'Instagram',whatsapp:'WhatsApp',loja_fisica:'Loja Fisica',anuncio:'Anuncio',indicacao:'Indicacao',captacao:'Captacao',site:'Site',outro:'Outro'};
+      return '<div class="br"><div class="bl">' + (labels[e[0]]||e[0]) + '</div><div class="bt"><div class="bf" style="width:' + Math.round(e[1]/maxO*100) + '%"></div></div><div class="bv">' + e[1] + '</div></div>';
+    }).join('') + '</div></div>' +
+    '<div class="card"><div style="font-size:13px;font-weight:700;margin-bottom:12px;border-bottom:1px solid var(--border);padding-bottom:8px">Mensagens por Tipo</div><div class="bc">' +
+    Object.entries(byType).map(function(e){
+      var labels = {aniversario:'Aniversario',pos_venda:'Pos-venda',inativos:'Reativacao',outro:'Outro'};
+      return '<div class="br"><div class="bl">' + (labels[e[0]]||e[0]) + '</div><div class="bt"><div class="bf" style="width:' + (log.length?Math.round(e[1]/log.length*100):0) + '%"></div></div><div class="bv">' + e[1] + '</div></div>';
+    }).join('') + '</div></div>' +
+    '</div>' +
+
+    // VENDEDORAS
+    (sps.length ?
+    '<div class="card"><div style="font-size:13px;font-weight:700;margin-bottom:12px;border-bottom:1px solid var(--border);padding-bottom:8px">Ranking Vendedoras</div>' +
+    spStats.map(function(s,i){ return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:9px"><div style="font-weight:700;font-size:14px;color:var(--text3);width:18px">' + (i+1) + '</div><div class="av-sm" style="background:var(--green-l);color:var(--green)">' + ini(s.name) + '</div><div style="flex:1"><div style="font-size:13px;font-weight:500">' + s.name + '</div><div style="font-size:11px;color:var(--text3)">' + s.count + ' msgs</div></div><div class="bt" style="max-width:70px"><div class="bf" style="width:' + (spStats[0].count?Math.round(s.count/spStats[0].count*100):0) + '%"></div></div></div>'; }).join('') +
+    '</div>' : '');
+}
+
+
 function renderExport(){
   document.getElementById('exp-container').innerHTML=
     '<div class="card"><div style="font-size:26px;margin-bottom:10px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div style="font-weight:700;margin-bottom:3px">Clientes CSV</div><div style="font-size:12px;color:var(--text2);margin-bottom:14px">Abre no Excel e Google Sheets</div><button class="btn btn-p" onclick="expCSV()">Baixar CSV</button></div>'+
