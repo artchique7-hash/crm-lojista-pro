@@ -1958,37 +1958,51 @@ function gerarLinkCaptacao() {
   var titulo = document.getElementById('cap-titulo').value.trim();
   var desc = document.getElementById('cap-desc').value.trim();
   if (!titulo) { toast('Informe o titulo do formulario', 'e'); return; }
+  var btn = document.querySelector('#page-captacao .btn-p');
+  if (btn) { btn.textContent = 'Gerando...'; btn.disabled = true; }
 
-  // Gerar token baseado no store_id + titulo + desc
-  var raw = CU.id + '|' + titulo + '|' + desc;
-  var encoded = btoa(unescape(encodeURIComponent(raw)));
-  var token = encoded.replace(/=/g,'').replace(/[+]/g,'-').replace(/[/]/g,'_');
-  var base = window.location.href.split('?')[0];
-  _capLink = base + '?cap=' + token;
+  // Gerar ID curto de 6 caracteres
+  var chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  var formId = '';
+  for (var i = 0; i < 6; i++) formId += chars[Math.floor(Math.random() * chars.length)];
 
-  // Mostrar resultado
-  document.getElementById('cap-resultado').style.display = 'block';
-  document.getElementById('cap-link-display').textContent = _capLink;
-  document.getElementById('prev-titulo').textContent = titulo;
-  document.getElementById('prev-desc').textContent = desc;
+  // Salvar no Supabase
+  _sb.from('captacao_forms').insert({
+    id: formId,
+    store_id: CU.id,
+    titulo: titulo,
+    descricao: desc
+  }).then(function(res) {
+    if (btn) { btn.textContent = 'Gerar Link e QR Code'; btn.disabled = false; }
+    if (res.error) {
+      formId = formId + Math.floor(Math.random()*9);
+      _sb.from('captacao_forms').insert({id:formId, store_id:CU.id, titulo:titulo, descricao:desc}).then(function(){});
+    }
+    var base = window.location.href.split('?')[0];
+    _capLink = base + '?f=' + formId;
 
-  var waText = encodeURIComponent('Cadastre-se na nossa loja! ' + _capLink);
-  document.getElementById('cap-wa-btn').href = 'https://wa.me/?text=' + waText;
+    // Mostrar resultado
+    document.getElementById('cap-resultado').style.display = 'block';
+    document.getElementById('cap-link-display').textContent = _capLink;
+    document.getElementById('prev-titulo').textContent = titulo;
+    document.getElementById('prev-desc').textContent = desc;
 
-  // Gerar QR Code
-  var qrEl = document.getElementById('cap-qr');
-  if (qrEl) {
-    qrEl.innerHTML = '';
-    var url = 'https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=' + encodeURIComponent(_capLink);
-    var img = document.createElement('img');
-    img.src = url;
-    img.style.borderRadius = '8px';
-    img.style.boxShadow = '0 2px 8px rgba(0,0,0,.1)';
-    img.id = 'qr-img';
-    qrEl.appendChild(img);
-  }
+    var waText = encodeURIComponent('Cadastre-se na nossa loja! ' + _capLink);
+    document.getElementById('cap-wa-btn').href = 'https://wa.me/?text=' + waText;
 
-  toast('Link gerado com sucesso!');
+    var qrEl = document.getElementById('cap-qr');
+    if (qrEl) {
+      qrEl.innerHTML = '';
+      var url = 'https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=' + encodeURIComponent(_capLink);
+      var img = document.createElement('img');
+      img.src = url;
+      img.style.borderRadius = '8px';
+      img.style.boxShadow = '0 2px 8px rgba(0,0,0,.1)';
+      img.id = 'qr-img';
+      qrEl.appendChild(img);
+    }
+    toast('Link gerado com sucesso!');
+  });
 }
 
 function copiarLinkCaptacao() {
@@ -2021,31 +2035,51 @@ function baixarQRCode() {
 // ── FORMULARIO PUBLICO ──
 function verificarCaptacaoPublica() {
   var params = new URLSearchParams(window.location.search);
+  var formId = params.get('f');
   var cap = params.get('cap');
-  if (!cap) return false;
 
-  try {
-    var padded = cap.replace(/-/g,'+').replace(/_/g,'/');
-    while (padded.length % 4) padded += '=';
-    var decoded = decodeURIComponent(escape(atob(padded)));
-    var parts = decoded.split('|');
-    _capStoreId = parts[0];
-    var titulo = parts[1] || 'Cadastre-se em nossa loja';
-    var desc = parts[2] || 'Preencha seus dados para receber nossas novidades.';
+  if (!formId && !cap) return false;
 
-    // Esconder auth e app, mostrar form publico
+  function mostrarForm(titulo, desc, storeId) {
+    _capStoreId = storeId;
     document.getElementById('auth-screen').style.display = 'none';
     document.getElementById('app').style.display = 'none';
     document.getElementById('captacao-publica').style.display = 'block';
     document.getElementById('pub-titulo').textContent = titulo;
     document.getElementById('pub-desc').textContent = desc;
-
-    // Carregar tags da loja
     carregarTagsPublicas();
-    return true;
-  } catch(e) {
-    return false;
   }
+
+  if (formId) {
+    // Link curto - buscar no Supabase
+    _sb.from('captacao_forms').select('*').eq('id', formId).single().then(function(res) {
+      if (res.error || !res.data) {
+        document.getElementById('auth-screen').style.display = 'flex';
+        return;
+      }
+      mostrarForm(res.data.titulo, res.data.descricao || '', res.data.store_id);
+    });
+    // Mostrar loading enquanto busca
+    document.getElementById('auth-screen').style.display = 'none';
+    document.getElementById('captacao-publica').style.display = 'block';
+    document.getElementById('pub-titulo').textContent = 'Carregando...';
+    document.getElementById('pub-desc').textContent = '';
+    return true;
+  }
+
+  if (cap) {
+    // Link longo antigo - manter compatibilidade
+    try {
+      var padded = cap.replace(/-/g,'+').replace(/_/g,'/');
+      while (padded.length % 4) padded += '=';
+      var decoded = decodeURIComponent(escape(atob(padded)));
+      var parts = decoded.split('|');
+      mostrarForm(parts[1]||'Cadastre-se em nossa loja', parts[2]||'', parts[0]);
+      return true;
+    } catch(e) { return false; }
+  }
+
+  return false;
 }
 
 function carregarTagsPublicas() {
@@ -2293,16 +2327,16 @@ function salvarClienteRapido() {
   var nome = document.getElementById('cr-nome').value.trim();
   if (!nome) { toast('Informe o nome da cliente', 'e'); return; }
   var phone = document.getElementById('cr-phone').value.trim() || null;
-  var btn = document.querySelector('#modal-cliente-rapido .btn-p');
-  btn.textContent = 'Salvando...'; btn.disabled = true;
+  var btns = document.querySelectorAll('#modal-cliente-rapido .btn-p');
+  var btn = btns[btns.length - 1];
+  if (btn) { btn.textContent = 'Salvando...'; btn.disabled = true; }
   _sb.from('clients').insert({
     store_id: CU.id, name: nome, phone: phone,
     status: 'ainda_nao_comprou', loyalty: 'regular',
     origin: null, payment_methods: [], channels: [], tags: []
   }).select().single().then(function(res) {
-    btn.textContent = 'Salvar e Vincular'; btn.disabled = false;
-    if (res.error || !res.data) { toast('Erro ao salvar', 'e'); return; }
-    // Adicionar ao array local imediatamente
+    if (btn) { btn.textContent = 'Salvar e Vincular'; btn.disabled = false; }
+    if (res.error || !res.data) { toast('Erro: ' + (res.error ? res.error.message : 'sem resposta'), 'e'); return; }
     _clients.unshift(res.data);
     // Atualizar select de perdas
     var sel = document.getElementById('perda-cliente');
