@@ -321,6 +321,10 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 @keyframes slideIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
 
 @media(max-width:768px){
+  .dash-resumo-grid{grid-template-columns:1fr 1fr}
+  #dash-insights .dash-insight-card{padding:12px 14px}
+  #dash-insights > div{grid-template-columns:1fr}
+
   .sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}
   .sb-overlay.open{display:block}.topbar{display:flex}.bottom-nav{display:flex}
   .main{margin-left:0;padding-bottom:68px}.page{padding:16px;padding-top:72px}
@@ -397,6 +401,32 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 .funil-stage-label{font-size:10px;color:var(--text3);font-weight:500}
 .funil-stage-val{font-family:"Syne",sans-serif;font-size:14px;font-weight:700;margin-bottom:2px}
 .funil-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+
+/* DASHBOARD NOVO */
+.dash-prior-item{display:flex;align-items:center;gap:14px;padding:14px 18px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;transition:all .2s;margin-bottom:8px;box-shadow:var(--sh)}
+.dash-prior-item:hover{transform:translateX(4px);box-shadow:var(--sh-md);border-color:var(--border2)}
+.dash-prior-icon{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dash-prior-count{font-family:"Syne",sans-serif;font-size:22px;font-weight:700;min-width:36px;text-align:right;flex-shrink:0}
+.dash-prior-arrow{color:var(--text3);flex-shrink:0;transition:transform .2s}
+.dash-prior-item:hover .dash-prior-arrow{transform:translateX(3px);color:var(--green)}
+
+.dash-resumo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.dash-resumo-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:18px 16px;text-align:center;box-shadow:var(--sh);position:relative;overflow:hidden}
+.dash-resumo-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px}
+.dash-resumo-num{font-family:"Syne",sans-serif;font-size:28px;font-weight:700;letter-spacing:-.03em;margin-bottom:4px}
+.dash-resumo-label{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+
+.dash-insight-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;display:flex;align-items:flex-start;gap:13px;margin-bottom:8px;box-shadow:var(--sh);transition:box-shadow .2s}
+.dash-insight-card:hover{box-shadow:var(--sh-md)}
+.dash-insight-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dash-insight-title{font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.dash-insight-value{font-size:14px;font-weight:600;color:var(--text)}
+.dash-insight-sub{font-size:11px;color:var(--text3);margin-top:2px}
+
+.dash-prox-item{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rs);margin-bottom:7px;box-shadow:var(--sh)}
+.dash-prox-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.dash-prox-date{font-size:11px;color:var(--text3);font-weight:600;min-width:70px;flex-shrink:0}
+.dash-vazio{background:var(--bg4);border:1.5px dashed var(--border2);border-radius:var(--r);padding:20px;text-align:center;color:var(--text3);font-size:13px}
 
 </style>
 </head>
@@ -574,10 +604,59 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 
  <main class="main">
  <div id="page-dashboard" class="page active">
- <div class="ph"><div><h1 class="pt">Dashboard</h1><p class="ps">Visão geral da sua carteira</p></div></div>
- <div class="stats-grid" id="stats-grid"></div>
- <h2 style="font-size:14px;font-weight:700;margin-bottom:12px">Oportunidades de Venda</h2>
- <div class="opps-grid" id="opps-grid"></div>
+ <!-- HEADER -->
+ <div class="ph" style="margin-bottom:20px">
+  <div>
+   <h1 class="pt" id="dash-saudacao">Bom dia</h1>
+   <p class="ps" id="dash-data">Carregando...</p>
+  </div>
+  <button class="btn btn-p btn-sm" onclick="showPage('fluxo')">
+   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="16" y1="11" x2="22" y2="11"/></svg>
+   Registrar Fluxo
+  </button>
+ </div>
+
+ <!-- 1. PRIORIDADES DO DIA -->
+ <div style="margin-bottom:26px">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+   <div style="width:3px;height:18px;background:var(--gold-grad);border-radius:2px"></div>
+   <h2 style="font-size:13px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px">Prioridades do Dia</h2>
+  </div>
+  <div id="dash-prioridades"></div>
+ </div>
+
+ <!-- 2. RESUMO DO DIA -->
+ <div style="margin-bottom:26px">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+   <div style="width:3px;height:18px;background:var(--green);border-radius:2px"></div>
+   <h2 style="font-size:13px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px">Resumo do Dia</h2>
+  </div>
+  <div id="dash-resumo"></div>
+ </div>
+
+ <!-- 3. INSIGHTS -->
+ <div style="margin-bottom:26px">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+   <div style="display:flex;align-items:center;gap:8px">
+    <div style="width:3px;height:18px;background:var(--blue);border-radius:2px"></div>
+    <h2 style="font-size:13px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px">Insights</h2>
+   </div>
+   <a onclick="showPage('reports')" style="font-size:12px;color:var(--green);cursor:pointer;font-weight:600">Ver Relatorios →</a>
+  </div>
+  <div id="dash-insights"></div>
+ </div>
+
+ <!-- 4. PROXIMAS ACOES -->
+ <div style="margin-bottom:26px">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+   <div style="display:flex;align-items:center;gap:8px">
+    <div style="width:3px;height:18px;background:var(--purple);border-radius:2px"></div>
+    <h2 style="font-size:13px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px">Proximas Acoes</h2>
+   </div>
+   <a onclick="showPage('escritorio')" style="font-size:12px;color:var(--green);cursor:pointer;font-weight:600">Ver Escritorio →</a>
+  </div>
+  <div id="dash-proximas"></div>
+ </div>
  </div>
 
  <div id="page-clients" class="page">
@@ -1561,22 +1640,160 @@ function scoreLabel(s) { if(s>=70)return{cls:'score-a',label:'A'}; if(s>=45)retu
 
 // ── DASHBOARD ──
 function renderDash() {
-  const c=gC(), bd=getBD(c), ia=getIA(c), ps=getPS(c), rem=getReminders(c);
-  document.getElementById('stats-grid').innerHTML=`
-    <div class="sc g"><div class="si g"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="sv">${c.length}</div><div class="sl">Total Clientes</div></div>
-    <div class="sc go"><div class="si go"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div class="sv">${bd.length}</div><div class="sl">Aniversariantes</div></div>
-    <div class="sc r"><div class="si r"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="sv">${ia.length}</div><div class="sl">Inativas</div></div>
-    <div class="sc b"><div class="si b"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg></div><div class="sv">${ps.length}</div><div class="sl">Pos-venda</div></div>
-    <div class="sc pu"><div class="si pu"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg></div><div class="sv">${rem.length}</div><div class="sl">Lembretes</div></div>
-    <div class="sc dk"><div class="si dk"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><div class="sv">${c.filter(x=>x.purchases&&x.purchases.length>0).length}</div><div class="sl">Ja Compraram</div></div>
-  `;
-  document.getElementById('opps-grid').innerHTML=`
-    <div class="oc go" onclick="showPage('birthdays')"><div class="oi go"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div class="oc-title">Aniversariantes</div><div class="oc-count">${bd.length}</div><div class="oc-desc">Fazem aniversario este mes</div></div>
-    <div class="oc r" onclick="showPage('inactive')"><div class="oi r"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="oc-title">Reativar Clientes</div><div class="oc-count">${ia.length}</div><div class="oc-desc">Sumidas ha 60+ dias</div></div>
-    <div class="oc b" onclick="showPage('postsale')"><div class="oi b"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/></svg></div><div class="oc-title">Pos-venda</div><div class="oc-count">${ps.length}</div><div class="oc-desc">Compraram nos ultimos 7 dias</div></div>
-    <div class="oc pu" onclick="showPage('reminders')"><div class="oi pu"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg></div><div class="oc-title">Lembretes</div><div class="oc-count">${rem.length}</div><div class="oc-desc">Contatos agendados para hoje</div></div>
-    <div class="oc g" onclick="showPage('filter')"><div class="oi g"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg></div><div class="oc-title">Busca por Tag</div><div class="oc-count">${c.filter(x=>!x.purchases||!x.purchases.length).length}</div><div class="oc-desc">Filtrar por produto ou interesse</div></div>
-  `;
+  var clients = gC();
+  var bd = getBD(clients);
+  var ia = getIA(clients);
+  var ps = getPS(clients);
+  var rem = getReminders(clients);
+  var hoje = new Date().toISOString().split('T')[0];
+  var fluxoHoje = _fluxo[hoje] || {fisico:0, online:0, vendas_fisico:0, vendas_online:0, perdas:[]};
+
+  // Saudação dinâmica
+  var hora = new Date().getHours();
+  var saudacao = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
+  var nomeLoja = CU ? (CU.store || CU.name || '') : '';
+  var el_sau = document.getElementById('dash-saudacao');
+  var el_dat = document.getElementById('dash-data');
+  if (el_sau) el_sau.textContent = saudacao + (nomeLoja ? ', ' + nomeLoja : '') + ' 👋';
+  if (el_dat) {
+    var dn = new Date();
+    var dias = ['domingo','segunda-feira','terca-feira','quarta-feira','quinta-feira','sexta-feira','sabado'];
+    var meses = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+    el_dat.textContent = dias[dn.getDay()] + ', ' + dn.getDate() + ' de ' + meses[dn.getMonth()] + ' de ' + dn.getFullYear();
+  }
+
+  // ── 1. PRIORIDADES DO DIA ──
+  var prioEl = document.getElementById('dash-prioridades');
+  if (prioEl) {
+    var prioridades = [
+      { label:'Aniversariantes este mes', count:bd.length, sub:'Clientes que fazem aniversario agora', page:'birthdays', cor:'var(--gold)', bg:'var(--gold-l)', icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>' },
+      { label:'Lembretes vencidos', count:rem.length, sub:'Contatos agendados para hoje ou atrasados', page:'reminders', cor:'var(--purple)', bg:'var(--purple-l)', icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>' },
+      { label:'Pos-venda pendente', count:ps.length, sub:'Compraram nos ultimos 7 dias', page:'postsale', cor:'var(--blue)', bg:'var(--blue-l)', icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>' },
+      { label:'Clientes para reativar', count:ia.length, sub:'Somidas ha 60+ dias', page:'inactive', cor:'var(--red)', bg:'var(--red-l)', icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' },
+      { label:'Buscar por interesse', count:clients.length, sub:'Filtrar clientes por produto ou tag', page:'filter', cor:'var(--green)', bg:'var(--green-l)', icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>' },
+    ];
+    // Ordenar por urgência (maior count primeiro, exceto o último que é informativo)
+    var urgentes = prioridades.slice(0,4).sort(function(a,b){ return b.count - a.count; });
+    urgentes.push(prioridades[4]);
+    prioEl.innerHTML = urgentes.map(function(p) {
+      return '<div class="dash-prior-item" onclick="showPage(\'' + p.page + '\')">' +
+        '<div class="dash-prior-icon" style="background:' + p.bg + '">' + p.icon + '</div>' +
+        '<div style="flex:1;min-width:0">' +
+          '<div style="font-weight:600;font-size:14px">' + p.label + '</div>' +
+          '<div style="font-size:12px;color:var(--text3);margin-top:2px">' + p.sub + '</div>' +
+        '</div>' +
+        '<div class="dash-prior-count" style="color:' + p.cor + '">' + p.count + '</div>' +
+        '<div class="dash-prior-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>' +
+      '</div>';
+    }).join('');
+  }
+
+  // ── 2. RESUMO DO DIA ──
+  var resumoEl = document.getElementById('dash-resumo');
+  if (resumoEl) {
+    var attTotal = (fluxoHoje.fisico || 0) + (fluxoHoje.online || 0);
+    var vendasTotal = (fluxoHoje.vendas_fisico || 0) + (fluxoHoje.vendas_online || 0);
+    var convTotal = attTotal > 0 ? Math.round((vendasTotal/attTotal)*100) : 0;
+    var novosHoje = clients.filter(function(cl){ return (cl.created_at||'').startsWith(hoje); }).length;
+    var semRegistro = attTotal === 0;
+
+    if (semRegistro) {
+      resumoEl.innerHTML = '<div class="dash-vazio">' +
+        '<div style="font-size:28px;margin-bottom:8px">📋</div>' +
+        '<div style="font-weight:600;margin-bottom:4px">Nenhum atendimento registrado hoje</div>' +
+        '<div style="font-size:12px;margin-bottom:14px">Registre o fluxo do dia para ver seus indicadores aqui.</div>' +
+        '<button class="btn btn-p btn-sm" onclick="showPage(\'fluxo\')">Registrar Fluxo do Dia</button>' +
+      '</div>';
+    } else {
+      resumoEl.innerHTML = '<div class="dash-resumo-grid">' +
+        '<div class="dash-resumo-card" style="--c:var(--text)"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--dark-grad)"></div><div class="dash-resumo-num">' + attTotal + '</div><div class="dash-resumo-label">Atendimentos</div></div>' +
+        '<div class="dash-resumo-card"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--green)"></div><div class="dash-resumo-num" style="color:var(--green)">' + vendasTotal + '</div><div class="dash-resumo-label">Vendas</div></div>' +
+        '<div class="dash-resumo-card"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:' + (convTotal>=30?'var(--green)':convTotal>=15?'var(--gold)':'var(--red)') + '"></div><div class="dash-resumo-num" style="color:' + (convTotal>=30?'var(--green)':convTotal>=15?'var(--gold)':'var(--red)') + '">' + convTotal + '%</div><div class="dash-resumo-label">Conversao</div></div>' +
+        '<div class="dash-resumo-card"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--blue)"></div><div class="dash-resumo-num" style="color:var(--blue)">' + novosHoje + '</div><div class="dash-resumo-label">Novos Clientes</div></div>' +
+      '</div>' +
+      (convTotal < 15 && attTotal >= 5 ? '<div style="margin-top:10px;background:var(--red-l);border:1px solid rgba(184,50,50,.15);border-radius:var(--rs);padding:12px 16px;font-size:13px;color:var(--red);display:flex;align-items:center;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Conversao abaixo do esperado. Que tal registrar as perdas do dia?</div>' : '') +
+      (convTotal >= 30 ? '<div style="margin-top:10px;background:var(--green-l);border:1px solid rgba(31,92,58,.15);border-radius:var(--rs);padding:12px 16px;font-size:13px;color:var(--green);display:flex;align-items:center;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Otimo desempenho! Conversao acima de 30% hoje.</div>' : '');
+    }
+  }
+
+  // ── 3. INSIGHTS ──
+  var insightsEl = document.getElementById('dash-insights');
+  if (insightsEl) {
+    var todasPerdas = [];
+    Object.values(_fluxo).forEach(function(d){ (d.perdas||[]).forEach(function(p){ todasPerdas.push(p); }); });
+
+    var prodCounts = {};
+    todasPerdas.forEach(function(p){ if(p.produto){ var k=p.produto.toLowerCase().trim(); prodCounts[k]=(prodCounts[k]||0)+1; } });
+    var topProd = Object.entries(prodCounts).sort(function(a,b){ return b[1]-a[1]; })[0];
+
+    var motivoCounts = {};
+    todasPerdas.forEach(function(p){ if(p.motivo){ var k=p.motivo.toLowerCase().trim(); motivoCounts[k]=(motivoCounts[k]||0)+1; } });
+    var topMotivo = Object.entries(motivoCounts).sort(function(a,b){ return b[1]-a[1]; })[0];
+
+    var allTags = {};
+    clients.forEach(function(cl){ (cl.tags||[]).forEach(function(t){ if(t) allTags[t]=(allTags[t]||0)+1; }); });
+    var topTag = Object.entries(allTags).sort(function(a,b){ return b[1]-a[1]; })[0];
+
+    var semCompra = clients.filter(function(cl){ return !cl.purchases||!cl.purchases.length; }).length;
+    var pctSemCompra = clients.length > 0 ? Math.round((semCompra/clients.length)*100) : 0;
+
+    var insights = [];
+    if (topProd) insights.push({ icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>', bg:'var(--green-l)', title:'Produto mais procurado', value:topProd[0], sub:topProd[1]+' ocorrencia'+(topProd[1]!==1?'s':'') });
+    if (topMotivo) insights.push({ icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>', bg:'var(--red-l)', title:'Principal motivo de perda', value:topMotivo[0], sub:topMotivo[1]+' registro'+(topMotivo[1]!==1?'s':'') });
+    if (topTag) insights.push({ icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>', bg:'var(--gold-l)', title:'Categoria mais buscada', value:topTag[0], sub:topTag[1]+' cliente'+(topTag[1]!==1?'s':'') });
+    if (pctSemCompra > 0) insights.push({ icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>', bg:'var(--blue-l)', title:'Oportunidade de venda', value:semCompra+' clientes ainda nao compraram', sub:pctSemCompra+'% da base - potencial de ativacao' });
+
+    if (!insights.length) {
+      insightsEl.innerHTML = '<div class="dash-vazio"><div style="font-size:24px;margin-bottom:6px">📊</div><div style="font-weight:600;margin-bottom:3px">Sem dados suficientes ainda</div><div style="font-size:12px">Registre perdas e cadastre mais clientes para ver insights aqui.</div></div>';
+    } else {
+      insightsEl.innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' +
+        insights.map(function(ins) {
+          return '<div class="dash-insight-card">' +
+            '<div class="dash-insight-icon" style="background:' + ins.bg + '">' + ins.icon + '</div>' +
+            '<div style="min-width:0"><div class="dash-insight-title">' + ins.title + '</div>' +
+            '<div class="dash-insight-value">' + ins.value + '</div>' +
+            '<div class="dash-insight-sub">' + ins.sub + '</div></div>' +
+          '</div>';
+        }).join('') + '</div>';
+    }
+  }
+
+  // ── 4. PROXIMAS ACOES ──
+  var proxEl = document.getElementById('dash-proximas');
+  if (proxEl) {
+    var eventos = JSON.parse(localStorage.getItem('slp_eventos') || '[]');
+    var hoje2 = new Date().toISOString().split('T')[0];
+    var proximos = eventos.filter(function(e){ return e.data >= hoje2; })
+      .sort(function(a,b){ return a.data.localeCompare(b.data); }).slice(0,5);
+
+    var TIPO_COR_P = {stories:'#e07020', reels:'#7d3c98', live:'#b83232', campanha:'#1f5c3a', data:'#a07830', outro:'#8a9e90'};
+    var TIPO_LABEL = {stories:'Stories', reels:'Reels', live:'Live', campanha:'Campanha', data:'Data Especial', outro:'Evento'};
+
+    if (!proximos.length) {
+      proxEl.innerHTML = '<div class="dash-vazio">' +
+        '<div style="font-size:24px;margin-bottom:6px">📅</div>' +
+        '<div style="font-weight:600;margin-bottom:3px">Nenhuma acao planejada</div>' +
+        '<div style="font-size:12px;margin-bottom:12px">Use o Escritorio da Loja para planejar suas campanhas, conteudos e datas.</div>' +
+        '<button class="btn btn-g btn-sm" onclick="showPage(\'escritorio\')">Abrir Escritorio</button>' +
+      '</div>';
+    } else {
+      var MESES_P = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+      proxEl.innerHTML = proximos.map(function(ev) {
+        var d = new Date(ev.data + 'T12:00:00');
+        var dataFmt = d.getDate() + ' ' + MESES_P[d.getMonth()];
+        var cor = TIPO_COR_P[ev.tipo] || TIPO_COR_P.outro;
+        return '<div class="dash-prox-item">' +
+          '<div class="dash-prox-dot" style="background:' + cor + '"></div>' +
+          '<div class="dash-prox-date">' + dataFmt + '</div>' +
+          '<div style="flex:1;min-width:0">' +
+            '<div style="font-size:13px;font-weight:600">' + ev.titulo + '</div>' +
+            '<div style="font-size:11px;color:var(--text3)">' + (TIPO_LABEL[ev.tipo]||'Evento') + '</div>' +
+          '</div>' +
+          '<span class="badge" style="background:' + cor + '18;color:' + cor + ';font-size:10px">' + (TIPO_LABEL[ev.tipo]||'Evento') + '</span>' +
+        '</div>';
+      }).join('');
+    }
+  }
 }
 
 // ── CLIENTS ──
