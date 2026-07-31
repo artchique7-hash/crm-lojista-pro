@@ -332,6 +332,72 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   .ct th:nth-child(4),.ct td:nth-child(4),.ct th:nth-child(5),.ct td:nth-child(5){display:none}
 }
 @media(max-width:480px){.opps-grid{grid-template-columns:1fr}}
+
+/* ESCRITORIO DA LOJA */
+.escrit-tabs{display:flex;gap:0;background:var(--bg4);border-radius:var(--r);padding:4px;margin-bottom:24px;overflow-x:auto}
+.escrit-tab{flex:1;padding:10px 16px;border-radius:var(--rs);cursor:pointer;font-size:13px;font-weight:600;color:var(--text3);transition:all .2s;text-align:center;white-space:nowrap;border:none;background:none;font-family:"DM Sans",sans-serif}
+.escrit-tab.active{background:var(--bg2);color:var(--text);box-shadow:var(--sh)}
+.escrit-section{display:none}.escrit-section.active{display:block;animation:fadeUp .22s ease}
+
+/* OBJETIVOS */
+.meta-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:20px;display:flex;align-items:flex-start;gap:16px;transition:box-shadow .2s;box-shadow:var(--sh)}
+.meta-card:hover{box-shadow:var(--sh-md)}
+.meta-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.meta-prog{height:6px;background:var(--border);border-radius:20px;overflow:hidden;margin-top:10px}
+.meta-prog-bar{height:100%;border-radius:20px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.meta-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+
+/* CALENDARIO */
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.cal-nav{display:flex;align-items:center;gap:8px}
+.cal-nav-btn{width:32px;height:32px;border-radius:8px;background:var(--bg4);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);transition:all .15s;font-family:"DM Sans",sans-serif}
+.cal-nav-btn:hover{background:var(--bg2);border-color:var(--green);color:var(--green)}
+.cal-month-label{font-family:"Syne",sans-serif;font-weight:700;font-size:16px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-day-label{text-align:center;font-size:10px;font-weight:700;color:var(--text3);padding:8px 4px;text-transform:uppercase;letter-spacing:.5px}
+.cal-day{min-height:80px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rs);padding:8px;cursor:pointer;transition:all .18s;position:relative}
+.cal-day:hover{border-color:var(--green);background:var(--green-l)}
+.cal-day.today{border-color:var(--green);background:var(--green-l)}
+.cal-day.today .cal-dn{background:var(--green);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center}
+.cal-day.other-month{opacity:.35}
+.cal-day.has-event{border-color:var(--gold)}
+.cal-dn{font-size:12px;font-weight:700;margin-bottom:4px;width:24px;height:24px;display:flex;align-items:center;justify-content:center}
+.cal-event{font-size:10px;padding:2px 5px;border-radius:4px;margin-bottom:2px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4}
+.cal-event.stories{background:#fde8d8;color:#b45a1a}
+.cal-event.reels{background:#f3e8ff;color:#7d3c98}
+.cal-event.campanha{background:#e8f5ee;color:#1f5c3a}
+.cal-event.live{background:#fdecea;color:#b83232}
+.cal-event.data{background:#fdf6e8;color:#a07830}
+.cal-event.outro{background:var(--bg4);color:var(--text2)}
+.cal-legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.cal-leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)}
+.cal-leg-dot{width:8px;height:8px;border-radius:50%}
+
+/* ROTINA */
+.rotina-col{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.rotina-col-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.rotina-col-title{font-family:"Syne",sans-serif;font-weight:700;font-size:14px}
+.rotina-task{display:flex;align-items:flex-start;gap:10px;padding:12px 18px;border-bottom:1px solid var(--border);transition:background .15s}
+.rotina-task:hover{background:var(--bg4)}
+.rotina-task:last-child{border-bottom:none}
+.rotina-check{width:18px;height:18px;border-radius:5px;border:2px solid var(--border2);cursor:pointer;flex-shrink:0;margin-top:2px;transition:all .18s;display:flex;align-items:center;justify-content:center}
+.rotina-check.done{background:var(--green);border-color:var(--green)}
+.rotina-check.done::after{content:'';width:5px;height:9px;border:2px solid #fff;border-top:none;border-left:none;transform:rotate(40deg);margin-top:-2px}
+.rotina-task-text{font-size:13px;color:var(--text);line-height:1.4}
+.rotina-task-text.done{text-decoration:line-through;color:var(--text3)}
+.rotina-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;margin-left:auto;flex-shrink:0}
+
+/* FUNIS */
+.funil-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);transition:box-shadow .2s}
+.funil-card:hover{box-shadow:var(--sh-md)}
+.funil-header{padding:18px 20px;border-bottom:1px solid var(--border)}
+.funil-stages{display:flex;padding:16px 20px;gap:6px;overflow-x:auto}
+.funil-stage{flex:1;min-width:80px;text-align:center}
+.funil-stage-bar{height:8px;border-radius:20px;margin-bottom:6px;position:relative}
+.funil-stage-label{font-size:10px;color:var(--text3);font-weight:500}
+.funil-stage-val{font-family:"Syne",sans-serif;font-size:14px;font-weight:700;margin-bottom:2px}
+.funil-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+
 </style>
 </head>
 <body>
@@ -438,6 +504,10 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
  <div class="nav-i" data-page="captacao" onclick="showPage('captacao')">
  <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
  Captacao de Clientes
+ </div>
+ <div class="nav-i" data-page="escritorio" onclick="showPage('escritorio')">
+ <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+ Escritorio da Loja
  </div>
  <div class="sb-sec">Oportunidades</div>
  <div class="nav-i" data-page="birthdays" onclick="showPage('birthdays')">
@@ -750,6 +820,328 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   </div>
 </div>
 
+
+ <!-- ESCRITORIO DA LOJA -->
+ <div id="page-escritorio" class="page">
+  <div class="ph">
+   <div>
+    <h1 class="pt">Escritorio da Loja</h1>
+    <p class="ps">Planejamento, metas e organizacao da sua operacao</p>
+   </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="escrit-tabs">
+   <button class="escrit-tab active" onclick="switchEscrit('objetivos',this)">Objetivos</button>
+   <button class="escrit-tab" onclick="switchEscrit('calendario',this)">Calendario</button>
+   <button class="escrit-tab" onclick="switchEscrit('rotina',this)">Rotina Comercial</button>
+   <button class="escrit-tab" onclick="switchEscrit('funis',this)">Funis</button>
+  </div>
+
+  <!-- OBJETIVOS -->
+  <div id="escrit-objetivos" class="escrit-section active">
+   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+    <div>
+     <h2 style="font-size:16px;font-weight:700;font-family:'Syne',sans-serif">Metas da Loja</h2>
+     <p style="font-size:12px;color:var(--text3);margin-top:2px">Defina e acompanhe seus objetivos</p>
+    </div>
+    <button class="btn btn-p btn-sm" onclick="abrirModalMeta()">+ Nova Meta</button>
+   </div>
+
+   <!-- Cards de meta -->
+   <div class="meta-grid" id="metas-grid">
+    <!-- Exemplos visuais -->
+    <div class="meta-card">
+     <div class="meta-icon" style="background:var(--green-l)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+     </div>
+     <div style="flex:1;min-width:0">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+       <div style="font-weight:700;font-size:14px">Meta de Clientes</div>
+       <span class="badge bg-g">Ativo</span>
+      </div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:8px">Captar 50 novos clientes este mes</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+       <span style="font-size:12px;color:var(--text3)">Progresso</span>
+       <span style="font-size:13px;font-weight:700;color:var(--green)">0 / 50</span>
+      </div>
+      <div class="meta-prog"><div class="meta-prog-bar" style="width:0%;background:var(--green)"></div></div>
+     </div>
+    </div>
+
+    <div class="meta-card">
+     <div class="meta-icon" style="background:var(--blue-l)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+     </div>
+     <div style="flex:1;min-width:0">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+       <div style="font-weight:700;font-size:14px">Meta de Conversao</div>
+       <span class="badge bg-b">Ativo</span>
+      </div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:8px">Atingir 30% de conversao na loja fisica</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+       <span style="font-size:12px;color:var(--text3)">Atual</span>
+       <span style="font-size:13px;font-weight:700;color:var(--blue)">0%</span>
+      </div>
+      <div class="meta-prog"><div class="meta-prog-bar" style="width:0%;background:var(--blue)"></div></div>
+     </div>
+    </div>
+
+    <div class="meta-card">
+     <div class="meta-icon" style="background:var(--gold-l)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+     </div>
+     <div style="flex:1;min-width:0">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+       <div style="font-weight:700;font-size:14px">Meta de Campanhas</div>
+       <span class="badge bg-go">Planejando</span>
+      </div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:8px">Realizar 2 campanhas comerciais este mes</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+       <span style="font-size:12px;color:var(--text3)">Realizadas</span>
+       <span style="font-size:13px;font-weight:700;color:var(--gold)">0 / 2</span>
+      </div>
+      <div class="meta-prog"><div class="meta-prog-bar" style="width:0%;background:var(--gold)"></div></div>
+     </div>
+    </div>
+
+    <!-- Card adicionar nova -->
+    <div class="meta-card" style="border-style:dashed;cursor:pointer;justify-content:center;align-items:center;flex-direction:column;gap:8px;min-height:120px;background:var(--bg3)" onclick="abrirModalMeta()">
+     <div style="width:36px;height:36px;border-radius:50%;background:var(--bg4);border:1.5px dashed var(--border2);display:flex;align-items:center;justify-content:center;color:var(--text3)">+</div>
+     <div style="font-size:13px;color:var(--text3);font-weight:500">Adicionar nova meta</div>
+    </div>
+   </div>
+
+   <!-- Info -->
+   <div style="margin-top:20px;background:var(--gold-l);border:1px solid rgba(160,120,48,.15);border-radius:var(--r);padding:16px;display:flex;align-items:flex-start;gap:12px">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <div style="font-size:12px;color:var(--gold);line-height:1.6"><strong>Em breve:</strong> As metas se conectarao automaticamente aos dados do sistema — conversao, clientes captados, campanhas e mais.</div>
+   </div>
+  </div>
+
+  <!-- CALENDARIO -->
+  <div id="escrit-calendario" class="escrit-section">
+   <div class="card" style="padding:24px">
+    <div class="cal-header">
+     <div class="cal-nav">
+      <button class="cal-nav-btn" onclick="calNav(-1)">&#8249;</button>
+      <span class="cal-month-label" id="cal-month-label">Maio 2026</span>
+      <button class="cal-nav-btn" onclick="calNav(1)">&#8250;</button>
+     </div>
+     <div style="display:flex;gap:8px;align-items:center">
+      <button class="btn btn-g btn-sm" onclick="calHoje()">Hoje</button>
+      <button class="btn btn-p btn-sm" onclick="abrirModalEvento()">+ Evento</button>
+     </div>
+    </div>
+    <div class="cal-grid" id="cal-grid">
+     <div class="cal-day-label">Seg</div>
+     <div class="cal-day-label">Ter</div>
+     <div class="cal-day-label">Qua</div>
+     <div class="cal-day-label">Qui</div>
+     <div class="cal-day-label">Sex</div>
+     <div class="cal-day-label">Sab</div>
+     <div class="cal-day-label">Dom</div>
+    </div>
+    <div class="cal-legend">
+     <div class="cal-leg-item"><div class="cal-leg-dot" style="background:#e07020"></div> Stories</div>
+     <div class="cal-leg-item"><div class="cal-leg-dot" style="background:#7d3c98"></div> Reels/Lives</div>
+     <div class="cal-leg-item"><div class="cal-leg-dot" style="background:#1f5c3a"></div> Campanha</div>
+     <div class="cal-leg-item"><div class="cal-leg-dot" style="background:#a07830"></div> Data Especial</div>
+     <div class="cal-leg-item"><div class="cal-leg-dot" style="background:#8a9e90"></div> Outro</div>
+    </div>
+   </div>
+  </div>
+
+  <!-- ROTINA COMERCIAL -->
+  <div id="escrit-rotina" class="escrit-section">
+   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+    <div>
+     <h2 style="font-size:16px;font-weight:700;font-family:'Syne',sans-serif">Rotina Comercial</h2>
+     <p style="font-size:12px;color:var(--text3);margin-top:2px">Organize sua execucao diaria</p>
+    </div>
+    <button class="btn btn-p btn-sm" onclick="abrirModalTarefa()">+ Tarefa</button>
+   </div>
+
+   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px" id="rotina-cols">
+    <!-- Coluna Diario -->
+    <div class="rotina-col">
+     <div class="rotina-col-header">
+      <div style="display:flex;align-items:center;gap:8px">
+       <div style="width:8px;height:8px;border-radius:50%;background:var(--green)"></div>
+       <span class="rotina-col-title">Diario</span>
+      </div>
+      <span class="badge bg-g" id="count-diario">0</span>
+     </div>
+     <div id="tarefas-diario">
+      <div class="rotina-task">
+       <div class="rotina-check" onclick="toggleTask(this)"></div>
+       <div style="flex:1"><div class="rotina-task-text">Registrar atendimentos no Fluxo do Dia</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Toda manha</div></div>
+      </div>
+      <div class="rotina-task">
+       <div class="rotina-check" onclick="toggleTask(this)"></div>
+       <div style="flex:1"><div class="rotina-task-text">Verificar lembretes e pos-venda</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Toda manha</div></div>
+      </div>
+      <div class="rotina-task">
+       <div class="rotina-check" onclick="toggleTask(this)"></div>
+       <div style="flex:1"><div class="rotina-task-text">Registrar perdas do dia</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Ao fechar a loja</div></div>
+      </div>
+     </div>
+    </div>
+    <!-- Coluna Semanal -->
+    <div class="rotina-col">
+     <div class="rotina-col-header">
+      <div style="display:flex;align-items:center;gap:8px">
+       <div style="width:8px;height:8px;border-radius:50%;background:var(--blue)"></div>
+       <span class="rotina-col-title">Semanal</span>
+      </div>
+      <span class="badge bg-b" id="count-semanal">0</span>
+     </div>
+     <div id="tarefas-semanal">
+      <div class="rotina-task">
+       <div class="rotina-check" onclick="toggleTask(this)"></div>
+       <div style="flex:1"><div class="rotina-task-text">Analisar taxa de conversao da semana</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Segunda-feira</div></div>
+      </div>
+      <div class="rotina-task">
+       <div class="rotina-check" onclick="toggleTask(this)"></div>
+       <div style="flex:1"><div class="rotina-task-text">Enviar mensagens para clientes inativos</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Quarta-feira</div></div>
+      </div>
+      <div class="rotina-task">
+       <div class="rotina-check" onclick="toggleTask(this)"></div>
+       <div style="flex:1"><div class="rotina-task-text">Revisar oportunidades em aberto</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Sexta-feira</div></div>
+      </div>
+     </div>
+    </div>
+    <!-- Coluna Mensal -->
+    <div class="rotina-col">
+     <div class="rotina-col-header">
+      <div style="display:flex;align-items:center;gap:8px">
+       <div style="width:8px;height:8px;border-radius:50%;background:var(--gold)"></div>
+       <span class="rotina-col-title">Mensal</span>
+      </div>
+      <span class="badge bg-go" id="count-mensal">0</span>
+     </div>
+     <div id="tarefas-mensal">
+      <div class="rotina-task">
+       <div class="rotina-check" onclick="toggleTask(this)"></div>
+       <div style="flex:1"><div class="rotina-task-text">Revisar metas do mes</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Primeiro dia util</div></div>
+      </div>
+      <div class="rotina-task">
+       <div class="rotina-check" onclick="toggleTask(this)"></div>
+       <div style="flex:1"><div class="rotina-task-text">Analisar relatorio mensal completo</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Ultimo dia util</div></div>
+      </div>
+      <div class="rotina-task">
+       <div class="rotina-check" onclick="toggleTask(this)"></div>
+       <div style="flex:1"><div class="rotina-task-text">Planejar campanhas do proximo mes</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Ultima semana</div></div>
+      </div>
+     </div>
+    </div>
+   </div>
+
+   <div style="margin-top:16px;background:var(--blue-l);border:1px solid rgba(26,92,138,.12);border-radius:var(--r);padding:14px;display:flex;align-items:flex-start;gap:10px">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <div style="font-size:12px;color:var(--blue);line-height:1.6"><strong>Em breve:</strong> Adicione suas proprias tarefas, defina frequencias e acompanhe a execucao da sua equipe.</div>
+   </div>
+  </div>
+
+  <!-- FUNIS -->
+  <div id="escrit-funis" class="escrit-section">
+   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+    <div>
+     <h2 style="font-size:16px;font-weight:700;font-family:'Syne',sans-serif">Funis Comerciais</h2>
+     <p style="font-size:12px;color:var(--text3);margin-top:2px">Organize suas estrategias e acompanhe resultados</p>
+    </div>
+    <button class="btn btn-p btn-sm" onclick="abrirModalFunil()">+ Novo Funil</button>
+   </div>
+
+   <div class="funil-grid">
+    <!-- Funil exemplo 1 -->
+    <div class="funil-card">
+     <div class="funil-header">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+       <div style="font-weight:700;font-size:14px;font-family:'Syne',sans-serif">Campanha de Lancamento</div>
+       <span class="badge bg-go">Planejando</span>
+      </div>
+      <div style="font-size:12px;color:var(--text2)">Funil de campanha comercial</div>
+     </div>
+     <div class="funil-stages">
+      <div class="funil-stage">
+       <div class="funil-stage-val">0</div>
+       <div class="funil-stage-bar" style="background:rgba(31,92,58,.15)"><div style="height:100%;width:0%;background:var(--green);border-radius:20px"></div></div>
+       <div class="funil-stage-label">Alcance</div>
+      </div>
+      <div style="display:flex;align-items:center;padding-bottom:20px;color:var(--border2)">›</div>
+      <div class="funil-stage">
+       <div class="funil-stage-val">0</div>
+       <div class="funil-stage-bar" style="background:rgba(26,92,138,.12)"><div style="height:100%;width:0%;background:var(--blue);border-radius:20px"></div></div>
+       <div class="funil-stage-label">Interesse</div>
+      </div>
+      <div style="display:flex;align-items:center;padding-bottom:20px;color:var(--border2)">›</div>
+      <div class="funil-stage">
+       <div class="funil-stage-val">0</div>
+       <div class="funil-stage-bar" style="background:rgba(160,120,48,.12)"><div style="height:100%;width:0%;background:var(--gold);border-radius:20px"></div></div>
+       <div class="funil-stage-label">Contato</div>
+      </div>
+      <div style="display:flex;align-items:center;padding-bottom:20px;color:var(--border2)">›</div>
+      <div class="funil-stage">
+       <div class="funil-stage-val">0</div>
+       <div class="funil-stage-bar" style="background:rgba(184,50,50,.1)"><div style="height:100%;width:0%;background:var(--red);border-radius:20px"></div></div>
+       <div class="funil-stage-label">Venda</div>
+      </div>
+     </div>
+    </div>
+
+    <!-- Funil exemplo 2 -->
+    <div class="funil-card">
+     <div class="funil-header">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+       <div style="font-weight:700;font-size:14px;font-family:'Syne',sans-serif">Reativacao de Clientes</div>
+       <span class="badge bg-g">Ativo</span>
+      </div>
+      <div style="font-size:12px;color:var(--text2)">Funil de reativacao via WhatsApp</div>
+     </div>
+     <div class="funil-stages">
+      <div class="funil-stage">
+       <div class="funil-stage-val">0</div>
+       <div class="funil-stage-bar" style="background:var(--green-l)"><div style="height:100%;width:0%;background:var(--green);border-radius:20px"></div></div>
+       <div class="funil-stage-label">Listadas</div>
+      </div>
+      <div style="display:flex;align-items:center;padding-bottom:20px;color:var(--border2)">›</div>
+      <div class="funil-stage">
+       <div class="funil-stage-val">0</div>
+       <div class="funil-stage-bar" style="background:var(--blue-l)"><div style="height:100%;width:0%;background:var(--blue);border-radius:20px"></div></div>
+       <div class="funil-stage-label">Contactadas</div>
+      </div>
+      <div style="display:flex;align-items:center;padding-bottom:20px;color:var(--border2)">›</div>
+      <div class="funil-stage">
+       <div class="funil-stage-val">0</div>
+       <div class="funil-stage-bar" style="background:var(--gold-l)"><div style="height:100%;width:0%;background:var(--gold);border-radius:20px"></div></div>
+       <div class="funil-stage-label">Responderam</div>
+      </div>
+      <div style="display:flex;align-items:center;padding-bottom:20px;color:var(--border2)">›</div>
+      <div class="funil-stage">
+       <div class="funil-stage-val">0</div>
+       <div class="funil-stage-bar" style="background:var(--green-l)"><div style="height:100%;width:0%;background:var(--green);border-radius:20px"></div></div>
+       <div class="funil-stage-label">Compraram</div>
+      </div>
+     </div>
+    </div>
+
+    <!-- Card novo funil -->
+    <div class="funil-card" style="border-style:dashed;background:var(--bg3);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:140px" onclick="abrirModalFunil()">
+     <div style="width:40px;height:40px;border-radius:50%;background:var(--bg4);border:1.5px dashed var(--border2);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:20px">+</div>
+     <div style="font-size:13px;color:var(--text3);font-weight:500">Criar novo funil</div>
+    </div>
+   </div>
+
+   <div style="margin-top:16px;background:var(--purple-l);border:1px solid rgba(92,58,138,.12);border-radius:var(--r);padding:14px;display:flex;align-items:flex-start;gap:10px">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <div style="font-size:12px;color:var(--purple);line-height:1.6"><strong>Em breve:</strong> Crie funis personalizados para campanhas, grupos, lives e lancamentos. Registre etapas, resultados e acompanhe a conversao de cada estrategia.</div>
+   </div>
+  </div>
+
+ </div>
+ <!-- FIM ESCRITORIO -->
+
  <div id="page-client-detail" class="page"><div id="detail-content"></div></div>
  </main>
 </div>
@@ -899,6 +1291,112 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
  </div>
 </div>
 
+<!-- MODAIS ESCRITORIO -->
+<div class="mo" id="modal-meta">
+ <div class="modal" style="max-width:420px">
+  <div class="mh"><h3 class="mt2">Nova Meta</h3><button class="mc" onclick="document.getElementById('modal-meta').classList.remove('open')">x</button></div>
+  <div class="mb">
+   <div class="fg"><label class="fl">Titulo da Meta *</label><input type="text" id="meta-titulo" class="fi" placeholder="Ex: Captar 50 novos clientes"></div>
+   <div class="fg"><label class="fl">Descricao</label><input type="text" id="meta-desc" class="fi" placeholder="Ex: Meta do mes de junho"></div>
+   <div class="fgrid">
+    <div class="fg"><label class="fl">Valor Atual</label><input type="number" id="meta-atual" class="fi" placeholder="0" value="0"></div>
+    <div class="fg"><label class="fl">Meta</label><input type="number" id="meta-alvo" class="fi" placeholder="100"></div>
+   </div>
+   <div class="fg"><label class="fl">Categoria</label>
+    <select id="meta-cat" class="fi">
+     <option value="clientes">Clientes</option>
+     <option value="conversao">Conversao</option>
+     <option value="campanhas">Campanhas</option>
+     <option value="outro">Outro</option>
+    </select>
+   </div>
+  </div>
+  <div class="mf"><button class="btn btn-g btn-sm" onclick="document.getElementById('modal-meta').classList.remove('open')">Cancelar</button><button class="btn btn-p btn-sm" onclick="salvarMeta()">Salvar Meta</button></div>
+ </div>
+</div>
+
+<div class="mo" id="modal-evento">
+ <div class="modal" style="max-width:440px">
+  <div class="mh"><h3 class="mt2">Novo Evento</h3><button class="mc" onclick="document.getElementById('modal-evento').classList.remove('open')">x</button></div>
+  <div class="mb">
+   <div class="fg"><label class="fl">Titulo *</label><input type="text" id="ev-titulo" class="fi" placeholder="Ex: Stories do lancamento"></div>
+   <div class="fgrid">
+    <div class="fg"><label class="fl">Data *</label><input type="date" id="ev-data" class="fi"></div>
+    <div class="fg"><label class="fl">Tipo</label>
+     <select id="ev-tipo" class="fi">
+      <option value="stories">Stories</option>
+      <option value="reels">Reels</option>
+      <option value="live">Live</option>
+      <option value="campanha">Campanha</option>
+      <option value="data">Data Especial</option>
+      <option value="outro">Outro</option>
+     </select>
+    </div>
+   </div>
+   <div class="fg"><label class="fl">Observacoes</label><textarea id="ev-obs" class="fta" style="min-height:60px" placeholder="Detalhes do evento..."></textarea></div>
+  </div>
+  <div class="mf"><button class="btn btn-g btn-sm" onclick="document.getElementById('modal-evento').classList.remove('open')">Cancelar</button><button class="btn btn-p btn-sm" onclick="salvarEvento()">Salvar</button></div>
+ </div>
+</div>
+
+<div class="mo" id="modal-tarefa">
+ <div class="modal" style="max-width:400px">
+  <div class="mh"><h3 class="mt2">Nova Tarefa</h3><button class="mc" onclick="document.getElementById('modal-tarefa').classList.remove('open')">x</button></div>
+  <div class="mb">
+   <div class="fg"><label class="fl">Tarefa *</label><input type="text" id="tar-titulo" class="fi" placeholder="Ex: Publicar stories de produto"></div>
+   <div class="fg"><label class="fl">Frequencia</label>
+    <select id="tar-freq" class="fi">
+     <option value="diario">Diario</option>
+     <option value="semanal">Semanal</option>
+     <option value="mensal">Mensal</option>
+    </select>
+   </div>
+   <div class="fg"><label class="fl">Horario sugerido</label><input type="text" id="tar-hora" class="fi" placeholder="Ex: Toda manha, Segunda-feira..."></div>
+  </div>
+  <div class="mf"><button class="btn btn-g btn-sm" onclick="document.getElementById('modal-tarefa').classList.remove('open')">Cancelar</button><button class="btn btn-p btn-sm" onclick="salvarTarefa()">Adicionar</button></div>
+ </div>
+</div>
+
+<div class="mo" id="modal-funil">
+ <div class="modal" style="max-width:440px">
+  <div class="mh"><h3 class="mt2">Novo Funil</h3><button class="mc" onclick="document.getElementById('modal-funil').classList.remove('open')">x</button></div>
+  <div class="mb">
+   <div class="fg"><label class="fl">Nome do Funil *</label><input type="text" id="fun-nome" class="fi" placeholder="Ex: Campanha de Inverno"></div>
+   <div class="fg"><label class="fl">Tipo</label>
+    <select id="fun-tipo" class="fi">
+     <option value="campanha">Campanha</option>
+     <option value="live">Live / Evento</option>
+     <option value="lancamento">Lancamento</option>
+     <option value="reativacao">Reativacao</option>
+     <option value="grupo">Grupo</option>
+     <option value="outro">Outro</option>
+    </select>
+   </div>
+   <div class="fg"><label class="fl">Descricao</label><textarea id="fun-desc" class="fta" style="min-height:60px" placeholder="Objetivo deste funil..."></textarea></div>
+  </div>
+  <div class="mf"><button class="btn btn-g btn-sm" onclick="document.getElementById('modal-funil').classList.remove('open')">Cancelar</button><button class="btn btn-p btn-sm" onclick="salvarFunil()">Criar Funil</button></div>
+ </div>
+</div>
+
+<!-- MODAL CLIENTE RAPIDO -->
+<div class="mo" id="modal-cliente-rapido">
+ <div class="modal" style="max-width:380px">
+  <div class="mh">
+   <h3 class="mt2">Cadastro Rapido</h3>
+   <button class="mc" onclick="fecharModalClienteRapido()">x</button>
+  </div>
+  <div class="mb">
+   <p style="font-size:13px;color:var(--text2);margin-bottom:18px">Cadastro minimo para vincular a esta perda. Voce pode completar os dados depois na tela de Clientes.</p>
+   <div class="fg"><label class="fl">Nome *</label><input type="text" id="cr-nome" class="fi" placeholder="Nome da cliente"></div>
+   <div class="fg"><label class="fl">WhatsApp</label><input type="tel" id="cr-phone" class="fi" placeholder="51999999999"></div>
+  </div>
+  <div class="mf">
+   <button class="btn btn-g btn-sm" onclick="fecharModalClienteRapido()">Cancelar</button>
+   <button class="btn btn-p btn-sm" onclick="salvarClienteRapido()">Salvar e Vincular</button>
+  </div>
+ </div>
+</div>
+
 <div class="tc" id="toast-c"></div>
 
 
@@ -1027,7 +1525,7 @@ function showPage(p) {
   const bni=document.querySelectorAll('.bn-i');
   if (bnMap[p]!==undefined && bni[bnMap[p]]) bni[bnMap[p]].classList.add('active');
   closeSB();
-  const R={dashboard:renderDash,clients:renderClients,fluxo:renderFluxo,captacao:renderCaptacao,birthdays:renderBirthdays,inactive:renderInactive,postsale:renderPostSale,reminders:renderReminders,filter:renderFilter,messages:renderMsgs,salespeople:renderSP,reports:renderReports,export:renderExport};
+  const R={dashboard:renderDash,clients:renderClients,escritorio:renderEscritorio,fluxo:renderFluxo,captacao:renderCaptacao,birthdays:renderBirthdays,inactive:renderInactive,postsale:renderPostSale,reminders:renderReminders,filter:renderFilter,messages:renderMsgs,salespeople:renderSP,reports:renderReports,export:renderExport};
   if (R[p]) R[p]();
 }
 function toggleSB() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sb-overlay').classList.toggle('open'); }
@@ -2351,6 +2849,217 @@ function salvarClienteRapido() {
     fecharModalClienteRapido();
     toast(nome + ' cadastrada e vinculada!');
   });
+}
+
+
+// ── ESCRITORIO DA LOJA ──
+var _calAno = new Date().getFullYear();
+var _calMes = new Date().getMonth();
+var _eventos = JSON.parse(localStorage.getItem('slp_eventos') || '[]');
+var _metas = JSON.parse(localStorage.getItem('slp_metas') || '[]');
+var _tarefas = JSON.parse(localStorage.getItem('slp_tarefas') || '[]');
+var _funis = JSON.parse(localStorage.getItem('slp_funis') || '[]');
+
+function switchEscrit(section, btn) {
+  document.querySelectorAll('.escrit-section').forEach(function(el){ el.classList.remove('active'); });
+  document.querySelectorAll('.escrit-tab').forEach(function(el){ el.classList.remove('active'); });
+  var el = document.getElementById('escrit-' + section);
+  if (el) el.classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (section === 'calendario') renderCalendario();
+}
+
+function renderEscritorio() {
+  renderCalendario();
+}
+
+// ── CALENDARIO ──
+var MESES = ['Janeiro','Fevereiro','Marco','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+var TIPOS_COR = {stories:'stories', reels:'reels', live:'reels', campanha:'campanha', data:'data', outro:'outro'};
+
+function calNav(delta) {
+  _calMes += delta;
+  if (_calMes < 0) { _calMes = 11; _calAno--; }
+  if (_calMes > 11) { _calMes = 0; _calAno++; }
+  renderCalendario();
+}
+function calHoje() {
+  _calAno = new Date().getFullYear();
+  _calMes = new Date().getMonth();
+  renderCalendario();
+}
+
+function renderCalendario() {
+  var label = document.getElementById('cal-month-label');
+  if (label) label.textContent = MESES[_calMes] + ' ' + _calAno;
+  var grid = document.getElementById('cal-grid');
+  if (!grid) return;
+
+  // Limpar dias anteriores mantendo headers
+  while (grid.children.length > 7) grid.removeChild(grid.lastChild);
+
+  var primeiro = new Date(_calAno, _calMes, 1);
+  var ultimo = new Date(_calAno, _calMes + 1, 0);
+  var hoje = new Date().toISOString().split('T')[0];
+
+  // Dia da semana do primeiro (0=dom, ajustar para seg=0)
+  var inicioDow = (primeiro.getDay() + 6) % 7;
+
+  // Dias do mes anterior
+  for (var i = 0; i < inicioDow; i++) {
+    var d = new Date(_calAno, _calMes, -inicioDow + i + 1);
+    var div = document.createElement('div');
+    div.className = 'cal-day other-month';
+    div.innerHTML = '<div class="cal-dn">' + d.getDate() + '</div>';
+    grid.appendChild(div);
+  }
+
+  // Dias do mes atual
+  for (var d2 = 1; d2 <= ultimo.getDate(); d2++) {
+    var dateStr = _calAno + '-' + String(_calMes+1).padStart(2,'0') + '-' + String(d2).padStart(2,'0');
+    var evsDia = _eventos.filter(function(e){ return e.data === dateStr; });
+    var div2 = document.createElement('div');
+    div2.className = 'cal-day' + (dateStr === hoje ? ' today' : '') + (evsDia.length ? ' has-event' : '');
+    div2.setAttribute('data-date', dateStr);
+    div2.onclick = function(){ abrirModalEvento(this.getAttribute('data-date')); };
+    var html = '<div class="cal-dn">' + d2 + '</div>';
+    evsDia.slice(0,2).forEach(function(ev) {
+      var cls = TIPOS_COR[ev.tipo] || 'outro';
+      html += '<div class="cal-event ' + cls + '">' + ev.titulo + '</div>';
+    });
+    if (evsDia.length > 2) html += '<div style="font-size:9px;color:var(--text3);padding:1px 5px">+' + (evsDia.length-2) + ' mais</div>';
+    div2.innerHTML = html;
+    grid.appendChild(div2);
+  }
+
+  // Completar semana
+  var total = inicioDow + ultimo.getDate();
+  var restante = (7 - (total % 7)) % 7;
+  for (var r = 1; r <= restante; r++) {
+    var div3 = document.createElement('div');
+    div3.className = 'cal-day other-month';
+    div3.innerHTML = '<div class="cal-dn">' + r + '</div>';
+    grid.appendChild(div3);
+  }
+}
+
+function abrirModalEvento(data) {
+  document.getElementById('ev-titulo').value = '';
+  document.getElementById('ev-obs').value = '';
+  document.getElementById('ev-tipo').value = 'stories';
+  document.getElementById('ev-data').value = data || new Date().toISOString().split('T')[0];
+  document.getElementById('modal-evento').classList.add('open');
+}
+
+function salvarEvento() {
+  var titulo = document.getElementById('ev-titulo').value.trim();
+  if (!titulo) { toast('Informe o titulo do evento', 'e'); return; }
+  var ev = {
+    id: Date.now().toString(),
+    titulo: titulo,
+    data: document.getElementById('ev-data').value,
+    tipo: document.getElementById('ev-tipo').value,
+    obs: document.getElementById('ev-obs').value.trim()
+  };
+  _eventos.push(ev);
+  localStorage.setItem('slp_eventos', JSON.stringify(_eventos));
+  document.getElementById('modal-evento').classList.remove('open');
+  renderCalendario();
+  toast('Evento salvo!');
+}
+
+// ── METAS ──
+function abrirModalMeta() {
+  ['meta-titulo','meta-desc'].forEach(function(id){ document.getElementById(id).value=''; });
+  document.getElementById('meta-atual').value = '0';
+  document.getElementById('meta-alvo').value = '';
+  document.getElementById('meta-cat').value = 'clientes';
+  document.getElementById('modal-meta').classList.add('open');
+}
+
+function salvarMeta() {
+  var titulo = document.getElementById('meta-titulo').value.trim();
+  if (!titulo) { toast('Informe o titulo da meta', 'e'); return; }
+  var meta = {
+    id: Date.now().toString(),
+    titulo: titulo,
+    desc: document.getElementById('meta-desc').value.trim(),
+    atual: parseFloat(document.getElementById('meta-atual').value) || 0,
+    alvo: parseFloat(document.getElementById('meta-alvo').value) || 100,
+    cat: document.getElementById('meta-cat').value
+  };
+  _metas.push(meta);
+  localStorage.setItem('slp_metas', JSON.stringify(_metas));
+  document.getElementById('modal-meta').classList.remove('open');
+  renderMetas();
+  toast('Meta salva!');
+}
+
+var COR_META = {clientes:'var(--green)', conversao:'var(--blue)', campanhas:'var(--gold)', outro:'var(--purple)'};
+
+function renderMetas() {
+  var grid = document.getElementById('metas-grid');
+  if (!grid) return;
+  var cards = _metas.map(function(m) {
+    var pct = m.alvo > 0 ? Math.min(100, Math.round((m.atual/m.alvo)*100)) : 0;
+    var cor = COR_META[m.cat] || 'var(--green)';
+    return '<div class="meta-card"><div class="meta-icon" style="background:' + cor.replace('var(--','var(--').replace(')','-l)') + '">' +
+      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="' + cor + '" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>' +
+      '<div style="flex:1;min-width:0"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><div style="font-weight:700;font-size:14px">' + m.titulo + '</div>' +
+      '<span style="font-size:11px;font-weight:700;color:' + cor + '">' + pct + '%</span></div>' +
+      (m.desc ? '<div style="font-size:12px;color:var(--text2);margin-bottom:8px">' + m.desc + '</div>' : '') +
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px"><span style="font-size:12px;color:var(--text3)">Progresso</span><span style="font-size:13px;font-weight:700;color:' + cor + '">' + m.atual + ' / ' + m.alvo + '</span></div>' +
+      '<div class="meta-prog"><div class="meta-prog-bar" style="width:' + pct + '%;background:' + cor + '"></div></div></div></div>';
+  });
+  // Manter o card de adicionar no final
+  var addCard = '<div class="meta-card" style="border-style:dashed;cursor:pointer;justify-content:center;align-items:center;flex-direction:column;gap:8px;min-height:120px;background:var(--bg3)" onclick="abrirModalMeta()"><div style="width:36px;height:36px;border-radius:50%;background:var(--bg4);border:1.5px dashed var(--border2);display:flex;align-items:center;justify-content:center;color:var(--text3)">+</div><div style="font-size:13px;color:var(--text3);font-weight:500">Adicionar nova meta</div></div>';
+  if (_metas.length) grid.innerHTML = cards.join('') + addCard;
+}
+
+// ── ROTINA ──
+function toggleTask(el) {
+  el.classList.toggle('done');
+  var text = el.parentElement.querySelector('.rotina-task-text');
+  if (text) text.classList.toggle('done');
+}
+
+function abrirModalTarefa() {
+  document.getElementById('tar-titulo').value = '';
+  document.getElementById('tar-freq').value = 'diario';
+  document.getElementById('tar-hora').value = '';
+  document.getElementById('modal-tarefa').classList.add('open');
+}
+
+function salvarTarefa() {
+  var titulo = document.getElementById('tar-titulo').value.trim();
+  if (!titulo) { toast('Informe a tarefa', 'e'); return; }
+  var freq = document.getElementById('tar-freq').value;
+  var hora = document.getElementById('tar-hora').value.trim();
+  var container = document.getElementById('tarefas-' + freq);
+  if (container) {
+    var div = document.createElement('div');
+    div.className = 'rotina-task';
+    div.innerHTML = '<div class="rotina-check" onclick="toggleTask(this)"></div>' +
+      '<div style="flex:1"><div class="rotina-task-text">' + titulo + '</div>' +
+      (hora ? '<div style="font-size:11px;color:var(--text3);margin-top:2px">' + hora + '</div>' : '') + '</div>';
+    container.appendChild(div);
+  }
+  document.getElementById('modal-tarefa').classList.remove('open');
+  toast('Tarefa adicionada!');
+}
+
+// ── FUNIS ──
+function abrirModalFunil() {
+  ['fun-nome','fun-desc'].forEach(function(id){ document.getElementById(id).value=''; });
+  document.getElementById('fun-tipo').value = 'campanha';
+  document.getElementById('modal-funil').classList.add('open');
+}
+
+function salvarFunil() {
+  var nome = document.getElementById('fun-nome').value.trim();
+  if (!nome) { toast('Informe o nome do funil', 'e'); return; }
+  toast('Funil "' + nome + '" criado! Em breve voce podera configurar as etapas.');
+  document.getElementById('modal-funil').classList.remove('open');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
