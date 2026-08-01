@@ -460,6 +460,37 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 .kan-mini-num{font-family:'Syne',sans-serif;font-size:20px;font-weight:700}
 .kan-mini-label{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
 
+/* ROTINA COMERCIAL */
+.rot-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);margin-bottom:12px;transition:box-shadow .2s}
+.rot-card:hover{box-shadow:var(--sh-md)}
+.rot-card-header{padding:14px 18px;display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none;-webkit-user-select:none}
+.rot-dia-badge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.rot-card-body{padding:0 18px 16px;border-top:1px solid var(--border);margin-top:2px}
+.rot-checklist{margin-top:12px}
+.rot-check-item{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid var(--border)}
+.rot-check-item:last-child{border-bottom:none}
+.rot-check-box{width:18px;height:18px;border-radius:5px;border:2px solid var(--border2);cursor:pointer;flex-shrink:0;transition:all .18s;display:flex;align-items:center;justify-content:center}
+.rot-check-box.done{background:var(--green);border-color:var(--green)}
+.rot-check-box.done::after{content:'';width:4px;height:8px;border:2px solid #fff;border-top:none;border-left:none;transform:rotate(40deg);margin-top:-2px}
+.rot-check-text{font-size:13px;color:var(--text)}
+.rot-check-text.done{text-decoration:line-through;color:var(--text3)}
+
+.ativ-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;margin-bottom:10px;box-shadow:var(--sh);transition:all .2s;cursor:pointer}
+.ativ-card:hover{box-shadow:var(--sh-md)}
+.ativ-card.concluida{opacity:.6}
+.prio-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px}
+.prio-normal{background:var(--bg4);color:var(--text2)}
+.prio-alta{background:var(--gold-l);color:var(--gold)}
+.prio-urgente{background:var(--red-l);color:var(--red)}
+.status-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px}
+.status-pendente{background:var(--bg4);color:var(--text2)}
+.status-andamento{background:var(--blue-l);color:var(--blue)}
+.status-concluida{background:var(--green-l);color:var(--green)}
+
+.modal-check-item{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--bg4);border-radius:var(--rs);margin-bottom:6px}
+.modal-check-remove{background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;line-height:1;padding:0;display:flex;margin-left:auto}
+.modal-check-remove:hover{color:var(--red)}
+
 </style>
 </head>
 <body>
@@ -1059,93 +1090,46 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 
   <!-- ROTINA COMERCIAL -->
   <div id="escrit-rotina" class="escrit-section">
-   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+
+   <!-- HEADER -->
+   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
     <div>
      <h2 style="font-size:16px;font-weight:700;font-family:'Syne',sans-serif">Rotina Comercial</h2>
-     <p style="font-size:12px;color:var(--text3);margin-top:2px">Organize sua execucao diaria</p>
+     <p style="font-size:12px;color:var(--text3);margin-top:2px">Organize os processos fixos e atividades da sua equipe</p>
     </div>
-    <button class="btn btn-p btn-sm" onclick="abrirModalTarefa()">+ Tarefa</button>
-   </div>
-
-   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px" id="rotina-cols">
-    <!-- Coluna Diario -->
-    <div class="rotina-col">
-     <div class="rotina-col-header">
-      <div style="display:flex;align-items:center;gap:8px">
-       <div style="width:8px;height:8px;border-radius:50%;background:var(--green)"></div>
-       <span class="rotina-col-title">Diario</span>
-      </div>
-      <span class="badge bg-g" id="count-diario">0</span>
-     </div>
-     <div id="tarefas-diario">
-      <div class="rotina-task">
-       <div class="rotina-check" onclick="toggleTask(this)"></div>
-       <div style="flex:1"><div class="rotina-task-text">Registrar atendimentos no Fluxo do Dia</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Toda manha</div></div>
-      </div>
-      <div class="rotina-task">
-       <div class="rotina-check" onclick="toggleTask(this)"></div>
-       <div style="flex:1"><div class="rotina-task-text">Verificar lembretes e pos-venda</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Toda manha</div></div>
-      </div>
-      <div class="rotina-task">
-       <div class="rotina-check" onclick="toggleTask(this)"></div>
-       <div style="flex:1"><div class="rotina-task-text">Registrar perdas do dia</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Ao fechar a loja</div></div>
-      </div>
-     </div>
-    </div>
-    <!-- Coluna Semanal -->
-    <div class="rotina-col">
-     <div class="rotina-col-header">
-      <div style="display:flex;align-items:center;gap:8px">
-       <div style="width:8px;height:8px;border-radius:50%;background:var(--blue)"></div>
-       <span class="rotina-col-title">Semanal</span>
-      </div>
-      <span class="badge bg-b" id="count-semanal">0</span>
-     </div>
-     <div id="tarefas-semanal">
-      <div class="rotina-task">
-       <div class="rotina-check" onclick="toggleTask(this)"></div>
-       <div style="flex:1"><div class="rotina-task-text">Analisar taxa de conversao da semana</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Segunda-feira</div></div>
-      </div>
-      <div class="rotina-task">
-       <div class="rotina-check" onclick="toggleTask(this)"></div>
-       <div style="flex:1"><div class="rotina-task-text">Enviar mensagens para clientes inativos</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Quarta-feira</div></div>
-      </div>
-      <div class="rotina-task">
-       <div class="rotina-check" onclick="toggleTask(this)"></div>
-       <div style="flex:1"><div class="rotina-task-text">Revisar oportunidades em aberto</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Sexta-feira</div></div>
-      </div>
-     </div>
-    </div>
-    <!-- Coluna Mensal -->
-    <div class="rotina-col">
-     <div class="rotina-col-header">
-      <div style="display:flex;align-items:center;gap:8px">
-       <div style="width:8px;height:8px;border-radius:50%;background:var(--gold)"></div>
-       <span class="rotina-col-title">Mensal</span>
-      </div>
-      <span class="badge bg-go" id="count-mensal">0</span>
-     </div>
-     <div id="tarefas-mensal">
-      <div class="rotina-task">
-       <div class="rotina-check" onclick="toggleTask(this)"></div>
-       <div style="flex:1"><div class="rotina-task-text">Revisar metas do mes</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Primeiro dia util</div></div>
-      </div>
-      <div class="rotina-task">
-       <div class="rotina-check" onclick="toggleTask(this)"></div>
-       <div style="flex:1"><div class="rotina-task-text">Analisar relatorio mensal completo</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Ultimo dia util</div></div>
-      </div>
-      <div class="rotina-task">
-       <div class="rotina-check" onclick="toggleTask(this)"></div>
-       <div style="flex:1"><div class="rotina-task-text">Planejar campanhas do proximo mes</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Ultima semana</div></div>
-      </div>
-     </div>
+    <div style="display:flex;gap:8px">
+     <button class="btn btn-g btn-sm" onclick="abrirModalRotina()">+ Rotina Recorrente</button>
+     <button class="btn btn-p btn-sm" onclick="abrirModalAtividade()">+ Atividade Pontual</button>
     </div>
    </div>
 
-   <div style="margin-top:16px;background:var(--blue-l);border:1px solid rgba(26,92,138,.12);border-radius:var(--r);padding:14px;display:flex;align-items:flex-start;gap:10px">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-    <div style="font-size:12px;color:var(--blue);line-height:1.6"><strong>Em breve:</strong> Adicione suas proprias tarefas, defina frequencias e acompanhe a execucao da sua equipe.</div>
+   <!-- ROTINAS RECORRENTES -->
+   <div style="margin-bottom:28px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+     <div style="width:3px;height:16px;background:var(--green);border-radius:2px"></div>
+     <h3 style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px">Rotinas Recorrentes</h3>
+     <span class="badge bg-g" id="rotinas-count">0</span>
+    </div>
+    <div id="rotinas-grid"></div>
    </div>
+
+   <!-- ATIVIDADES PONTUAIS -->
+   <div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+     <div style="width:3px;height:16px;background:var(--blue);border-radius:2px"></div>
+     <h3 style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px">Atividades Pontuais</h3>
+     <span class="badge bg-b" id="atividades-count">0</span>
+    </div>
+    <!-- Filtro de status -->
+    <div style="display:flex;gap:6px;margin-bottom:14px" id="ativ-filtro">
+     <button class="btn btn-sm" id="af-todas" onclick="filtrarAtividades('todas')" style="padding:5px 12px;font-size:12px">Todas</button>
+     <button class="btn btn-sm" id="af-pendente" onclick="filtrarAtividades('pendente')" style="padding:5px 12px;font-size:12px">Pendentes</button>
+     <button class="btn btn-sm" id="af-andamento" onclick="filtrarAtividades('andamento')" style="padding:5px 12px;font-size:12px">Em andamento</button>
+     <button class="btn btn-sm" id="af-concluida" onclick="filtrarAtividades('concluida')" style="padding:5px 12px;font-size:12px">Concluidas</button>
+    </div>
+    <div id="atividades-lista"></div>
+   </div>
+
   </div>
 
   <!-- FUNIS -->
@@ -1502,6 +1486,85 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
    <button class="btn btn-g btn-sm" onclick="fecharModalConteudo()">Cancelar</button>
    <button class="btn btn-p btn-sm" onclick="salvarEvento()">Salvar</button>
   </div>
+ </div>
+</div>
+
+<!-- MODAL ROTINA RECORRENTE -->
+<div class="mo" id="modal-rotina">
+ <div class="modal" style="max-width:480px">
+  <div class="mh"><h3 class="mt2" id="modal-rotina-title">Nova Rotina</h3><button class="mc" onclick="fecharModalRotina()">x</button></div>
+  <div class="mb">
+   <input type="hidden" id="rot-edit-id">
+   <div class="fg"><label class="fl">Nome da Rotina *</label><input type="text" id="rot-nome" class="fi" placeholder="Ex: Pos-venda semanal"></div>
+   <div class="fgrid">
+    <div class="fg"><label class="fl">Dia / Recorrencia</label>
+     <select id="rot-dia" class="fi">
+      <option value="segunda">Segunda-feira</option>
+      <option value="terca">Terca-feira</option>
+      <option value="quarta">Quarta-feira</option>
+      <option value="quinta">Quinta-feira</option>
+      <option value="sexta">Sexta-feira</option>
+      <option value="sabado">Sabado</option>
+      <option value="domingo">Domingo</option>
+      <option value="diario">Todos os dias</option>
+      <option value="personalizado">Personalizado</option>
+     </select>
+    </div>
+    <div class="fg"><label class="fl">Horario (opcional)</label><input type="time" id="rot-hora" class="fi"></div>
+   </div>
+   <div class="fg"><label class="fl">Responsavel</label><input type="text" id="rot-resp" class="fi" placeholder="Ex: Equipe de vendas"></div>
+   <div class="fg"><label class="fl">Descricao</label><textarea id="rot-desc" class="fta" style="min-height:56px" placeholder="O que deve ser feito nesta rotina?"></textarea></div>
+   <div class="fg">
+    <label class="fl">Checklist</label>
+    <div id="rot-checklist-items" style="margin-bottom:8px"></div>
+    <div style="display:flex;gap:7px">
+     <input type="text" id="rot-check-input" class="fi" placeholder="Adicionar item ao checklist..." style="flex:1">
+     <button class="btn btn-g btn-sm" onclick="addCheckRotina()">+</button>
+    </div>
+   </div>
+  </div>
+  <div class="mf"><button class="btn btn-g btn-sm" onclick="fecharModalRotina()">Cancelar</button><button class="btn btn-p btn-sm" onclick="salvarRotina()">Salvar Rotina</button></div>
+ </div>
+</div>
+
+<!-- MODAL ATIVIDADE PONTUAL -->
+<div class="mo" id="modal-atividade">
+ <div class="modal" style="max-width:480px">
+  <div class="mh"><h3 class="mt2" id="modal-ativ-title">Nova Atividade</h3><button class="mc" onclick="fecharModalAtividade()">x</button></div>
+  <div class="mb">
+   <input type="hidden" id="ativ-edit-id">
+   <div class="fg"><label class="fl">Titulo *</label><input type="text" id="ativ-titulo" class="fi" placeholder="Ex: Montar vitrine da colecao nova"></div>
+   <div class="fgrid">
+    <div class="fg"><label class="fl">Data</label><input type="date" id="ativ-data" class="fi"></div>
+    <div class="fg"><label class="fl">Prioridade</label>
+     <select id="ativ-prio" class="fi">
+      <option value="normal">Normal</option>
+      <option value="alta">Alta</option>
+      <option value="urgente">Urgente</option>
+     </select>
+    </div>
+   </div>
+   <div class="fgrid">
+    <div class="fg"><label class="fl">Responsavel</label><input type="text" id="ativ-resp" class="fi" placeholder="Quem vai executar?"></div>
+    <div class="fg"><label class="fl">Status</label>
+     <select id="ativ-status" class="fi">
+      <option value="pendente">Pendente</option>
+      <option value="andamento">Em andamento</option>
+      <option value="concluida">Concluida</option>
+     </select>
+    </div>
+   </div>
+   <div class="fg">
+    <label class="fl">Checklist</label>
+    <div id="ativ-checklist-items" style="margin-bottom:8px"></div>
+    <div style="display:flex;gap:7px">
+     <input type="text" id="ativ-check-input" class="fi" placeholder="Adicionar item ao checklist..." style="flex:1">
+     <button class="btn btn-g btn-sm" onclick="addCheckAtividade()">+</button>
+    </div>
+   </div>
+   <div class="fg"><label class="fl">Observacoes</label><textarea id="ativ-obs" class="fta" style="min-height:52px" placeholder="Detalhes, referencias..."></textarea></div>
+  </div>
+  <div class="mf"><button class="btn btn-g btn-sm" onclick="fecharModalAtividade()">Cancelar</button><button class="btn btn-p btn-sm" onclick="salvarAtividade()">Salvar</button></div>
  </div>
 </div>
 
@@ -2597,93 +2660,7 @@ function saveFluxoToDB(date) {
   }
 }
 
-function renderFluxo() {
-  var inp = document.getElementById('fluxo-date');
-  if (inp && !inp.value) inp.value = getTodayStr();
-  var date = getFluxoDate();
-  var day = getFluxoDay(date);
 
-  var label = document.getElementById('fluxo-date-label');
-  if (label) label.textContent = date === getTodayStr() ? 'Hoje - ' + fD(date) : fD(date);
-
-  var cF = document.getElementById('count-fisico');
-  var cO = document.getElementById('count-online');
-  if (cF) cF.textContent = day.fisico;
-  if (cO) cO.textContent = day.online;
-
-  var total = day.fisico + day.online;
-
-  // Buscar vendas do dia direto no Supabase
-  var statsEl = document.getElementById('fluxo-stats');
-  if (statsEl) {
-    _sb.from('purchases').select('id').eq('store_id', CU.id).eq('date', date).then(function(res) {
-      var numVendas = (res.data || []).length;
-      var conv = total > 0 ? Math.round((numVendas / total) * 100) : 0;
-      statsEl.innerHTML =
-        '<div class="ri"><div class="rv">' + total + '</div><div class="rl">Total Atendimentos</div></div>' +
-        '<div class="ri"><div class="rv" style="color:var(--green)">' + numVendas + '</div><div class="rl">Vendas no Dia</div></div>' +
-        '<div class="ri"><div class="rv" style="color:var(--blue)">' + conv + '%</div><div class="rl">Taxa de Conversao</div></div>' +
-        '<div class="ri"><div class="rv" style="color:var(--red)">' + (day.perdas||[]).length + '</div><div class="rl">Perdas Registradas</div></div>';
-    });
-  }
-
-  var perdas = day.perdas || [];
-  var pl = document.getElementById('perdas-list');
-  if (pl) {
-    if (!perdas.length) {
-      pl.innerHTML = '<div class="empty"><div class="empty-d">Nenhuma perda registrada</div></div>';
-    } else {
-      var html = '';
-      perdas.forEach(function(p, i) {
-        html += '<div class="perda-item">';
-        html += '<div>';
-        html += '<div style="font-weight:600;font-size:13px">' + p.produto + '</div>';
-        if (p.motivo) html += '<div style="font-size:12px;color:var(--text2);margin-top:2px">' + p.motivo + '</div>';
-        if (p.clienteNome) html += '<div style="font-size:11px;color:var(--text3);margin-top:2px">Cliente: ' + p.clienteNome + '</div>';
-        html += '</div>';
-        html += '<div style="display:flex;align-items:center;gap:6px">';
-        html += '<span class="perda-tag">' + (p.canal === 'online' ? 'Online' : 'Fisica') + '</span>';
-        html += '<button class="btn btn-d btn-xs" data-date="' + date + '" data-idx="' + i + '" onclick="removePerdaBtn(this)">x</button>';
-        html += '</div></div>';
-      });
-      pl.innerHTML = html;
-    }
-  }
-
-  var sel = document.getElementById('perda-cliente');
-  if (sel) {
-    sel.innerHTML = '<option value="">Sem vinculo</option>' +
-      gC().map(function(cl) { return '<option value="' + cl.id + '">' + cl.name + '</option>'; }).join('');
-  }
-
-  // Grafico de produtos mais buscados (todas as perdas do fluxo carregado)
-  var prodChart = document.getElementById('perda-chart');
-  if (prodChart) {
-    var allPerdas = [];
-    Object.values(_fluxo).forEach(function(d) {
-      (d.perdas || []).forEach(function(p) { allPerdas.push(p); });
-    });
-    if (!allPerdas.length) {
-      prodChart.innerHTML = '<div class="empty" style="padding:16px"><div class="empty-d">Nenhuma perda registrada ainda</div></div>';
-    } else {
-      var counts = {};
-      allPerdas.forEach(function(p) {
-        var key = p.produto.toLowerCase().trim();
-        counts[key] = (counts[key] || 0) + 1;
-      });
-      var sorted = Object.entries(counts).sort(function(a,b){ return b[1]-a[1]; }).slice(0,10);
-      var max = sorted[0][1];
-      var html2 = sorted.map(function(e) {
-        return '<div class="br" style="margin-bottom:8px">' +
-          '<div class="bl" style="width:120px;font-size:12px;color:var(--text2)">' + e[0] + '</div>' +
-          '<div class="bt"><div class="bf" style="width:' + Math.round(e[1]/max*100) + '%"></div></div>' +
-          '<div class="bv" style="font-size:12px;font-weight:600;min-width:20px">' + e[1] + '</div>' +
-        '</div>';
-      }).join('');
-      prodChart.innerHTML = html2;
-    }
-  }
-}
 
 function changeCount(tipo, delta) {
   var date = getFluxoDate();
@@ -3175,6 +3152,9 @@ function switchEscrit(section, btn) {
 
 function renderEscritorio() {
   renderPlanMes();
+  renderRotinas();
+  renderAtividades();
+  filtrarAtividades('todas');
 }
 
 // ── PLANEJAMENTO MENSAL ──
@@ -3709,37 +3689,369 @@ function renderMetas() {
   grid.innerHTML = cards.join('') + addCard;
 }
 
-// ── ROTINA ──
-function toggleTask(el) {
-  el.classList.toggle('done');
-  var text = el.parentElement.querySelector('.rotina-task-text');
-  if (text) text.classList.toggle('done');
+// ── ROTINA COMERCIAL ──
+var _rotinas = JSON.parse(localStorage.getItem('slp_rotinas') || '[]');
+var _atividades = JSON.parse(localStorage.getItem('slp_atividades') || '[]');
+var _rotCheckTemp = [];
+var _ativCheckTemp = [];
+var _ativFiltro = 'todas';
+
+var DIAS_LABEL = {
+  segunda:'Segunda-feira', terca:'Terca-feira', quarta:'Quarta-feira',
+  quinta:'Quinta-feira', sexta:'Sexta-feira', sabado:'Sabado',
+  domingo:'Domingo', diario:'Todos os dias', personalizado:'Personalizado'
+};
+var DIAS_COR = {
+  segunda:'var(--green)', terca:'var(--blue)', quarta:'var(--purple)',
+  quinta:'var(--gold)', sexta:'var(--red)', sabado:'#e07020',
+  domingo:'#8a9e90', diario:'var(--dark)', personalizado:'var(--text2)'
+};
+var DIAS_BG = {
+  segunda:'var(--green-l)', terca:'var(--blue-l)', quarta:'var(--purple-l)',
+  quinta:'var(--gold-l)', sexta:'var(--red-l)', sabado:'#fef0e6',
+  domingo:'var(--bg4)', diario:'rgba(22,32,26,.07)', personalizado:'var(--bg4)'
+};
+var DIAS_ORDER = ['segunda','terca','quarta','quinta','sexta','sabado','domingo','diario','personalizado'];
+
+// ── ROTINAS ──
+function abrirModalRotina(id) {
+  var rot = id ? _rotinas.find(function(r){ return r.id===id; }) : null;
+  document.getElementById('modal-rotina-title').textContent = rot ? 'Editar Rotina' : 'Nova Rotina';
+  document.getElementById('rot-edit-id').value = id || '';
+  document.getElementById('rot-nome').value = rot ? rot.nome : '';
+  document.getElementById('rot-dia').value = rot ? (rot.dia||'segunda') : 'segunda';
+  document.getElementById('rot-hora').value = rot ? (rot.hora||'') : '';
+  document.getElementById('rot-resp').value = rot ? (rot.resp||'') : '';
+  document.getElementById('rot-desc').value = rot ? (rot.desc||'') : '';
+  document.getElementById('rot-check-input').value = '';
+  _rotCheckTemp = rot ? (rot.checklist||[]).map(function(item){ return {texto:item.texto, done:false}; }) : [];
+  renderCheckTempRotina();
+  document.getElementById('modal-rotina').classList.add('open');
+  setTimeout(function(){ document.getElementById('rot-nome').focus(); }, 100);
 }
 
-function abrirModalTarefa() {
-  document.getElementById('tar-titulo').value = '';
-  document.getElementById('tar-freq').value = 'diario';
-  document.getElementById('tar-hora').value = '';
-  document.getElementById('modal-tarefa').classList.add('open');
+function fecharModalRotina() { document.getElementById('modal-rotina').classList.remove('open'); }
+
+function addCheckRotina() {
+  var inp = document.getElementById('rot-check-input');
+  var val = inp.value.trim();
+  if (!val) return;
+  _rotCheckTemp.push({texto:val, done:false});
+  inp.value = '';
+  renderCheckTempRotina();
+  inp.focus();
 }
 
-function salvarTarefa() {
-  var titulo = document.getElementById('tar-titulo').value.trim();
-  if (!titulo) { toast('Informe a tarefa', 'e'); return; }
-  var freq = document.getElementById('tar-freq').value;
-  var hora = document.getElementById('tar-hora').value.trim();
-  var container = document.getElementById('tarefas-' + freq);
-  if (container) {
-    var div = document.createElement('div');
-    div.className = 'rotina-task';
-    div.innerHTML = '<div class="rotina-check" onclick="toggleTask(this)"></div>' +
-      '<div style="flex:1"><div class="rotina-task-text">' + titulo + '</div>' +
-      (hora ? '<div style="font-size:11px;color:var(--text3);margin-top:2px">' + hora + '</div>' : '') + '</div>';
-    container.appendChild(div);
+function renderCheckTempRotina() {
+  var el = document.getElementById('rot-checklist-items');
+  if (!el) return;
+  el.innerHTML = _rotCheckTemp.map(function(item, i) {
+    return '<div class="modal-check-item">' +
+      '<div style="font-size:13px;flex:1">' + item.texto + '</div>' +
+      '<button class="modal-check-remove" onclick="remCheckRotina(' + i + ')">×</button>' +
+    '</div>';
+  }).join('');
+}
+
+function remCheckRotina(i) {
+  _rotCheckTemp.splice(i, 1);
+  renderCheckTempRotina();
+}
+
+function salvarRotina() {
+  var nome = document.getElementById('rot-nome').value.trim();
+  if (!nome) { toast('Informe o nome da rotina', 'e'); return; }
+  var editId = document.getElementById('rot-edit-id').value;
+  var rot = {
+    id: editId || Date.now().toString(),
+    nome: nome,
+    dia: document.getElementById('rot-dia').value,
+    hora: document.getElementById('rot-hora').value,
+    resp: document.getElementById('rot-resp').value.trim(),
+    desc: document.getElementById('rot-desc').value.trim(),
+    checklist: _rotCheckTemp.map(function(item){ return {texto:item.texto}; }),
+    checkDone: {}
+  };
+  if (editId) {
+    var idx = _rotinas.findIndex(function(r){ return r.id===editId; });
+    if (idx !== -1) { rot.checkDone = _rotinas[idx].checkDone || {}; _rotinas[idx] = rot; }
+    else _rotinas.push(rot);
+  } else {
+    _rotinas.push(rot);
   }
-  document.getElementById('modal-tarefa').classList.remove('open');
-  toast('Tarefa adicionada!');
+  localStorage.setItem('slp_rotinas', JSON.stringify(_rotinas));
+  fecharModalRotina();
+  renderRotinas();
+  toast(editId ? 'Rotina atualizada!' : 'Rotina criada!');
 }
+
+function excluirRotina(id) {
+  if (!confirm('Excluir esta rotina?')) return;
+  _rotinas = _rotinas.filter(function(r){ return r.id!==id; });
+  localStorage.setItem('slp_rotinas', JSON.stringify(_rotinas));
+  renderRotinas();
+  toast('Rotina excluida.');
+}
+
+function toggleCheckRotina(rotId, idx) {
+  var rot = _rotinas.find(function(r){ return r.id===rotId; });
+  if (!rot) return;
+  if (!rot.checkDone) rot.checkDone = {};
+  rot.checkDone[idx] = !rot.checkDone[idx];
+  localStorage.setItem('slp_rotinas', JSON.stringify(_rotinas));
+  var box = document.getElementById('rc-' + rotId + '-' + idx);
+  var txt = document.getElementById('rt-' + rotId + '-' + idx);
+  if (box) box.classList.toggle('done', rot.checkDone[idx]);
+  if (txt) txt.classList.toggle('done', rot.checkDone[idx]);
+}
+
+function toggleRotExpand(id) {
+  var body = document.getElementById('rot-body-' + id);
+  var arrow = document.getElementById('rot-arrow-' + id);
+  if (!body) return;
+  var isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  if (arrow) arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+}
+
+function renderRotinas() {
+  var grid = document.getElementById('rotinas-grid');
+  var countEl = document.getElementById('rotinas-count');
+  if (!grid) return;
+  if (countEl) countEl.textContent = _rotinas.length;
+
+  if (!_rotinas.length) {
+    grid.innerHTML = '<div class="dash-vazio">' +
+      '<div style="font-size:28px;margin-bottom:8px">📋</div>' +
+      '<div style="font-weight:600;margin-bottom:4px">Nenhuma rotina criada</div>' +
+      '<div style="font-size:12px;margin-bottom:14px">Crie rotinas fixas para organizar os processos da sua equipe</div>' +
+      '<button class="btn btn-g btn-sm" onclick="abrirModalRotina()">+ Criar primeira rotina</button>' +
+    '</div>';
+    return;
+  }
+
+  // Ordenar por dia da semana
+  var sorted = _rotinas.slice().sort(function(a,b){
+    return DIAS_ORDER.indexOf(a.dia) - DIAS_ORDER.indexOf(b.dia);
+  });
+
+  grid.innerHTML = sorted.map(function(rot) {
+    var cor = DIAS_COR[rot.dia] || 'var(--text2)';
+    var bg = DIAS_BG[rot.dia] || 'var(--bg4)';
+    var doneCount = rot.checklist ? rot.checklist.filter(function(_,i){ return rot.checkDone && rot.checkDone[i]; }).length : 0;
+    var totalCheck = rot.checklist ? rot.checklist.length : 0;
+    var pct = totalCheck > 0 ? Math.round((doneCount/totalCheck)*100) : 0;
+
+    return '<div class="rot-card">' +
+      '<div class="rot-card-header" onclick="toggleRotExpand('' + rot.id + '')">' +
+        '<div class="rot-dia-badge" style="background:' + bg + ';color:' + cor + '">' + (DIAS_LABEL[rot.dia]||rot.dia) + '</div>' +
+        '<div style="flex:1;min-width:0">' +
+          '<div style="font-weight:700;font-size:14px">' + rot.nome + '</div>' +
+          '<div style="display:flex;align-items:center;gap:10px;margin-top:3px;flex-wrap:wrap">' +
+            (rot.hora ? '<span style="font-size:11px;color:var(--text3)">⏰ ' + rot.hora + '</span>' : '') +
+            (rot.resp ? '<span style="font-size:11px;color:var(--text3)">👤 ' + rot.resp + '</span>' : '') +
+            (totalCheck > 0 ? '<span style="font-size:11px;color:' + (pct===100?'var(--green)':'var(--text3)') + '">' + doneCount + '/' + totalCheck + ' itens</span>' : '') +
+          '</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:6px;align-items:center">' +
+          (totalCheck > 0 ? '<div style="width:40px;height:5px;background:var(--border);border-radius:20px;overflow:hidden"><div style="height:100%;width:' + pct + '%;background:' + (pct===100?'var(--green)':'var(--gold)') + ';border-radius:20px"></div></div>' : '') +
+          '<svg id="rot-arrow-' + rot.id + '" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2" style="flex-shrink:0;transition:transform .2s;transform:rotate(0deg)"><polyline points="6 9 12 15 18 9"/></svg>' +
+        '</div>' +
+      '</div>' +
+      '<div id="rot-body-' + rot.id + '" class="rot-card-body" style="display:none">' +
+        (rot.desc ? '<p style="font-size:13px;color:var(--text2);margin-top:12px;line-height:1.5">' + rot.desc + '</p>' : '') +
+        (rot.checklist && rot.checklist.length ? '<div class="rot-checklist">' +
+          rot.checklist.map(function(item, i) {
+            var done = rot.checkDone && rot.checkDone[i];
+            return '<div class="rot-check-item">' +
+              '<div class="rot-check-box' + (done?' done':'') + '" id="rc-' + rot.id + '-' + i + '" onclick="toggleCheckRotina('' + rot.id + '',' + i + ')"></div>' +
+              '<span class="rot-check-text' + (done?' done':'') + '" id="rt-' + rot.id + '-' + i + '">' + item.texto + '</span>' +
+            '</div>';
+          }).join('') +
+        '</div>' : '<p style="font-size:12px;color:var(--text3);margin-top:12px">Nenhum item no checklist</p>') +
+        '<div style="display:flex;gap:7px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">' +
+          '<button class="btn btn-g btn-xs" onclick="abrirModalRotina('' + rot.id + '')">Editar</button>' +
+          '<button class="btn btn-d btn-xs" onclick="excluirRotina('' + rot.id + '')">Excluir</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+// ── ATIVIDADES PONTUAIS ──
+function abrirModalAtividade(id) {
+  var at = id ? _atividades.find(function(a){ return a.id===id; }) : null;
+  document.getElementById('modal-ativ-title').textContent = at ? 'Editar Atividade' : 'Nova Atividade';
+  document.getElementById('ativ-edit-id').value = id || '';
+  document.getElementById('ativ-titulo').value = at ? at.titulo : '';
+  document.getElementById('ativ-data').value = at ? (at.data||'') : new Date().toISOString().split('T')[0];
+  document.getElementById('ativ-prio').value = at ? (at.prio||'normal') : 'normal';
+  document.getElementById('ativ-resp').value = at ? (at.resp||'') : '';
+  document.getElementById('ativ-status').value = at ? (at.status||'pendente') : 'pendente';
+  document.getElementById('ativ-obs').value = at ? (at.obs||'') : '';
+  document.getElementById('ativ-check-input').value = '';
+  _ativCheckTemp = at ? (at.checklist||[]).map(function(item){ return {texto:item.texto, done:item.done||false}; }) : [];
+  renderCheckTempAtiv();
+  document.getElementById('modal-atividade').classList.add('open');
+  setTimeout(function(){ document.getElementById('ativ-titulo').focus(); }, 100);
+}
+
+function fecharModalAtividade() { document.getElementById('modal-atividade').classList.remove('open'); }
+
+function addCheckAtividade() {
+  var inp = document.getElementById('ativ-check-input');
+  var val = inp.value.trim();
+  if (!val) return;
+  _ativCheckTemp.push({texto:val, done:false});
+  inp.value = '';
+  renderCheckTempAtiv();
+  inp.focus();
+}
+
+function renderCheckTempAtiv() {
+  var el = document.getElementById('ativ-checklist-items');
+  if (!el) return;
+  el.innerHTML = _ativCheckTemp.map(function(item, i) {
+    return '<div class="modal-check-item">' +
+      '<div style="font-size:13px;flex:1">' + item.texto + '</div>' +
+      '<button class="modal-check-remove" onclick="remCheckAtiv(' + i + ')">×</button>' +
+    '</div>';
+  }).join('');
+}
+
+function remCheckAtiv(i) { _ativCheckTemp.splice(i,1); renderCheckTempAtiv(); }
+
+function salvarAtividade() {
+  var titulo = document.getElementById('ativ-titulo').value.trim();
+  if (!titulo) { toast('Informe o titulo', 'e'); return; }
+  var editId = document.getElementById('ativ-edit-id').value;
+  var at = {
+    id: editId || Date.now().toString(),
+    titulo: titulo,
+    data: document.getElementById('ativ-data').value,
+    prio: document.getElementById('ativ-prio').value,
+    resp: document.getElementById('ativ-resp').value.trim(),
+    status: document.getElementById('ativ-status').value,
+    obs: document.getElementById('ativ-obs').value.trim(),
+    checklist: _ativCheckTemp.map(function(item){ return {texto:item.texto, done:item.done}; })
+  };
+  if (editId) {
+    var idx = _atividades.findIndex(function(a){ return a.id===editId; });
+    if (idx !== -1) _atividades[idx] = at; else _atividades.push(at);
+  } else {
+    _atividades.push(at);
+  }
+  localStorage.setItem('slp_atividades', JSON.stringify(_atividades));
+  fecharModalAtividade();
+  renderAtividades();
+  toast(editId ? 'Atividade atualizada!' : 'Atividade criada!');
+}
+
+function excluirAtividade(id) {
+  if (!confirm('Excluir esta atividade?')) return;
+  _atividades = _atividades.filter(function(a){ return a.id!==id; });
+  localStorage.setItem('slp_atividades', JSON.stringify(_atividades));
+  renderAtividades();
+  toast('Atividade excluida.');
+}
+
+function toggleCheckAtiv(ativId, idx) {
+  var at = _atividades.find(function(a){ return a.id===ativId; });
+  if (!at || !at.checklist) return;
+  at.checklist[idx].done = !at.checklist[idx].done;
+  // Auto status se tudo concluido
+  var allDone = at.checklist.every(function(item){ return item.done; });
+  if (allDone && at.checklist.length > 0) at.status = 'concluida';
+  localStorage.setItem('slp_atividades', JSON.stringify(_atividades));
+  renderAtividades();
+}
+
+function mudarStatusAtiv(id, status) {
+  var at = _atividades.find(function(a){ return a.id===id; });
+  if (!at) return;
+  at.status = status;
+  localStorage.setItem('slp_atividades', JSON.stringify(_atividades));
+  renderAtividades();
+  toast('Status atualizado!');
+}
+
+function filtrarAtividades(filtro) {
+  _ativFiltro = filtro;
+  ['todas','pendente','andamento','concluida'].forEach(function(f) {
+    var btn = document.getElementById('af-' + f);
+    if (btn) { btn.classList.toggle('btn-p', f===filtro); btn.classList.toggle('btn-g', f!==filtro); }
+  });
+  renderAtividades();
+}
+
+function renderAtividades() {
+  var lista = document.getElementById('atividades-lista');
+  var countEl = document.getElementById('atividades-count');
+  if (!lista) return;
+
+  var filtered = _atividades;
+  if (_ativFiltro !== 'todas') filtered = _atividades.filter(function(a){ return a.status===_ativFiltro; });
+  if (countEl) countEl.textContent = _atividades.length;
+
+  if (!filtered.length) {
+    lista.innerHTML = '<div class="dash-vazio">' +
+      (_atividades.length ? '<div style="font-size:13px">Nenhuma atividade neste filtro</div>' :
+        '<div style="font-weight:600;margin-bottom:4px">Nenhuma atividade criada</div><div style="font-size:12px;margin-bottom:14px">Adicione atividades pontuais para projetos especificos</div>' +
+        '<button class="btn btn-g btn-sm" onclick="abrirModalAtividade()">+ Criar atividade</button>') +
+    '</div>';
+    return;
+  }
+
+  // Ordenar: urgente > alta > normal; depois por data
+  var prioOrd = {urgente:0, alta:1, normal:2};
+  filtered = filtered.slice().sort(function(a,b){
+    var pp = (prioOrd[a.prio]||2) - (prioOrd[b.prio]||2);
+    if (pp !== 0) return pp;
+    return (a.data||'').localeCompare(b.data||'');
+  });
+
+  lista.innerHTML = filtered.map(function(at) {
+    var totalCheck = (at.checklist||[]).length;
+    var doneCheck = (at.checklist||[]).filter(function(i){ return i.done; }).length;
+    var pct = totalCheck > 0 ? Math.round((doneCheck/totalCheck)*100) : 0;
+    var hoje = new Date().toISOString().split('T')[0];
+    var vencida = at.data && at.data < hoje && at.status !== 'concluida';
+
+    return '<div class="ativ-card ' + at.status + '" onclick="abrirModalAtividade('' + at.id + '')">' +
+      '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px">' +
+        '<div style="flex:1;min-width:0">' +
+          '<div style="font-weight:700;font-size:14px;margin-bottom:4px' + (at.status==='concluida'?';text-decoration:line-through;color:var(--text3)':'') + '">' + at.titulo + '</div>' +
+          '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
+            '<span class="prio-badge prio-' + at.prio + '">' + (at.prio==='urgente'?'🔴 Urgente':at.prio==='alta'?'🟡 Alta':'Normal') + '</span>' +
+            '<span class="status-badge status-' + at.status + '">' + (at.status==='concluida'?'Concluida':at.status==='andamento'?'Em andamento':'Pendente') + '</span>' +
+            (at.data ? '<span style="font-size:11px;color:' + (vencida?'var(--red)':'var(--text3)') + '">' + (vencida?'⚠️ ':'') + at.data.split('-').reverse().join('/') + '</span>' : '') +
+            (at.resp ? '<span style="font-size:11px;color:var(--text3)">👤 ' + at.resp + '</span>' : '') +
+          '</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:5px;flex-shrink:0" onclick="event.stopPropagation()">' +
+          (at.status !== 'concluida' ? '<button class="btn btn-g btn-xs" onclick="mudarStatusAtiv('' + at.id + '','concluida')">✓</button>' : '') +
+          '<button class="btn btn-d btn-xs" onclick="excluirAtividade('' + at.id + '')">×</button>' +
+        '</div>' +
+      '</div>' +
+      (totalCheck > 0 ?
+        '<div style="margin-top:10px">' +
+          (at.checklist||[]).map(function(item, i) {
+            return '<div class="rot-check-item" onclick="event.stopPropagation();toggleCheckAtiv('' + at.id + '',' + i + ')">' +
+              '<div class="rot-check-box' + (item.done?' done':'') + '"></div>' +
+              '<span class="rot-check-text' + (item.done?' done':'') + '">' + item.texto + '</span>' +
+            '</div>';
+          }).join('') +
+          '<div style="margin-top:8px">' +
+            '<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:11px;color:var(--text3)">' + doneCheck + '/' + totalCheck + ' concluidos</span><span style="font-size:11px;font-weight:600;color:' + (pct===100?'var(--green)':'var(--text2)') + '">' + pct + '%</span></div>' +
+            '<div style="height:5px;background:var(--border);border-radius:20px;overflow:hidden"><div style="height:100%;width:' + pct + '%;background:' + (pct===100?'var(--green)':'var(--blue)') + ';border-radius:20px;transition:width .4s"></div></div>' +
+          '</div>' +
+        '</div>' : '') +
+    '</div>';
+  }).join('');
+}
+
+function abrirModalTarefa() { abrirModalAtividade(); }
+function salvarTarefa() { salvarAtividade(); }
 
 // ── FUNIS ──
 function abrirModalFunil() {
