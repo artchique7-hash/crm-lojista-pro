@@ -922,80 +922,15 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
     <div>
      <h2 style="font-size:16px;font-weight:700;font-family:'Syne',sans-serif">Metas da Loja</h2>
-     <p style="font-size:12px;color:var(--text3);margin-top:2px">Defina e acompanhe seus objetivos</p>
+     <p style="font-size:12px;color:var(--text3);margin-top:2px">Acompanhe o progresso dos seus objetivos</p>
     </div>
     <button class="btn btn-p btn-sm" onclick="abrirModalMeta()">+ Nova Meta</button>
    </div>
+   <!-- Resumo rápido -->
+   <div id="metas-resumo" style="display:none;margin-bottom:18px"></div>
 
-   <!-- Cards de meta -->
-   <div class="meta-grid" id="metas-grid">
-    <!-- Exemplos visuais -->
-    <div class="meta-card">
-     <div class="meta-icon" style="background:var(--green-l)">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
-     </div>
-     <div style="flex:1;min-width:0">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-       <div style="font-weight:700;font-size:14px">Meta de Clientes</div>
-       <span class="badge bg-g">Ativo</span>
-      </div>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:8px">Captar 50 novos clientes este mes</div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
-       <span style="font-size:12px;color:var(--text3)">Progresso</span>
-       <span style="font-size:13px;font-weight:700;color:var(--green)">0 / 50</span>
-      </div>
-      <div class="meta-prog"><div class="meta-prog-bar" style="width:0%;background:var(--green)"></div></div>
-     </div>
-    </div>
-
-    <div class="meta-card">
-     <div class="meta-icon" style="background:var(--blue-l)">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-     </div>
-     <div style="flex:1;min-width:0">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-       <div style="font-weight:700;font-size:14px">Meta de Conversao</div>
-       <span class="badge bg-b">Ativo</span>
-      </div>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:8px">Atingir 30% de conversao na loja fisica</div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
-       <span style="font-size:12px;color:var(--text3)">Atual</span>
-       <span style="font-size:13px;font-weight:700;color:var(--blue)">0%</span>
-      </div>
-      <div class="meta-prog"><div class="meta-prog-bar" style="width:0%;background:var(--blue)"></div></div>
-     </div>
-    </div>
-
-    <div class="meta-card">
-     <div class="meta-icon" style="background:var(--gold-l)">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-     </div>
-     <div style="flex:1;min-width:0">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-       <div style="font-weight:700;font-size:14px">Meta de Campanhas</div>
-       <span class="badge bg-go">Planejando</span>
-      </div>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:8px">Realizar 2 campanhas comerciais este mes</div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
-       <span style="font-size:12px;color:var(--text3)">Realizadas</span>
-       <span style="font-size:13px;font-weight:700;color:var(--gold)">0 / 2</span>
-      </div>
-      <div class="meta-prog"><div class="meta-prog-bar" style="width:0%;background:var(--gold)"></div></div>
-     </div>
-    </div>
-
-    <!-- Card adicionar nova -->
-    <div class="meta-card" style="border-style:dashed;cursor:pointer;justify-content:center;align-items:center;flex-direction:column;gap:8px;min-height:120px;background:var(--bg3)" onclick="abrirModalMeta()">
-     <div style="width:36px;height:36px;border-radius:50%;background:var(--bg4);border:1.5px dashed var(--border2);display:flex;align-items:center;justify-content:center;color:var(--text3)">+</div>
-     <div style="font-size:13px;color:var(--text3);font-weight:500">Adicionar nova meta</div>
-    </div>
-   </div>
-
-   <!-- Info -->
-   <div style="margin-top:20px;background:var(--gold-l);border:1px solid rgba(160,120,48,.15);border-radius:var(--r);padding:16px;display:flex;align-items:flex-start;gap:12px">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-    <div style="font-size:12px;color:var(--gold);line-height:1.6"><strong>Em breve:</strong> As metas se conectarao automaticamente aos dados do sistema — conversao, clientes captados, campanhas e mais.</div>
-   </div>
+   <!-- Grid de metas dinâmico -->
+   <div class="meta-grid" id="metas-grid"></div>
   </div>
 
   <!-- CALENDARIO -->
@@ -1372,25 +1307,67 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 
 <!-- MODAIS ESCRITORIO -->
 <div class="mo" id="modal-meta">
- <div class="modal" style="max-width:420px">
-  <div class="mh"><h3 class="mt2">Nova Meta</h3><button class="mc" onclick="document.getElementById('modal-meta').classList.remove('open')">x</button></div>
+ <div class="modal" style="max-width:460px">
+  <div class="mh"><h3 class="mt2" id="modal-meta-title">Nova Meta</h3><button class="mc" onclick="fecharModalMeta()">x</button></div>
   <div class="mb">
-   <div class="fg"><label class="fl">Titulo da Meta *</label><input type="text" id="meta-titulo" class="fi" placeholder="Ex: Captar 50 novos clientes"></div>
-   <div class="fg"><label class="fl">Descricao</label><input type="text" id="meta-desc" class="fi" placeholder="Ex: Meta do mes de junho"></div>
+   <input type="hidden" id="meta-edit-id">
+   <div class="fg"><label class="fl">Nome da Meta *</label><input type="text" id="meta-titulo" class="fi" placeholder="Ex: Vender R$ 5.000 em Lives"></div>
    <div class="fgrid">
-    <div class="fg"><label class="fl">Valor Atual</label><input type="number" id="meta-atual" class="fi" placeholder="0" value="0"></div>
-    <div class="fg"><label class="fl">Meta</label><input type="number" id="meta-alvo" class="fi" placeholder="100"></div>
+    <div class="fg"><label class="fl">Categoria</label>
+     <select id="meta-cat" class="fi">
+      <option value="faturamento">Faturamento</option>
+      <option value="clientes">Clientes</option>
+      <option value="conversao">Conversao</option>
+      <option value="conteudo">Conteudo</option>
+      <option value="personalizada">Personalizada</option>
+     </select>
+    </div>
+    <div class="fg"><label class="fl">Unidade</label>
+     <select id="meta-unidade" class="fi">
+      <option value="numero">Numero (ex: 50 clientes)</option>
+      <option value="reais">Valor em R$</option>
+      <option value="percentual">Percentual (%)</option>
+     </select>
+    </div>
    </div>
-   <div class="fg"><label class="fl">Categoria</label>
-    <select id="meta-cat" class="fi">
-     <option value="clientes">Clientes</option>
-     <option value="conversao">Conversao</option>
-     <option value="campanhas">Campanhas</option>
-     <option value="outro">Outro</option>
-    </select>
+   <div class="fgrid">
+    <div class="fg"><label class="fl">Inicio do Periodo *</label><input type="date" id="meta-inicio" class="fi"></div>
+    <div class="fg"><label class="fl">Fim do Periodo *</label><input type="date" id="meta-fim" class="fi"></div>
+   </div>
+   <div class="fgrid">
+    <div class="fg"><label class="fl">Valor da Meta *</label><input type="number" id="meta-alvo" class="fi" placeholder="Ex: 5000" step="0.01"></div>
+    <div class="fg"><label class="fl">Resultado Atual</label><input type="number" id="meta-atual" class="fi" placeholder="0" value="0" step="0.01"></div>
+   </div>
+   <div class="fg"><label class="fl">Descricao (opcional)</label><input type="text" id="meta-desc" class="fi" placeholder="Ex: Faturamento via Lives de maio"></div>
+  </div>
+  <div class="mf">
+   <button class="btn btn-g btn-sm" onclick="fecharModalMeta()">Cancelar</button>
+   <button class="btn btn-p btn-sm" onclick="salvarMeta()">Salvar Meta</button>
+  </div>
+ </div>
+</div>
+
+<!-- MODAL ATUALIZAR RESULTADO -->
+<div class="mo" id="modal-resultado">
+ <div class="modal" style="max-width:360px">
+  <div class="mh"><h3 class="mt2">Atualizar Resultado</h3><button class="mc" onclick="fecharModalResultado()">x</button></div>
+  <div class="mb">
+   <input type="hidden" id="res-meta-id">
+   <div style="background:var(--bg4);border-radius:var(--rs);padding:14px;margin-bottom:16px">
+    <div style="font-size:11px;color:var(--text3);margin-bottom:3px">Meta</div>
+    <div style="font-weight:700;font-size:14px" id="res-meta-nome"></div>
+    <div style="font-size:12px;color:var(--text2);margin-top:2px" id="res-meta-alvo"></div>
+   </div>
+   <div class="fg">
+    <label class="fl">Resultado Atual *</label>
+    <input type="number" id="res-valor" class="fi" placeholder="Digite o resultado atual" step="0.01">
+    <div style="font-size:11px;color:var(--text3);margin-top:5px" id="res-hint"></div>
    </div>
   </div>
-  <div class="mf"><button class="btn btn-g btn-sm" onclick="document.getElementById('modal-meta').classList.remove('open')">Cancelar</button><button class="btn btn-p btn-sm" onclick="salvarMeta()">Salvar Meta</button></div>
+  <div class="mf">
+   <button class="btn btn-g btn-sm" onclick="fecharModalResultado()">Cancelar</button>
+   <button class="btn btn-p btn-sm" onclick="confirmarResultado()">Atualizar</button>
+  </div>
  </div>
 </div>
 
@@ -3186,51 +3163,236 @@ function salvarEvento() {
 }
 
 // ── METAS ──
-function abrirModalMeta() {
-  ['meta-titulo','meta-desc'].forEach(function(id){ document.getElementById(id).value=''; });
-  document.getElementById('meta-atual').value = '0';
-  document.getElementById('meta-alvo').value = '';
-  document.getElementById('meta-cat').value = 'clientes';
+var CAT_COR = {
+  faturamento: 'var(--green)',
+  clientes: 'var(--blue)',
+  conversao: 'var(--gold)',
+  conteudo: 'var(--purple)',
+  personalizada: 'var(--red)'
+};
+var CAT_LABEL = {
+  faturamento:'Faturamento', clientes:'Clientes',
+  conversao:'Conversao', conteudo:'Conteudo', personalizada:'Personalizada'
+};
+var CAT_ICONE = {
+  faturamento:'<path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>',
+  clientes:'<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/>',
+  conversao:'<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>',
+  conteudo:'<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>',
+  personalizada:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>'
+};
+
+function getStatusMeta(m) {
+  var hoje = new Date().toISOString().split('T')[0];
+  var pct = m.alvo > 0 ? (m.atual / m.alvo) * 100 : 0;
+  if (pct >= 100) return {label:'Concluida', cls:'bg-g', cor:'var(--green)'};
+  if (m.fim && hoje > m.fim && pct < 100) return {label:'Atrasada', cls:'bg-r', cor:'var(--red)'};
+  return {label:'Em andamento', cls:'bg-b', cor:'var(--blue)'};
+}
+
+function formatValorMeta(val, unidade) {
+  val = parseFloat(val) || 0;
+  if (unidade === 'reais') return 'R$ ' + val.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+  if (unidade === 'percentual') return val + '%';
+  return val.toString();
+}
+
+function diasRestantes(fim) {
+  if (!fim) return null;
+  var hoje = new Date(); hoje.setHours(0,0,0,0);
+  var fimD = new Date(fim + 'T00:00:00');
+  var diff = Math.ceil((fimD - hoje) / 86400000);
+  return diff;
+}
+
+function abrirModalMeta(id) {
+  var m = id ? _metas.find(function(x){ return x.id === id; }) : null;
+  document.getElementById('modal-meta-title').textContent = m ? 'Editar Meta' : 'Nova Meta';
+  document.getElementById('meta-edit-id').value = id || '';
+  document.getElementById('meta-titulo').value = m ? m.titulo : '';
+  document.getElementById('meta-cat').value = m ? (m.cat||'faturamento') : 'faturamento';
+  document.getElementById('meta-unidade').value = m ? (m.unidade||'numero') : 'numero';
+  document.getElementById('meta-inicio').value = m ? (m.inicio||'') : new Date().toISOString().split('T')[0];
+  document.getElementById('meta-fim').value = m ? (m.fim||'') : '';
+  document.getElementById('meta-alvo').value = m ? m.alvo : '';
+  document.getElementById('meta-atual').value = m ? m.atual : '0';
+  document.getElementById('meta-desc').value = m ? (m.desc||'') : '';
   document.getElementById('modal-meta').classList.add('open');
+}
+
+function fecharModalMeta() {
+  document.getElementById('modal-meta').classList.remove('open');
 }
 
 function salvarMeta() {
   var titulo = document.getElementById('meta-titulo').value.trim();
-  if (!titulo) { toast('Informe o titulo da meta', 'e'); return; }
+  var alvo = parseFloat(document.getElementById('meta-alvo').value);
+  var inicio = document.getElementById('meta-inicio').value;
+  var fim = document.getElementById('meta-fim').value;
+  if (!titulo) { toast('Informe o nome da meta', 'e'); return; }
+  if (!alvo || alvo <= 0) { toast('Informe o valor da meta', 'e'); return; }
+  if (!inicio || !fim) { toast('Informe o periodo da meta', 'e'); return; }
+
+  var editId = document.getElementById('meta-edit-id').value;
   var meta = {
-    id: Date.now().toString(),
+    id: editId || Date.now().toString(),
     titulo: titulo,
-    desc: document.getElementById('meta-desc').value.trim(),
+    cat: document.getElementById('meta-cat').value,
+    unidade: document.getElementById('meta-unidade').value,
+    inicio: inicio,
+    fim: fim,
+    alvo: alvo,
     atual: parseFloat(document.getElementById('meta-atual').value) || 0,
-    alvo: parseFloat(document.getElementById('meta-alvo').value) || 100,
-    cat: document.getElementById('meta-cat').value
+    desc: document.getElementById('meta-desc').value.trim(),
+    criadaEm: editId ? (_metas.find(function(x){ return x.id===editId; })||{}).criadaEm : new Date().toISOString()
   };
-  _metas.push(meta);
+
+  if (editId) {
+    var idx = _metas.findIndex(function(x){ return x.id === editId; });
+    if (idx !== -1) _metas[idx] = meta;
+  } else {
+    _metas.push(meta);
+  }
   localStorage.setItem('slp_metas', JSON.stringify(_metas));
-  document.getElementById('modal-meta').classList.remove('open');
+  fecharModalMeta();
   renderMetas();
-  toast('Meta salva!');
+  toast(editId ? 'Meta atualizada!' : 'Meta criada!');
 }
 
-var COR_META = {clientes:'var(--green)', conversao:'var(--blue)', campanhas:'var(--gold)', outro:'var(--purple)'};
+function excluirMeta(id) {
+  if (!confirm('Excluir esta meta?')) return;
+  _metas = _metas.filter(function(m){ return m.id !== id; });
+  localStorage.setItem('slp_metas', JSON.stringify(_metas));
+  renderMetas();
+  toast('Meta excluida.');
+}
+
+function abrirModalResultado(id) {
+  var m = _metas.find(function(x){ return x.id === id; });
+  if (!m) return;
+  document.getElementById('res-meta-id').value = id;
+  document.getElementById('res-meta-nome').textContent = m.titulo;
+  document.getElementById('res-meta-alvo').textContent = 'Meta: ' + formatValorMeta(m.alvo, m.unidade);
+  document.getElementById('res-valor').value = m.atual;
+  document.getElementById('res-hint').textContent = 'Resultado atual: ' + formatValorMeta(m.atual, m.unidade) + ' de ' + formatValorMeta(m.alvo, m.unidade);
+  document.getElementById('modal-resultado').classList.add('open');
+  setTimeout(function(){ document.getElementById('res-valor').focus(); document.getElementById('res-valor').select(); }, 100);
+}
+
+function fecharModalResultado() {
+  document.getElementById('modal-resultado').classList.remove('open');
+}
+
+function confirmarResultado() {
+  var id = document.getElementById('res-meta-id').value;
+  var valor = parseFloat(document.getElementById('res-valor').value);
+  if (isNaN(valor) || valor < 0) { toast('Informe um valor valido', 'e'); return; }
+  var idx = _metas.findIndex(function(x){ return x.id === id; });
+  if (idx === -1) return;
+  _metas[idx].atual = valor;
+  localStorage.setItem('slp_metas', JSON.stringify(_metas));
+  fecharModalResultado();
+  renderMetas();
+  var pct = _metas[idx].alvo > 0 ? Math.round((valor/_metas[idx].alvo)*100) : 0;
+  toast('Resultado atualizado! ' + pct + '% atingido');
+}
 
 function renderMetas() {
   var grid = document.getElementById('metas-grid');
+  var resumoEl = document.getElementById('metas-resumo');
   if (!grid) return;
+
+  // Resumo rápido
+  if (resumoEl && _metas.length) {
+    var concluidas = _metas.filter(function(m){ return getStatusMeta(m).label==='Concluida'; }).length;
+    var andamento = _metas.filter(function(m){ return getStatusMeta(m).label==='Em andamento'; }).length;
+    var atrasadas = _metas.filter(function(m){ return getStatusMeta(m).label==='Atrasada'; }).length;
+    resumoEl.style.display = 'grid';
+    resumoEl.style.gridTemplateColumns = 'repeat(3,1fr)';
+    resumoEl.style.gap = '10px';
+    resumoEl.innerHTML =
+      '<div class="ri" style="text-align:center"><div class="rv" style="color:var(--green)">' + concluidas + '</div><div class="rl">Concluidas</div></div>' +
+      '<div class="ri" style="text-align:center"><div class="rv" style="color:var(--blue)">' + andamento + '</div><div class="rl">Em andamento</div></div>' +
+      '<div class="ri" style="text-align:center"><div class="rv" style="color:var(--red)">' + atrasadas + '</div><div class="rl">Atrasadas</div></div>';
+  } else if (resumoEl) {
+    resumoEl.style.display = 'none';
+  }
+
+  if (!_metas.length) {
+    grid.innerHTML =
+      '<div style="grid-column:1/-1;text-align:center;padding:48px 20px">' +
+      '<div style="width:56px;height:56px;border-radius:50%;background:var(--bg4);display:flex;align-items:center;justify-content:center;margin:0 auto 16px">' +
+      '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div>' +
+      '<div style="font-weight:700;font-size:15px;color:var(--text2);margin-bottom:6px">Nenhuma meta cadastrada</div>' +
+      '<div style="font-size:13px;color:var(--text3);margin-bottom:18px">Defina suas metas para acompanhar o progresso da loja</div>' +
+      '<button class="btn btn-p btn-sm" onclick="abrirModalMeta()">+ Criar primeira meta</button>' +
+      '</div>';
+    return;
+  }
+
   var cards = _metas.map(function(m) {
     var pct = m.alvo > 0 ? Math.min(100, Math.round((m.atual/m.alvo)*100)) : 0;
-    var cor = COR_META[m.cat] || 'var(--green)';
-    return '<div class="meta-card"><div class="meta-icon" style="background:' + cor.replace('var(--','var(--').replace(')','-l)') + '">' +
-      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="' + cor + '" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>' +
-      '<div style="flex:1;min-width:0"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><div style="font-weight:700;font-size:14px">' + m.titulo + '</div>' +
-      '<span style="font-size:11px;font-weight:700;color:' + cor + '">' + pct + '%</span></div>' +
-      (m.desc ? '<div style="font-size:12px;color:var(--text2);margin-bottom:8px">' + m.desc + '</div>' : '') +
-      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px"><span style="font-size:12px;color:var(--text3)">Progresso</span><span style="font-size:13px;font-weight:700;color:' + cor + '">' + m.atual + ' / ' + m.alvo + '</span></div>' +
-      '<div class="meta-prog"><div class="meta-prog-bar" style="width:' + pct + '%;background:' + cor + '"></div></div></div></div>';
+    var cor = CAT_COR[m.cat] || 'var(--green)';
+    var status = getStatusMeta(m);
+    var dias = diasRestantes(m.fim);
+    var icone = CAT_ICONE[m.cat] || CAT_ICONE.personalizada;
+    var corBg = cor.replace(')', '-l)').replace('var(--', 'var(--');
+    var progCor = pct >= 100 ? 'var(--green)' : pct >= 60 ? 'var(--gold)' : cor;
+
+    var diasInfo = '';
+    if (dias !== null) {
+      if (dias > 0) diasInfo = '<span style="font-size:11px;color:var(--text3)">' + dias + ' dia' + (dias!==1?'s':'') + ' restante' + (dias!==1?'s':'') + '</span>';
+      else if (dias === 0) diasInfo = '<span style="font-size:11px;color:var(--gold);font-weight:600">Termina hoje</span>';
+      else diasInfo = '<span style="font-size:11px;color:var(--red);font-weight:600">Encerrada</span>';
+    }
+
+    return '<div class="meta-card" style="flex-direction:column;gap:0;padding:0;overflow:hidden">' +
+      // Header colorido
+      '<div style="background:' + cor + ';padding:14px 18px;display:flex;align-items:center;justify-content:space-between">' +
+        '<div style="display:flex;align-items:center;gap:10px">' +
+          '<div style="width:36px;height:36px;background:rgba(255,255,255,.15);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0">' +
+            '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">' + icone + '</svg>' +
+          '</div>' +
+          '<div>' +
+            '<div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.6px">' + (CAT_LABEL[m.cat]||'Meta') + '</div>' +
+            '<div style="font-weight:700;font-size:14px;color:#fff">' + m.titulo + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<span style="background:rgba(255,255,255,.2);color:#fff;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600">' + status.label + '</span>' +
+      '</div>' +
+      // Body
+      '<div style="padding:16px 18px">' +
+        (m.desc ? '<div style="font-size:12px;color:var(--text2);margin-bottom:12px">' + m.desc + '</div>' : '') +
+        // Progresso
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">' +
+          '<span style="font-size:12px;color:var(--text3)">Progresso</span>' +
+          '<div style="display:flex;align-items:center;gap:8px">' +
+            '<span style="font-size:13px;color:var(--text2)">' + formatValorMeta(m.atual, m.unidade) + ' / ' + formatValorMeta(m.alvo, m.unidade) + '</span>' +
+            '<span style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:' + progCor + '">' + pct + '%</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="meta-prog" style="height:8px;margin-bottom:10px"><div class="meta-prog-bar" style="width:' + pct + '%;background:' + progCor + '"></div></div>' +
+        // Periodo + dias
+        '<div style="display:flex;align-items:center;justify-content:space-between">' +
+          '<span style="font-size:11px;color:var(--text3)">' + (m.inicio?m.inicio.split('-').reverse().join('/'):'-') + ' ate ' + (m.fim?m.fim.split('-').reverse().join('/'):'-') + '</span>' +
+          diasInfo +
+        '</div>' +
+        // Acoes
+        '<div style="display:flex;gap:7px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">' +
+          '<button class="btn btn-p btn-sm" style="flex:1" onclick="abrirModalResultado('' + m.id + '')">Atualizar Resultado</button>' +
+          '<button class="btn btn-g btn-xs" onclick="abrirModalMeta('' + m.id + '')">Editar</button>' +
+          '<button class="btn btn-d btn-xs" onclick="excluirMeta('' + m.id + '')">x</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
   });
-  // Manter o card de adicionar no final
-  var addCard = '<div class="meta-card" style="border-style:dashed;cursor:pointer;justify-content:center;align-items:center;flex-direction:column;gap:8px;min-height:120px;background:var(--bg3)" onclick="abrirModalMeta()"><div style="width:36px;height:36px;border-radius:50%;background:var(--bg4);border:1.5px dashed var(--border2);display:flex;align-items:center;justify-content:center;color:var(--text3)">+</div><div style="font-size:13px;color:var(--text3);font-weight:500">Adicionar nova meta</div></div>';
-  if (_metas.length) grid.innerHTML = cards.join('') + addCard;
+
+  var addCard = '<div class="meta-card" style="border-style:dashed;cursor:pointer;justify-content:center;align-items:center;flex-direction:column;gap:8px;min-height:160px;background:var(--bg3)" onclick="abrirModalMeta()">' +
+    '<div style="width:40px;height:40px;border-radius:50%;background:var(--bg4);border:1.5px dashed var(--border2);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:22px">+</div>' +
+    '<div style="font-size:13px;color:var(--text3);font-weight:500">Nova meta</div>' +
+  '</div>';
+
+  grid.innerHTML = cards.join('') + addCard;
 }
 
 // ── ROTINA ──
