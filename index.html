@@ -428,6 +428,38 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 .dash-prox-date{font-size:11px;color:var(--text3);font-weight:600;min-width:70px;flex-shrink:0}
 .dash-vazio{background:var(--bg4);border:1.5px dashed var(--border2);border-radius:var(--r);padding:20px;text-align:center;color:var(--text3);font-size:13px}
 
+/* PLANEJAMENTO MENSAL */
+.plan-field{margin-bottom:14px}
+.plan-field-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+.plan-field-value{font-size:14px;color:var(--text);line-height:1.5}
+.plan-field-empty{font-size:13px;color:var(--text3);font-style:italic}
+
+/* KANBAN */
+.kan-col{min-width:200px;width:200px;flex-shrink:0}
+.kan-col-header{padding:10px 12px;border-radius:var(--rs) var(--rs) 0 0;display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.kan-col-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.kan-col-count{font-size:11px;font-weight:700;padding:2px 7px;border-radius:20px}
+.kan-cards{display:flex;flex-direction:column;gap:7px;min-height:120px}
+.kan-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rs);padding:12px;cursor:pointer;transition:all .18s;box-shadow:var(--sh)}
+.kan-card:hover{box-shadow:var(--sh-md);transform:translateY(-1px)}
+.kan-card-title{font-size:13px;font-weight:600;margin-bottom:5px;line-height:1.3}
+.kan-card-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.kan-card-tag{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:600}
+.kan-card-date{font-size:10px;color:var(--text3)}
+.kan-drop-zone{min-height:60px;border:1.5px dashed var(--border2);border-radius:var(--rs);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:11px;cursor:pointer;transition:all .18s}
+.kan-drop-zone:hover{border-color:var(--green);background:var(--green-l);color:var(--green)}
+
+/* LISTA */
+.plan-lista-item{display:flex;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
+.plan-lista-item:hover{background:var(--bg4)}
+.plan-lista-item:last-child{border-bottom:none}
+.plan-tipo-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+
+/* MINI KANBAN */
+.kan-mini-col{background:var(--bg4);border-radius:var(--rs);padding:10px;text-align:center}
+.kan-mini-num{font-family:'Syne',sans-serif;font-size:20px;font-weight:700}
+.kan-mini-label{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+
 </style>
 </head>
 <body>
@@ -933,37 +965,96 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
    <div class="meta-grid" id="metas-grid"></div>
   </div>
 
-  <!-- CALENDARIO -->
+  <!-- CALENDARIO / PLANEJAMENTO MENSAL -->
   <div id="escrit-calendario" class="escrit-section">
-   <div class="card" style="padding:24px">
-    <div class="cal-header">
-     <div class="cal-nav">
-      <button class="cal-nav-btn" onclick="calNav(-1)">&#8249;</button>
-      <span class="cal-month-label" id="cal-month-label">Maio 2026</span>
-      <button class="cal-nav-btn" onclick="calNav(1)">&#8250;</button>
-     </div>
-     <div style="display:flex;gap:8px;align-items:center">
-      <button class="btn btn-g btn-sm" onclick="calHoje()">Hoje</button>
-      <button class="btn btn-p btn-sm" onclick="abrirModalEvento()">+ Evento</button>
-     </div>
+
+   <!-- HEADER DO MES -->
+   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+    <div style="display:flex;align-items:center;gap:10px">
+     <button class="cal-nav-btn" onclick="calNav(-1)">&#8249;</button>
+     <span class="cal-month-label" id="cal-month-label">Mes 2026</span>
+     <button class="cal-nav-btn" onclick="calNav(1)">&#8250;</button>
+     <button class="btn btn-g btn-sm" onclick="calHoje()">Hoje</button>
     </div>
-    <div class="cal-grid" id="cal-grid">
-     <div class="cal-day-label">Seg</div>
-     <div class="cal-day-label">Ter</div>
-     <div class="cal-day-label">Qua</div>
-     <div class="cal-day-label">Qui</div>
-     <div class="cal-day-label">Sex</div>
-     <div class="cal-day-label">Sab</div>
-     <div class="cal-day-label">Dom</div>
-    </div>
-    <div class="cal-legend">
-     <div class="cal-leg-item"><div class="cal-leg-dot" style="background:#e07020"></div> Stories</div>
-     <div class="cal-leg-item"><div class="cal-leg-dot" style="background:#7d3c98"></div> Reels/Lives</div>
-     <div class="cal-leg-item"><div class="cal-leg-dot" style="background:#1f5c3a"></div> Campanha</div>
-     <div class="cal-leg-item"><div class="cal-leg-dot" style="background:#a07830"></div> Data Especial</div>
-     <div class="cal-leg-item"><div class="cal-leg-dot" style="background:#8a9e90"></div> Outro</div>
+    <div style="display:flex;gap:7px;align-items:center">
+     <div style="display:flex;background:var(--bg4);border-radius:var(--rs);padding:3px;gap:2px">
+      <button class="btn btn-sm" id="view-btn-resumo" onclick="setCalView('resumo')" style="padding:6px 12px;font-size:12px">Resumo</button>
+      <button class="btn btn-sm" id="view-btn-lista" onclick="setCalView('lista')" style="padding:6px 12px;font-size:12px">Lista</button>
+      <button class="btn btn-sm" id="view-btn-kanban" onclick="setCalView('kanban')" style="padding:6px 12px;font-size:12px">Kanban</button>
+      <button class="btn btn-sm" id="view-btn-cal" onclick="setCalView('cal')" style="padding:6px 12px;font-size:12px">Calendario</button>
+     </div>
+     <button class="btn btn-p btn-sm" onclick="abrirModalConteudo()">+ Conteudo</button>
     </div>
    </div>
+
+   <!-- VIEW: RESUMO DO MES -->
+   <div id="plan-view-resumo">
+    <div class="card" style="margin-bottom:16px">
+     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px">Planejamento do Mes</div>
+      <button class="btn btn-g btn-xs" id="plan-edit-btn" onclick="togglePlanEdit()">Editar</button>
+     </div>
+     <div id="plan-view-mode">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" id="plan-display"></div>
+     </div>
+     <div id="plan-edit-mode" style="display:none">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+       <div class="fg"><label class="fl">Tema do Mes</label><input type="text" id="plan-tema" class="fi" placeholder="Ex: Inverno com estilo"></div>
+       <div class="fg"><label class="fl">Objetivo Principal</label><input type="text" id="plan-objetivo" class="fi" placeholder="Ex: Aumentar conversao em 20%"></div>
+       <div class="fg"><label class="fl">Campanhas Planejadas</label><input type="text" id="plan-campanhas" class="fi" placeholder="Ex: Liquidacao, Dia das Maes"></div>
+       <div class="fg"><label class="fl">Datas Importantes</label><input type="text" id="plan-datas" class="fi" placeholder="Ex: 12/05 Dia das Maes"></div>
+       <div class="fg c2"><label class="fl">Narrativa da Comunicacao</label><textarea id="plan-narrativa" class="fta" style="min-height:60px" placeholder="Qual sera a principal mensagem do mes?"></textarea></div>
+       <div class="fg c2"><label class="fl">Observacoes</label><textarea id="plan-obs" class="fta" style="min-height:50px" placeholder="Anotacoes gerais..."></textarea></div>
+      </div>
+      <div style="display:flex;gap:8px">
+       <button class="btn btn-p btn-sm" onclick="salvarPlanMes()">Salvar</button>
+       <button class="btn btn-g btn-sm" onclick="cancelarPlanEdit()">Cancelar</button>
+      </div>
+     </div>
+    </div>
+
+    <!-- Mini kanban resumo -->
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px" id="plan-kanban-mini"></div>
+   </div>
+
+   <!-- VIEW: LISTA -->
+   <div id="plan-view-lista" style="display:none">
+    <div class="card" style="padding:0;overflow:hidden">
+     <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+      <div style="font-weight:700;font-size:14px">Conteudos do Mes</div>
+      <span class="badge bg-g" id="lista-count">0</span>
+     </div>
+     <div id="plan-lista"></div>
+    </div>
+   </div>
+
+   <!-- VIEW: KANBAN -->
+   <div id="plan-view-kanban" style="display:none">
+    <div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:8px" id="plan-kanban"></div>
+   </div>
+
+   <!-- VIEW: CALENDARIO -->
+   <div id="plan-view-cal" style="display:none">
+    <div class="card" style="padding:20px">
+     <div class="cal-grid" id="cal-grid">
+      <div class="cal-day-label">Seg</div>
+      <div class="cal-day-label">Ter</div>
+      <div class="cal-day-label">Qua</div>
+      <div class="cal-day-label">Qui</div>
+      <div class="cal-day-label">Sex</div>
+      <div class="cal-day-label">Sab</div>
+      <div class="cal-day-label">Dom</div>
+     </div>
+     <div class="cal-legend" style="margin-top:14px">
+      <div class="cal-leg-item"><div class="cal-leg-dot" style="background:#e07020"></div>Stories</div>
+      <div class="cal-leg-item"><div class="cal-leg-dot" style="background:#7d3c98"></div>Reels/Live</div>
+      <div class="cal-leg-item"><div class="cal-leg-dot" style="background:#1f5c3a"></div>Campanha</div>
+      <div class="cal-leg-item"><div class="cal-leg-dot" style="background:#a07830"></div>Data Especial</div>
+      <div class="cal-leg-item"><div class="cal-leg-dot" style="background:#8a9e90"></div>Outro</div>
+     </div>
+    </div>
+   </div>
+
   </div>
 
   <!-- ROTINA COMERCIAL -->
@@ -1372,26 +1463,45 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 </div>
 
 <div class="mo" id="modal-evento">
- <div class="modal" style="max-width:440px">
-  <div class="mh"><h3 class="mt2">Novo Evento</h3><button class="mc" onclick="document.getElementById('modal-evento').classList.remove('open')">x</button></div>
+ <div class="modal" style="max-width:500px">
+  <div class="mh"><h3 class="mt2" id="modal-ev-title">Novo Conteudo</h3><button class="mc" onclick="fecharModalConteudo()">x</button></div>
   <div class="mb">
-   <div class="fg"><label class="fl">Titulo *</label><input type="text" id="ev-titulo" class="fi" placeholder="Ex: Stories do lancamento"></div>
+   <input type="hidden" id="ev-edit-id">
+   <div class="fg"><label class="fl">Titulo *</label><input type="text" id="ev-titulo" class="fi" placeholder="Ex: Stories do lancamento de inverno"></div>
    <div class="fgrid">
-    <div class="fg"><label class="fl">Data *</label><input type="date" id="ev-data" class="fi"></div>
-    <div class="fg"><label class="fl">Tipo</label>
+    <div class="fg"><label class="fl">Canal</label>
      <select id="ev-tipo" class="fi">
       <option value="stories">Stories</option>
       <option value="reels">Reels</option>
+      <option value="feed">Feed</option>
       <option value="live">Live</option>
       <option value="campanha">Campanha</option>
       <option value="data">Data Especial</option>
       <option value="outro">Outro</option>
      </select>
     </div>
+    <div class="fg"><label class="fl">Status</label>
+     <select id="ev-status" class="fi">
+      <option value="ideias">Ideias</option>
+      <option value="planejamento">Planejamento</option>
+      <option value="producao">Em producao</option>
+      <option value="agendado">Agendado</option>
+      <option value="publicado">Publicado</option>
+     </select>
+    </div>
    </div>
-   <div class="fg"><label class="fl">Observacoes</label><textarea id="ev-obs" class="fta" style="min-height:60px" placeholder="Detalhes do evento..."></textarea></div>
+   <div class="fgrid">
+    <div class="fg"><label class="fl">Data Prevista</label><input type="date" id="ev-data" class="fi"></div>
+    <div class="fg"><label class="fl">Responsavel</label><input type="text" id="ev-resp" class="fi" placeholder="Ex: Minha equipe"></div>
+   </div>
+   <div class="fg"><label class="fl">Objetivo</label><input type="text" id="ev-objetivo" class="fi" placeholder="Ex: Aumentar engajamento, divulgar campanha..."></div>
+   <div class="fg"><label class="fl">Campanha Relacionada</label><input type="text" id="ev-campanha" class="fi" placeholder="Ex: Liquidacao de Inverno"></div>
+   <div class="fg"><label class="fl">Observacoes</label><textarea id="ev-obs" class="fta" style="min-height:56px" placeholder="Detalhes, referencias, links..."></textarea></div>
   </div>
-  <div class="mf"><button class="btn btn-g btn-sm" onclick="document.getElementById('modal-evento').classList.remove('open')">Cancelar</button><button class="btn btn-p btn-sm" onclick="salvarEvento()">Salvar</button></div>
+  <div class="mf">
+   <button class="btn btn-g btn-sm" onclick="fecharModalConteudo()">Cancelar</button>
+   <button class="btn btn-p btn-sm" onclick="salvarEvento()">Salvar</button>
+  </div>
  </div>
 </div>
 
@@ -3060,106 +3170,310 @@ function switchEscrit(section, btn) {
   var el = document.getElementById('escrit-' + section);
   if (el) el.classList.add('active');
   if (btn) btn.classList.add('active');
-  if (section === 'calendario') renderCalendario();
+  if (section === 'calendario') renderPlanMes();
 }
 
 function renderEscritorio() {
-  renderCalendario();
+  renderPlanMes();
 }
 
-// ── CALENDARIO ──
+// ── PLANEJAMENTO MENSAL ──
 var MESES = ['Janeiro','Fevereiro','Marco','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-var TIPOS_COR = {stories:'stories', reels:'reels', live:'reels', campanha:'campanha', data:'data', outro:'outro'};
+var TIPOS_COR = {stories:'stories', reels:'reels', feed:'reels', live:'reels', campanha:'campanha', data:'data', outro:'outro'};
+var TIPO_COR_HEX = {stories:'#e07020', reels:'#7d3c98', feed:'#2471a3', live:'#b83232', campanha:'#1f5c3a', data:'#a07830', outro:'#8a9e90'};
+var TIPO_LABEL = {stories:'Stories', reels:'Reels', feed:'Feed', live:'Live', campanha:'Campanha', data:'Data Especial', outro:'Outro'};
+
+var KAN_COLS = [
+  {id:'ideias',    label:'Ideias',       cor:'#8a9e90', bg:'var(--bg4)'},
+  {id:'planejamento', label:'Planejamento', cor:'#2471a3', bg:'var(--blue-l)'},
+  {id:'producao',  label:'Em Producao',  cor:'#a07830', bg:'var(--gold-l)'},
+  {id:'agendado',  label:'Agendado',     cor:'#7d3c98', bg:'var(--purple-l)'},
+  {id:'publicado', label:'Publicado',    cor:'#1f5c3a', bg:'var(--green-l)'}
+];
+
+var _calView = 'resumo';
+var _planMes = JSON.parse(localStorage.getItem('slp_plan') || '{}');
 
 function calNav(delta) {
   _calMes += delta;
   if (_calMes < 0) { _calMes = 11; _calAno--; }
   if (_calMes > 11) { _calMes = 0; _calAno++; }
-  renderCalendario();
+  renderPlanMes();
 }
 function calHoje() {
   _calAno = new Date().getFullYear();
   _calMes = new Date().getMonth();
-  renderCalendario();
+  renderPlanMes();
 }
 
-function renderCalendario() {
+function getMesKey() { return _calAno + '-' + String(_calMes+1).padStart(2,'0'); }
+
+function getEventosMes() {
+  var key = getMesKey();
+  return _eventos.filter(function(e){ return e.data && e.data.startsWith(key); });
+}
+
+function setCalView(v) {
+  _calView = v;
+  ['resumo','lista','kanban','cal'].forEach(function(id){
+    var btn = document.getElementById('view-btn-' + id);
+    var el = document.getElementById('plan-view-' + id);
+    if (btn) { btn.classList.toggle('btn-p', id===v); btn.classList.toggle('btn-g', id!==v); }
+    if (el) el.style.display = id===v ? 'block' : 'none';
+  });
+  if (v==='kanban') renderKanban();
+  else if (v==='lista') renderLista();
+  else if (v==='cal') renderCalGrid();
+  else renderResumoMes();
+}
+
+function renderPlanMes() {
   var label = document.getElementById('cal-month-label');
   if (label) label.textContent = MESES[_calMes] + ' ' + _calAno;
+  setCalView(_calView);
+}
+
+// ── RESUMO ──
+function renderResumoMes() {
+  var key = getMesKey();
+  var plan = _planMes[key] || {};
+  var evs = getEventosMes();
+
+  // Campos do planejamento
+  var displayEl = document.getElementById('plan-display');
+  if (displayEl) {
+    var campos = [
+      {id:'tema', label:'Tema do Mes', val:plan.tema},
+      {id:'objetivo', label:'Objetivo Principal', val:plan.objetivo},
+      {id:'campanhas', label:'Campanhas Planejadas', val:plan.campanhas},
+      {id:'datas', label:'Datas Importantes', val:plan.datas},
+      {id:'narrativa', label:'Narrativa da Comunicacao', val:plan.narrativa},
+      {id:'obs', label:'Observacoes', val:plan.obs}
+    ];
+    displayEl.innerHTML = campos.map(function(f) {
+      return '<div class="plan-field">' +
+        '<div class="plan-field-label">' + f.label + '</div>' +
+        (f.val ? '<div class="plan-field-value">' + f.val + '</div>' :
+          '<div class="plan-field-empty">Nao preenchido</div>') +
+      '</div>';
+    }).join('');
+  }
+
+  // Mini kanban
+  var miniEl = document.getElementById('plan-kanban-mini');
+  if (miniEl) {
+    miniEl.innerHTML = KAN_COLS.map(function(col) {
+      var n = evs.filter(function(e){ return (e.status||'ideias')===col.id; }).length;
+      return '<div class="kan-mini-col">' +
+        '<div class="kan-mini-num" style="color:' + col.cor + '">' + n + '</div>' +
+        '<div class="kan-mini-label">' + col.label + '</div>' +
+      '</div>';
+    }).join('');
+  }
+}
+
+function togglePlanEdit() {
+  var key = getMesKey();
+  var plan = _planMes[key] || {};
+  var viewEl = document.getElementById('plan-view-mode');
+  var editEl = document.getElementById('plan-edit-mode');
+  var isEdit = editEl.style.display !== 'none';
+  if (!isEdit) {
+    // Abrir edição
+    ['tema','objetivo','campanhas','datas'].forEach(function(f){
+      var el = document.getElementById('plan-' + f);
+      if (el) el.value = plan[f] || '';
+    });
+    ['narrativa','obs'].forEach(function(f){
+      var el = document.getElementById('plan-' + f);
+      if (el) el.value = plan[f] || '';
+    });
+    viewEl.style.display = 'none';
+    editEl.style.display = 'block';
+    document.getElementById('plan-edit-btn').textContent = 'Cancelar';
+  } else {
+    cancelarPlanEdit();
+  }
+}
+
+function cancelarPlanEdit() {
+  document.getElementById('plan-view-mode').style.display = 'block';
+  document.getElementById('plan-edit-mode').style.display = 'none';
+  document.getElementById('plan-edit-btn').textContent = 'Editar';
+}
+
+function salvarPlanMes() {
+  var key = getMesKey();
+  _planMes[key] = {
+    tema: document.getElementById('plan-tema').value.trim(),
+    objetivo: document.getElementById('plan-objetivo').value.trim(),
+    campanhas: document.getElementById('plan-campanhas').value.trim(),
+    datas: document.getElementById('plan-datas').value.trim(),
+    narrativa: document.getElementById('plan-narrativa').value.trim(),
+    obs: document.getElementById('plan-obs').value.trim()
+  };
+  localStorage.setItem('slp_plan', JSON.stringify(_planMes));
+  cancelarPlanEdit();
+  renderResumoMes();
+  toast('Planejamento salvo!');
+}
+
+// ── LISTA ──
+function renderLista() {
+  var evs = getEventosMes().sort(function(a,b){ return (a.data||'').localeCompare(b.data||''); });
+  var el = document.getElementById('plan-lista');
+  var countEl = document.getElementById('lista-count');
+  if (countEl) countEl.textContent = evs.length;
+  if (!el) return;
+  if (!evs.length) {
+    el.innerHTML = '<div class="empty" style="padding:32px"><div class="empty-t">Nenhum conteudo planejado</div><div class="empty-d">Clique em + Conteudo para comecar</div></div>';
+    return;
+  }
+  el.innerHTML = evs.map(function(ev) {
+    var cor = TIPO_COR_HEX[ev.tipo] || TIPO_COR_HEX.outro;
+    var col = KAN_COLS.find(function(c){ return c.id===(ev.status||'ideias'); }) || KAN_COLS[0];
+    return '<div class="plan-lista-item" onclick="abrirModalConteudo('' + ev.id + '')">' +
+      '<div class="plan-tipo-dot" style="background:' + cor + '"></div>' +
+      '<div style="min-width:60px;font-size:11px;color:var(--text3)">' + (ev.data ? ev.data.split('-').reverse().slice(0,2).join('/') : '-') + '</div>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-weight:600;font-size:13px">' + ev.titulo + '</div>' +
+        (ev.campanha ? '<div style="font-size:11px;color:var(--text3)">Campanha: ' + ev.campanha + '</div>' : '') +
+      '</div>' +
+      '<span style="font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;background:' + col.bg + ';color:' + col.cor + '">' + col.label + '</span>' +
+      '<span style="font-size:11px;color:var(--text3);min-width:60px;text-align:right">' + (TIPO_LABEL[ev.tipo]||ev.tipo) + '</span>' +
+    '</div>';
+  }).join('');
+}
+
+// ── KANBAN ──
+function renderKanban() {
+  var evs = getEventosMes();
+  var el = document.getElementById('plan-kanban');
+  if (!el) return;
+  el.innerHTML = KAN_COLS.map(function(col) {
+    var cards = evs.filter(function(e){ return (e.status||'ideias')===col.id; });
+    var cor = TIPO_COR_HEX;
+    return '<div class="kan-col">' +
+      '<div class="kan-col-header" style="background:' + col.bg + '">' +
+        '<span class="kan-col-title" style="color:' + col.cor + '">' + col.label + '</span>' +
+        '<span class="kan-col-count" style="background:' + col.cor + '22;color:' + col.cor + '">' + cards.length + '</span>' +
+      '</div>' +
+      '<div class="kan-cards">' +
+        cards.map(function(ev) {
+          var c2 = TIPO_COR_HEX[ev.tipo] || TIPO_COR_HEX.outro;
+          return '<div class="kan-card" onclick="abrirModalConteudo('' + ev.id + '')">' +
+            '<div class="kan-card-title">' + ev.titulo + '</div>' +
+            '<div class="kan-card-meta">' +
+              '<span class="kan-card-tag" style="background:' + c2 + '18;color:' + c2 + '">' + (TIPO_LABEL[ev.tipo]||ev.tipo) + '</span>' +
+              (ev.data ? '<span class="kan-card-date">' + ev.data.split('-').reverse().slice(0,2).join('/') + '</span>' : '') +
+            '</div>' +
+            (ev.objetivo ? '<div style="font-size:11px;color:var(--text3);margin-top:5px">' + ev.objetivo + '</div>' : '') +
+            '<div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap">' +
+              KAN_COLS.filter(function(c3){ return c3.id!==col.id; }).map(function(c3){
+                return '<button class="btn btn-xs" style="font-size:10px;padding:2px 7px;background:' + c3.bg + ';color:' + c3.cor + ';border-color:transparent" onclick="event.stopPropagation();moverKan('' + ev.id + '','' + c3.id + '')">' + c3.label + '</button>';
+              }).join('') +
+            '</div>' +
+          '</div>';
+        }).join('') +
+        '<div class="kan-drop-zone" onclick="abrirModalConteudo(null,'' + col.id + '')">+ Adicionar</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function moverKan(id, novoStatus) {
+  var idx = _eventos.findIndex(function(e){ return e.id===id; });
+  if (idx === -1) return;
+  _eventos[idx].status = novoStatus;
+  localStorage.setItem('slp_eventos', JSON.stringify(_eventos));
+  renderKanban();
+  toast('Movido para ' + (KAN_COLS.find(function(c){ return c.id===novoStatus; })||{}).label);
+}
+
+// ── CALENDÁRIO ──
+function renderCalGrid() {
   var grid = document.getElementById('cal-grid');
   if (!grid) return;
-
-  // Limpar dias anteriores mantendo headers
   while (grid.children.length > 7) grid.removeChild(grid.lastChild);
-
   var primeiro = new Date(_calAno, _calMes, 1);
   var ultimo = new Date(_calAno, _calMes + 1, 0);
   var hoje = new Date().toISOString().split('T')[0];
-
-  // Dia da semana do primeiro (0=dom, ajustar para seg=0)
   var inicioDow = (primeiro.getDay() + 6) % 7;
-
-  // Dias do mes anterior
   for (var i = 0; i < inicioDow; i++) {
     var d = new Date(_calAno, _calMes, -inicioDow + i + 1);
-    var div = document.createElement('div');
-    div.className = 'cal-day other-month';
+    var div = document.createElement('div'); div.className = 'cal-day other-month';
     div.innerHTML = '<div class="cal-dn">' + d.getDate() + '</div>';
     grid.appendChild(div);
   }
-
-  // Dias do mes atual
   for (var d2 = 1; d2 <= ultimo.getDate(); d2++) {
     var dateStr = _calAno + '-' + String(_calMes+1).padStart(2,'0') + '-' + String(d2).padStart(2,'0');
     var evsDia = _eventos.filter(function(e){ return e.data === dateStr; });
     var div2 = document.createElement('div');
-    div2.className = 'cal-day' + (dateStr === hoje ? ' today' : '') + (evsDia.length ? ' has-event' : '');
+    div2.className = 'cal-day' + (dateStr===hoje?' today':'') + (evsDia.length?' has-event':'');
     div2.setAttribute('data-date', dateStr);
-    div2.onclick = function(){ abrirModalEvento(this.getAttribute('data-date')); };
+    div2.onclick = function(){ abrirModalConteudo(null, 'ideias', this.getAttribute('data-date')); };
     var html = '<div class="cal-dn">' + d2 + '</div>';
-    evsDia.slice(0,2).forEach(function(ev) {
+    evsDia.slice(0,2).forEach(function(ev){
       var cls = TIPOS_COR[ev.tipo] || 'outro';
       html += '<div class="cal-event ' + cls + '">' + ev.titulo + '</div>';
     });
-    if (evsDia.length > 2) html += '<div style="font-size:9px;color:var(--text3);padding:1px 5px">+' + (evsDia.length-2) + ' mais</div>';
+    if (evsDia.length > 2) html += '<div style="font-size:9px;color:var(--text3);padding:1px 4px">+' + (evsDia.length-2) + '</div>';
     div2.innerHTML = html;
     grid.appendChild(div2);
   }
-
-  // Completar semana
   var total = inicioDow + ultimo.getDate();
-  var restante = (7 - (total % 7)) % 7;
-  for (var r = 1; r <= restante; r++) {
-    var div3 = document.createElement('div');
-    div3.className = 'cal-day other-month';
-    div3.innerHTML = '<div class="cal-dn">' + r + '</div>';
-    grid.appendChild(div3);
+  var rest = (7-(total%7))%7;
+  for (var r=1; r<=rest; r++) {
+    var div3=document.createElement('div'); div3.className='cal-day other-month';
+    div3.innerHTML='<div class="cal-dn">'+r+'</div>'; grid.appendChild(div3);
   }
 }
 
-function abrirModalEvento(data) {
-  document.getElementById('ev-titulo').value = '';
-  document.getElementById('ev-obs').value = '';
-  document.getElementById('ev-tipo').value = 'stories';
-  document.getElementById('ev-data').value = data || new Date().toISOString().split('T')[0];
+// ── MODAL CONTEUDO ──
+function abrirModalConteudo(id, statusDefault, dataDefault) {
+  var ev = id ? _eventos.find(function(e){ return e.id===id; }) : null;
+  document.getElementById('modal-ev-title').textContent = ev ? 'Editar Conteudo' : 'Novo Conteudo';
+  document.getElementById('ev-edit-id').value = id || '';
+  document.getElementById('ev-titulo').value = ev ? ev.titulo : '';
+  document.getElementById('ev-tipo').value = ev ? (ev.tipo||'stories') : 'stories';
+  document.getElementById('ev-status').value = ev ? (ev.status||'ideias') : (statusDefault||'ideias');
+  document.getElementById('ev-data').value = ev ? (ev.data||'') : (dataDefault||new Date().toISOString().split('T')[0]);
+  document.getElementById('ev-resp').value = ev ? (ev.resp||'') : '';
+  document.getElementById('ev-objetivo').value = ev ? (ev.objetivo||'') : '';
+  document.getElementById('ev-campanha').value = ev ? (ev.campanha||'') : '';
+  document.getElementById('ev-obs').value = ev ? (ev.obs||'') : '';
   document.getElementById('modal-evento').classList.add('open');
+}
+
+function fecharModalConteudo() {
+  document.getElementById('modal-evento').classList.remove('open');
 }
 
 function salvarEvento() {
   var titulo = document.getElementById('ev-titulo').value.trim();
-  if (!titulo) { toast('Informe o titulo do evento', 'e'); return; }
+  if (!titulo) { toast('Informe o titulo', 'e'); return; }
+  var editId = document.getElementById('ev-edit-id').value;
   var ev = {
-    id: Date.now().toString(),
+    id: editId || Date.now().toString(),
     titulo: titulo,
-    data: document.getElementById('ev-data').value,
     tipo: document.getElementById('ev-tipo').value,
+    status: document.getElementById('ev-status').value,
+    data: document.getElementById('ev-data').value,
+    resp: document.getElementById('ev-resp').value.trim(),
+    objetivo: document.getElementById('ev-objetivo').value.trim(),
+    campanha: document.getElementById('ev-campanha').value.trim(),
     obs: document.getElementById('ev-obs').value.trim()
   };
-  _eventos.push(ev);
+  if (editId) {
+    var idx = _eventos.findIndex(function(e){ return e.id===editId; });
+    if (idx !== -1) _eventos[idx] = ev; else _eventos.push(ev);
+  } else {
+    _eventos.push(ev);
+  }
   localStorage.setItem('slp_eventos', JSON.stringify(_eventos));
-  document.getElementById('modal-evento').classList.remove('open');
-  renderCalendario();
-  toast('Evento salvo!');
+  fecharModalConteudo();
+  renderPlanMes();
+  toast(editId ? 'Conteudo atualizado!' : 'Conteudo adicionado!');
 }
 
 // ── METAS ──
