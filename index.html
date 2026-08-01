@@ -3312,7 +3312,7 @@ function renderLista() {
   el.innerHTML = evs.map(function(ev) {
     var cor = TIPO_COR_HEX[ev.tipo] || TIPO_COR_HEX.outro;
     var col = KAN_COLS.find(function(c){ return c.id===(ev.status||'ideias'); }) || KAN_COLS[0];
-    return '<div class="plan-lista-item" onclick="abrirModalConteudo('' + ev.id + '')">' +
+    return '<div class="plan-lista-item" data-id="' + ev.id + '" onclick="abrirModalConteudo(this.dataset.id)">' +
       '<div class="plan-tipo-dot" style="background:' + cor + '"></div>' +
       '<div style="min-width:60px;font-size:11px;color:var(--text3)">' + (ev.data ? ev.data.split('-').reverse().slice(0,2).join('/') : '-') + '</div>' +
       '<div style="flex:1;min-width:0">' +
@@ -3330,35 +3330,38 @@ function renderKanban() {
   var evs = getEventosMes();
   var el = document.getElementById('plan-kanban');
   if (!el) return;
-  el.innerHTML = KAN_COLS.map(function(col) {
+  var html = '';
+  KAN_COLS.forEach(function(col) {
     var cards = evs.filter(function(e){ return (e.status||'ideias')===col.id; });
-    var cor = TIPO_COR_HEX;
-    return '<div class="kan-col">' +
+    var cardsHtml = '';
+    cards.forEach(function(ev) {
+      var c2 = TIPO_COR_HEX[ev.tipo] || TIPO_COR_HEX.outro;
+      var btnsHtml = '';
+      KAN_COLS.forEach(function(c3) {
+        if (c3.id === col.id) return;
+        btnsHtml += '<button class="btn btn-xs" style="background:' + c3.bg + ';color:' + c3.cor + ';border-color:transparent;margin:1px;font-size:10px;padding:2px 6px" data-evid="' + ev.id + '" data-col="' + c3.id + '" onclick="moverKan(this.dataset.evid,this.dataset.col)">' + c3.label + '</button>';
+      });
+      cardsHtml += '<div class="kan-card" data-evid="' + ev.id + '" onclick="abrirModalConteudo(this.dataset.evid)">' +
+        '<div class="kan-card-title">' + ev.titulo + '</div>' +
+        '<div class="kan-card-meta">' +
+          '<span class="kan-card-tag" style="background:' + c2 + '18;color:' + c2 + '">' + (TIPO_LABEL[ev.tipo]||ev.tipo) + '</span>' +
+          (ev.data ? '<span class="kan-card-date">' + ev.data.split('-').reverse().slice(0,2).join('/') + '</span>' : '') +
+        '</div>' +
+        (ev.objetivo ? '<div style="font-size:11px;color:var(--text3);margin-top:5px">' + ev.objetivo + '</div>' : '') +
+        '<div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap">' + btnsHtml + '</div>' +
+      '</div>';
+    });
+    html += '<div class="kan-col">' +
       '<div class="kan-col-header" style="background:' + col.bg + '">' +
         '<span class="kan-col-title" style="color:' + col.cor + '">' + col.label + '</span>' +
         '<span class="kan-col-count" style="background:' + col.cor + '22;color:' + col.cor + '">' + cards.length + '</span>' +
       '</div>' +
-      '<div class="kan-cards">' +
-        cards.map(function(ev) {
-          var c2 = TIPO_COR_HEX[ev.tipo] || TIPO_COR_HEX.outro;
-          return '<div class="kan-card" onclick="abrirModalConteudo('' + ev.id + '')">' +
-            '<div class="kan-card-title">' + ev.titulo + '</div>' +
-            '<div class="kan-card-meta">' +
-              '<span class="kan-card-tag" style="background:' + c2 + '18;color:' + c2 + '">' + (TIPO_LABEL[ev.tipo]||ev.tipo) + '</span>' +
-              (ev.data ? '<span class="kan-card-date">' + ev.data.split('-').reverse().slice(0,2).join('/') + '</span>' : '') +
-            '</div>' +
-            (ev.objetivo ? '<div style="font-size:11px;color:var(--text3);margin-top:5px">' + ev.objetivo + '</div>' : '') +
-            '<div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap">' +
-              KAN_COLS.filter(function(c3){ return c3.id!==col.id; }).map(function(c3){
-                return '<button class="btn btn-xs" style="font-size:10px;padding:2px 7px;background:' + c3.bg + ';color:' + c3.cor + ';border-color:transparent" onclick="event.stopPropagation();moverKan('' + ev.id + '','' + c3.id + '')">' + c3.label + '</button>';
-              }).join('') +
-            '</div>' +
-          '</div>';
-        }).join('') +
-        '<div class="kan-drop-zone" onclick="abrirModalConteudo(null,'' + col.id + '')">+ Adicionar</div>' +
+      '<div class="kan-cards">' + cardsHtml +
+        '<div class="kan-drop-zone" data-col="' + col.id + '" onclick="abrirModalConteudo(null,this.dataset.col)">+ Adicionar</div>' +
       '</div>' +
     '</div>';
-  }).join('');
+  });
+  el.innerHTML = html;
 }
 
 function moverKan(id, novoStatus) {
@@ -3662,7 +3665,7 @@ function renderMetas() {
           '<span style="font-size:12px;color:var(--text3)">Progresso</span>' +
           '<div style="display:flex;align-items:center;gap:8px">' +
             '<span style="font-size:13px;color:var(--text2)">' + formatValorMeta(m.atual, m.unidade) + ' / ' + formatValorMeta(m.alvo, m.unidade) + '</span>' +
-            '<span style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:' + progCor + '">' + pct + '%</span>' +
+            '<span style="font-family:Syne,sans-serif;font-size:18px;font-weight:700;color:' + progCor + '">' + pct + '%</span>' +
           '</div>' +
         '</div>' +
         '<div class="meta-prog" style="height:8px;margin-bottom:10px"><div class="meta-prog-bar" style="width:' + pct + '%;background:' + progCor + '"></div></div>' +
@@ -3673,9 +3676,9 @@ function renderMetas() {
         '</div>' +
         // Acoes
         '<div style="display:flex;gap:7px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">' +
-          '<button class="btn btn-p btn-sm" style="flex:1" onclick="abrirModalResultado('' + m.id + '')">Atualizar Resultado</button>' +
-          '<button class="btn btn-g btn-xs" onclick="abrirModalMeta('' + m.id + '')">Editar</button>' +
-          '<button class="btn btn-d btn-xs" onclick="excluirMeta('' + m.id + '')">x</button>' +
+          '<button class="btn btn-p btn-sm" style="flex:1" data-darg="' + m.id + '" onclick="abrirModalResultado(this.dataset.darg)">Atualizar Resultado</button>' +
+          '<button class="btn btn-g btn-xs" data-darg="' + m.id + '" onclick="abrirModalMeta(this.dataset.darg)">Editar</button>' +
+          '<button class="btn btn-d btn-xs" data-darg="' + m.id + '" onclick="excluirMeta(this.dataset.darg)">x</button>' +
         '</div>' +
       '</div>' +
     '</div>';
@@ -3843,7 +3846,7 @@ function renderRotinas() {
     var pct = totalCheck > 0 ? Math.round((doneCount/totalCheck)*100) : 0;
 
     return '<div class="rot-card">' +
-      '<div class="rot-card-header" onclick="toggleRotExpand('' + rot.id + '')">' +
+      '<div class="rot-card-header" data-darg="' + rot.id + '" onclick="toggleRotExpand(this.dataset.darg)">' +
         '<div class="rot-dia-badge" style="background:' + bg + ';color:' + cor + '">' + (DIAS_LABEL[rot.dia]||rot.dia) + '</div>' +
         '<div style="flex:1;min-width:0">' +
           '<div style="font-weight:700;font-size:14px">' + rot.nome + '</div>' +
@@ -3864,14 +3867,14 @@ function renderRotinas() {
           rot.checklist.map(function(item, i) {
             var done = rot.checkDone && rot.checkDone[i];
             return '<div class="rot-check-item">' +
-              '<div class="rot-check-box' + (done?' done':'') + '" id="rc-' + rot.id + '-' + i + '" onclick="toggleCheckRotina('' + rot.id + '',' + i + ')"></div>' +
+              '<div class="rot-check-box' + (done?' done':'') + '" id="rc-' + rot.id + '-' + i + '" data-rotid="' + rot.id + '" data-idx="' + i + '" onclick="toggleCheckRotina(this.dataset.rotid,this.dataset.idx)"></div>' +
               '<span class="rot-check-text' + (done?' done':'') + '" id="rt-' + rot.id + '-' + i + '">' + item.texto + '</span>' +
             '</div>';
           }).join('') +
         '</div>' : '<p style="font-size:12px;color:var(--text3);margin-top:12px">Nenhum item no checklist</p>') +
         '<div style="display:flex;gap:7px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">' +
-          '<button class="btn btn-g btn-xs" onclick="abrirModalRotina('' + rot.id + '')">Editar</button>' +
-          '<button class="btn btn-d btn-xs" onclick="excluirRotina('' + rot.id + '')">Excluir</button>' +
+          '<button class="btn btn-g btn-xs" data-darg="' + rot.id + '" onclick="abrirModalRotina(this.dataset.darg)">Editar</button>' +
+          '<button class="btn btn-d btn-xs" data-darg="' + rot.id + '" onclick="excluirRotina(this.dataset.darg)">Excluir</button>' +
         '</div>' +
       '</div>' +
     '</div>';
@@ -4017,7 +4020,7 @@ function renderAtividades() {
     var hoje = new Date().toISOString().split('T')[0];
     var vencida = at.data && at.data < hoje && at.status !== 'concluida';
 
-    return '<div class="ativ-card ' + at.status + '" onclick="abrirModalAtividade('' + at.id + '')">' +
+    return '<div class="ativ-card ' + at.status + '" data-darg="' + at.id + '" onclick="abrirModalAtividade(this.dataset.darg)">' +
       '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px">' +
         '<div style="flex:1;min-width:0">' +
           '<div style="font-weight:700;font-size:14px;margin-bottom:4px' + (at.status==='concluida'?';text-decoration:line-through;color:var(--text3)':'') + '">' + at.titulo + '</div>' +
@@ -4029,14 +4032,14 @@ function renderAtividades() {
           '</div>' +
         '</div>' +
         '<div style="display:flex;gap:5px;flex-shrink:0" onclick="event.stopPropagation()">' +
-          (at.status !== 'concluida' ? '<button class="btn btn-g btn-xs" onclick="mudarStatusAtiv('' + at.id + '','concluida')">✓</button>' : '') +
-          '<button class="btn btn-d btn-xs" onclick="excluirAtividade('' + at.id + '')">×</button>' +
+          (at.status !== 'concluida' ? '<button class="btn btn-g btn-xs" data-atid="' + at.id + '" data-status="concluida" onclick="mudarStatusAtiv(this.dataset.atid,this.dataset.status)">✓</button>' : '') +
+          '<button class="btn btn-d btn-xs" data-darg="' + at.id + '" onclick="excluirAtividade(this.dataset.darg)">×</button>' +
         '</div>' +
       '</div>' +
       (totalCheck > 0 ?
         '<div style="margin-top:10px">' +
           (at.checklist||[]).map(function(item, i) {
-            return '<div class="rot-check-item" onclick="event.stopPropagation();toggleCheckAtiv('' + at.id + '',' + i + ')">' +
+            return '<div class="rot-check-item" data-atid="' + at.id + '" data-idx="' + i + '" onclick="event.stopPropagation();toggleCheckAtiv(this.dataset.atid,this.dataset.idx)">' +
               '<div class="rot-check-box' + (item.done?' done':'') + '"></div>' +
               '<span class="rot-check-text' + (item.done?' done':'') + '">' + item.texto + '</span>' +
             '</div>';
