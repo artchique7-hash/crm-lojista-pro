@@ -349,7 +349,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 .meta-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .meta-prog{height:6px;background:var(--border);border-radius:20px;overflow:hidden;margin-top:10px}
 .meta-prog-bar{height:100%;border-radius:20px;transition:width .6s cubic-bezier(.4,0,.2,1)}
-.meta-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.meta-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
 
 /* CALENDARIO */
 .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
@@ -3107,6 +3107,7 @@ function switchEscrit(section, btn) {
   if (el) el.classList.add('active');
   if (btn) btn.classList.add('active');
   if (section === 'calendario') renderPlanMes();
+  if (section === 'funis') renderFunis();
 }
 
 function renderEscritorio() {
@@ -3558,18 +3559,55 @@ function renderMetas() {
   var resumoEl = document.getElementById('metas-resumo');
   if (!grid) return;
 
-  // Resumo rápido
+  // Resumo rápido com grafico pizza
   if (resumoEl && _metas.length) {
     var concluidas = _metas.filter(function(m){ return getStatusMeta(m).label==='Concluida'; }).length;
     var andamento = _metas.filter(function(m){ return getStatusMeta(m).label==='Em andamento'; }).length;
     var atrasadas = _metas.filter(function(m){ return getStatusMeta(m).label==='Atrasada'; }).length;
-    resumoEl.style.display = 'grid';
-    resumoEl.style.gridTemplateColumns = 'repeat(3,1fr)';
-    resumoEl.style.gap = '10px';
-    resumoEl.innerHTML =
-      '<div class="ri" style="text-align:center"><div class="rv" style="color:var(--green)">' + concluidas + '</div><div class="rl">Concluidas</div></div>' +
-      '<div class="ri" style="text-align:center"><div class="rv" style="color:var(--blue)">' + andamento + '</div><div class="rl">Em andamento</div></div>' +
-      '<div class="ri" style="text-align:center"><div class="rv" style="color:var(--red)">' + atrasadas + '</div><div class="rl">Atrasadas</div></div>';
+    var total = _metas.length;
+    // Pizza SVG
+    function pizzaSlice(pct, offset, cor) {
+      if (pct <= 0) return '';
+      var deg = pct * 3.6;
+      var rad = function(d){ return d * Math.PI / 180; };
+      var startX = 50 + 40 * Math.sin(rad(offset * 3.6));
+      var startY = 50 - 40 * Math.cos(rad(offset * 3.6));
+      var endX = 50 + 40 * Math.sin(rad((offset + pct) * 3.6));
+      var endY = 50 - 40 * Math.cos(rad((offset + pct) * 3.6));
+      var large = deg > 180 ? 1 : 0;
+      return '<path d="M50,50 L' + startX + ',' + startY + ' A40,40 0 ' + large + ',1 ' + endX + ',' + endY + ' Z" fill="' + cor + '"/>';
+    }
+    var pCon = total ? (concluidas/total*100) : 0;
+    var pAnd = total ? (andamento/total*100) : 0;
+    var pAtr = total ? (atrasadas/total*100) : 0;
+    var svg = '<svg viewBox="0 0 100 100" width="90" height="90" style="display:block;filter:drop-shadow(0 2px 6px rgba(0,0,0,.10))">' +
+      (total === 0 ? '<circle cx="50" cy="50" r="40" fill="var(--border)"/>' : '') +
+      pizzaSlice(pCon, 0, '#1f5c3a') +
+      pizzaSlice(pAnd, pCon, '#1a5c8a') +
+      pizzaSlice(pAtr, pCon+pAnd, '#b83232') +
+      '<circle cx="50" cy="50" r="24" fill="var(--bg2)"/>' +
+      '<text x="50" y="54" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text)" font-family="Syne,sans-serif">' + total + '</text>' +
+    '</svg>';
+    resumoEl.style.display = 'flex';
+    resumoEl.style.alignItems = 'center';
+    resumoEl.style.gap = '20px';
+    resumoEl.style.background = 'var(--bg2)';
+    resumoEl.style.border = '1px solid var(--border)';
+    resumoEl.style.borderRadius = 'var(--r)';
+    resumoEl.style.padding = '18px 22px';
+    resumoEl.style.marginBottom = '18px';
+    resumoEl.style.boxShadow = 'var(--sh)';
+    resumoEl.innerHTML = svg +
+      '<div style="flex:1">' +
+        '<div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">Visao geral das metas</div>' +
+        '<div style="display:flex;gap:16px;flex-wrap:wrap">' +
+          '<div style="display:flex;align-items:center;gap:7px"><span style="width:10px;height:10px;border-radius:50%;background:#1f5c3a;display:inline-block"></span><span style="font-size:13px;color:var(--text2)">' + concluidas + ' Concluida' + (concluidas!==1?'s':'') + '</span></div>' +
+          '<div style="display:flex;align-items:center;gap:7px"><span style="width:10px;height:10px;border-radius:50%;background:#1a5c8a;display:inline-block"></span><span style="font-size:13px;color:var(--text2)">' + andamento + ' Em andamento</span></div>' +
+          '<div style="display:flex;align-items:center;gap:7px"><span style="width:10px;height:10px;border-radius:50%;background:#b83232;display:inline-block"></span><span style="font-size:13px;color:var(--text2)">' + atrasadas + ' Atrasada' + (atrasadas!==1?'s':'') + '</span></div>' +
+        '</div>' +
+        '<div style="margin-top:10px;height:6px;border-radius:20px;background:var(--border);overflow:hidden"><div style="height:100%;width:' + (total?Math.round(concluidas/total*100):0) + '%;background:#1f5c3a;border-radius:20px;transition:width .4s"></div></div>' +
+        '<div style="font-size:11px;color:var(--text3);margin-top:4px">' + (total?Math.round(concluidas/total*100):0) + '% das metas concluidas</div>' +
+      '</div>';
   } else if (resumoEl) {
     resumoEl.style.display = 'none';
   }
