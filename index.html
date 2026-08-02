@@ -388,12 +388,42 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 .escrit-section{display:none}.escrit-section.active{display:block;animation:fadeUp .22s ease}
 
 /* OBJETIVOS */
-.meta-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:20px;display:flex;align-items:flex-start;gap:16px;transition:box-shadow .2s;box-shadow:var(--sh)}
-.meta-card:hover{box-shadow:var(--sh-md)}
-.meta-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+/* METAS v2 */
+.meta-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);transition:box-shadow .2s,border-color .2s;box-shadow:var(--sh);overflow:hidden}
+.meta-card:hover{box-shadow:var(--sh-md);border-color:var(--border2)}
+.meta-card-accent{height:3px;border-radius:3px 3px 0 0}
+.meta-card-inner{padding:14px 16px}
+.meta-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}
+.meta-cat-chip{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;padding:2px 8px;border-radius:20px;margin-bottom:5px}
+.meta-titulo{font-size:14px;font-weight:700;color:var(--text);line-height:1.3;font-family:Syne,sans-serif}
+.meta-status-chip{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.meta-prog-wrap{margin:10px 0 6px}
+.meta-prog-nums{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:5px}
+.meta-prog-atual{font-size:15px;font-weight:700;font-family:Syne,sans-serif;color:var(--text)}
+.meta-prog-alvo{font-size:12px;color:var(--text3);margin-left:3px}
+.meta-prog-pct{font-size:13px;font-weight:700}
+.meta-prog-bar-wrap{height:5px;background:var(--border);border-radius:20px;overflow:hidden}
+.meta-prog-bar-fill{height:100%;border-radius:20px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.meta-info-row{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.meta-periodo{font-size:11px;color:var(--text3)}
+.meta-dias{font-size:11px;font-weight:600}
+.meta-actions{display:flex;align-items:center;gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border)}
+.meta-icon{display:none}
 .meta-prog{height:6px;background:var(--border);border-radius:20px;overflow:hidden;margin-top:10px}
 .meta-prog-bar{height:100%;border-radius:20px;transition:width .6s cubic-bezier(.4,0,.2,1)}
-.meta-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.meta-grid{display:flex;flex-direction:column;gap:10px}
+.meta-filtros{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.meta-filtro-btn{padding:5px 13px;border-radius:20px;border:1px solid var(--border);background:var(--bg2);font-size:12px;font-weight:600;color:var(--text3);cursor:pointer;transition:all .15s}
+.meta-filtro-btn:hover{border-color:var(--green);color:var(--green)}
+.meta-filtro-btn.active{background:var(--green);border-color:var(--green);color:#fff}
+.meta-resumo-v2{display:flex;align-items:center;gap:16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;margin-bottom:16px;box-shadow:var(--sh);flex-wrap:wrap}
+.meta-resumo-stat{display:flex;align-items:center;gap:8px;padding:0 14px;border-right:1px solid var(--border)}
+.meta-resumo-stat:last-child{border-right:none}
+.meta-resumo-num{font-size:20px;font-weight:700;font-family:Syne,sans-serif;line-height:1}
+.meta-resumo-label{font-size:11px;color:var(--text3);margin-top:2px}
+.meta-add-card{border:1.5px dashed var(--border2);border-radius:var(--r);padding:14px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;color:var(--text3);font-size:13px;font-weight:500;transition:all .15s;background:var(--bg3)}
+.meta-add-card:hover{border-color:var(--green);color:var(--green);background:var(--green-l)}
+@media(max-width:600px){.meta-resumo-v2{gap:10px}.meta-resumo-stat{padding:0 10px}}
 
 /* CALENDARIO */
 .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
@@ -1205,7 +1235,15 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
     <button class="btn btn-p btn-sm" onclick="abrirModalMeta()">+ Nova Meta</button>
    </div>
    <!-- Resumo rápido -->
-   <div id="metas-resumo" style="display:none;margin-bottom:18px"></div>
+   <div id="metas-resumo" style="display:none;margin-bottom:16px"></div>
+
+   <!-- Filtros -->
+   <div class="meta-filtros" id="meta-filtros">
+    <button class="meta-filtro-btn active" data-filtro="" onclick="filtrarMetas(this)">Todas</button>
+    <button class="meta-filtro-btn" data-filtro="Em andamento" onclick="filtrarMetas(this)">Em andamento</button>
+    <button class="meta-filtro-btn" data-filtro="Concluida" onclick="filtrarMetas(this)">Concluídas</button>
+    <button class="meta-filtro-btn" data-filtro="Atrasada" onclick="filtrarMetas(this)">Atrasadas</button>
+   </div>
 
    <!-- Grid de metas dinâmico -->
    <div class="meta-grid" id="metas-grid"></div>
@@ -4258,135 +4296,139 @@ function renderMetas() {
   var resumoEl = document.getElementById('metas-resumo');
   if (!grid) return;
 
-  // Resumo rápido com grafico pizza
+  // ── Resumo compacto ──
   if (resumoEl && _metas.length) {
-    var concluidas = _metas.filter(function(m){ return getStatusMeta(m).label==='Concluida'; }).length;
-    var andamento = _metas.filter(function(m){ return getStatusMeta(m).label==='Em andamento'; }).length;
-    var atrasadas = _metas.filter(function(m){ return getStatusMeta(m).label==='Atrasada'; }).length;
+    var con = _metas.filter(function(m){ return getStatusMeta(m).label==='Concluida'; }).length;
+    var and_ = _metas.filter(function(m){ return getStatusMeta(m).label==='Em andamento'; }).length;
+    var atr = _metas.filter(function(m){ return getStatusMeta(m).label==='Atrasada'; }).length;
     var total = _metas.length;
-    // Pizza SVG
-    function pizzaSlice(pct, offset, cor) {
-      if (pct <= 0) return '';
-      var deg = pct * 3.6;
-      var rad = function(d){ return d * Math.PI / 180; };
-      var startX = 50 + 40 * Math.sin(rad(offset * 3.6));
-      var startY = 50 - 40 * Math.cos(rad(offset * 3.6));
-      var endX = 50 + 40 * Math.sin(rad((offset + pct) * 3.6));
-      var endY = 50 - 40 * Math.cos(rad((offset + pct) * 3.6));
-      var large = deg > 180 ? 1 : 0;
-      return '<path d="M50,50 L' + startX + ',' + startY + ' A40,40 0 ' + large + ',1 ' + endX + ',' + endY + ' Z" fill="' + cor + '"/>';
-    }
-    var pCon = total ? (concluidas/total*100) : 0;
-    var pAnd = total ? (andamento/total*100) : 0;
-    var pAtr = total ? (atrasadas/total*100) : 0;
-    var svg = '<svg viewBox="0 0 100 100" width="90" height="90" style="display:block;filter:drop-shadow(0 2px 6px rgba(0,0,0,.10))">' +
-      (total === 0 ? '<circle cx="50" cy="50" r="40" fill="var(--border)"/>' : '') +
-      pizzaSlice(pCon, 0, '#1f5c3a') +
-      pizzaSlice(pAnd, pCon, '#1a5c8a') +
-      pizzaSlice(pAtr, pCon+pAnd, '#b83232') +
-      '<circle cx="50" cy="50" r="24" fill="var(--bg2)"/>' +
-      '<text x="50" y="54" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text)" font-family="Syne,sans-serif">' + total + '</text>' +
-    '</svg>';
+    var pctGeral = total ? Math.round(con/total*100) : 0;
     resumoEl.style.display = 'flex';
-    resumoEl.style.alignItems = 'center';
-    resumoEl.style.gap = '20px';
-    resumoEl.style.background = 'var(--bg2)';
-    resumoEl.style.border = '1px solid var(--border)';
-    resumoEl.style.borderRadius = 'var(--r)';
-    resumoEl.style.padding = '18px 22px';
-    resumoEl.style.marginBottom = '18px';
-    resumoEl.style.boxShadow = 'var(--sh)';
-    resumoEl.innerHTML = svg +
-      '<div style="flex:1">' +
-        '<div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">Visao geral das metas</div>' +
-        '<div style="display:flex;gap:16px;flex-wrap:wrap">' +
-          '<div style="display:flex;align-items:center;gap:7px"><span style="width:10px;height:10px;border-radius:50%;background:#1f5c3a;display:inline-block"></span><span style="font-size:13px;color:var(--text2)">' + concluidas + ' Concluida' + (concluidas!==1?'s':'') + '</span></div>' +
-          '<div style="display:flex;align-items:center;gap:7px"><span style="width:10px;height:10px;border-radius:50%;background:#1a5c8a;display:inline-block"></span><span style="font-size:13px;color:var(--text2)">' + andamento + ' Em andamento</span></div>' +
-          '<div style="display:flex;align-items:center;gap:7px"><span style="width:10px;height:10px;border-radius:50%;background:#b83232;display:inline-block"></span><span style="font-size:13px;color:var(--text2)">' + atrasadas + ' Atrasada' + (atrasadas!==1?'s':'') + '</span></div>' +
+    resumoEl.className = 'meta-resumo-v2';
+    resumoEl.innerHTML =
+      '<div style="flex:1;min-width:160px">' +
+        '<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px">' + total + ' meta' + (total!==1?'s':'') + ' cadastrada' + (total!==1?'s':'') + '</div>' +
+        '<div style="height:6px;background:var(--border);border-radius:20px;overflow:hidden;margin-bottom:5px">' +
+          '<div style="height:100%;width:' + pctGeral + '%;background:var(--green);border-radius:20px;transition:width .5s"></div>' +
         '</div>' +
-        '<div style="margin-top:10px;height:6px;border-radius:20px;background:var(--border);overflow:hidden"><div style="height:100%;width:' + (total?Math.round(concluidas/total*100):0) + '%;background:#1f5c3a;border-radius:20px;transition:width .4s"></div></div>' +
-        '<div style="font-size:11px;color:var(--text3);margin-top:4px">' + (total?Math.round(concluidas/total*100):0) + '% das metas concluidas</div>' +
+        '<div style="font-size:11px;color:var(--text3)">' + pctGeral + '% das metas concluídas</div>' +
+      '</div>' +
+      '<div style="display:flex;gap:0;flex-shrink:0">' +
+        '<div class="meta-resumo-stat">' +
+          '<div><div class="meta-resumo-num" style="color:var(--green)">' + con + '</div><div class="meta-resumo-label">Concluída' + (con!==1?'s':'') + '</div></div>' +
+        '</div>' +
+        '<div class="meta-resumo-stat">' +
+          '<div><div class="meta-resumo-num" style="color:var(--blue)">' + and_ + '</div><div class="meta-resumo-label">Em andamento</div></div>' +
+        '</div>' +
+        '<div class="meta-resumo-stat">' +
+          '<div><div class="meta-resumo-num" style="color:var(--red)">' + atr + '</div><div class="meta-resumo-label">Atrasada' + (atr!==1?'s':'') + '</div></div>' +
+        '</div>' +
       '</div>';
   } else if (resumoEl) {
     resumoEl.style.display = 'none';
   }
 
+  // Filtro ativo
+  var filtroAtivo = '';
+  var filtroBtn = document.querySelector('.meta-filtro-btn.active');
+  if (filtroBtn) filtroAtivo = filtroBtn.dataset.filtro || '';
+
+  var metasFiltradas = filtroAtivo
+    ? _metas.filter(function(m){ return getStatusMeta(m).label === filtroAtivo; })
+    : _metas;
+
   if (!_metas.length) {
     grid.innerHTML =
-      '<div style="grid-column:1/-1;text-align:center;padding:48px 20px">' +
-      '<div style="width:56px;height:56px;border-radius:50%;background:var(--bg4);display:flex;align-items:center;justify-content:center;margin:0 auto 16px">' +
-      '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div>' +
-      '<div style="font-weight:700;font-size:15px;color:var(--text2);margin-bottom:6px">Nenhuma meta cadastrada</div>' +
-      '<div style="font-size:13px;color:var(--text3);margin-bottom:18px">Defina suas metas para acompanhar o progresso da loja</div>' +
+      '<div style="text-align:center;padding:48px 20px">' +
+      '<div style="width:52px;height:52px;border-radius:50%;background:var(--bg4);display:flex;align-items:center;justify-content:center;margin:0 auto 14px">' +
+      '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div>' +
+      '<div style="font-weight:700;font-size:14px;color:var(--text2);margin-bottom:5px">Nenhuma meta cadastrada</div>' +
+      '<div style="font-size:12px;color:var(--text3);margin-bottom:16px">Defina seus objetivos para acompanhar o progresso da loja</div>' +
       '<button class="btn btn-p btn-sm" onclick="abrirModalMeta()">+ Criar primeira meta</button>' +
       '</div>';
     return;
   }
 
-  var cards = _metas.map(function(m) {
+  var cards = metasFiltradas.map(function(m) {
     var pct = m.alvo > 0 ? Math.min(100, Math.round((m.atual/m.alvo)*100)) : 0;
     var cor = CAT_COR[m.cat] || 'var(--green)';
+    var corL = cor.replace('var(--', 'var(--').replace(')', '-l)');
     var status = getStatusMeta(m);
     var dias = diasRestantes(m.fim);
     var icone = CAT_ICONE[m.cat] || CAT_ICONE.personalizada;
-    var corBg = cor.replace(')', '-l)').replace('var(--', 'var(--');
-    var progCor = pct >= 100 ? 'var(--green)' : pct >= 60 ? 'var(--gold)' : cor;
 
-    var diasInfo = '';
+    // Cor de status
+    var statusCor = status.label==='Concluida' ? 'var(--green)' : status.label==='Atrasada' ? 'var(--red)' : 'var(--blue)';
+    var statusBg  = status.label==='Concluida' ? 'var(--green-l)' : status.label==='Atrasada' ? 'var(--red-l)' : 'var(--blue-l)';
+    var progCor   = pct >= 100 ? 'var(--green)' : pct >= 60 ? 'var(--gold)' : cor;
+
+    // Info de dias
+    var diasHtml = '';
     if (dias !== null) {
-      if (dias > 0) diasInfo = '<span style="font-size:11px;color:var(--text3)">' + dias + ' dia' + (dias!==1?'s':'') + ' restante' + (dias!==1?'s':'') + '</span>';
-      else if (dias === 0) diasInfo = '<span style="font-size:11px;color:var(--gold);font-weight:600">Termina hoje</span>';
-      else diasInfo = '<span style="font-size:11px;color:var(--red);font-weight:600">Encerrada</span>';
+      if (dias > 0)     diasHtml = '<span class="meta-dias" style="color:var(--text3)">' + dias + 'd restante' + (dias!==1?'s':'') + '</span>';
+      else if (dias===0) diasHtml = '<span class="meta-dias" style="color:var(--gold)">Termina hoje</span>';
+      else               diasHtml = '<span class="meta-dias" style="color:var(--red)">Encerrada</span>';
     }
 
-    return '<div class="meta-card" style="flex-direction:column;gap:0;padding:0;overflow:hidden">' +
-      // Header colorido
-      '<div style="background:' + cor + ';padding:14px 18px;display:flex;align-items:center;justify-content:space-between">' +
-        '<div style="display:flex;align-items:center;gap:10px">' +
-          '<div style="width:36px;height:36px;background:rgba(255,255,255,.15);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0">' +
-            '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">' + icone + '</svg>' +
+    return '<div class="meta-card">' +
+      '<div class="meta-card-accent" style="background:' + cor + '"></div>' +
+      '<div class="meta-card-inner">' +
+        '<div class="meta-card-head">' +
+          '<div style="min-width:0">' +
+            '<div class="meta-cat-chip" style="background:' + corL + ';color:' + cor + '">' +
+              '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">' + icone + '</svg>' +
+              (CAT_LABEL[m.cat]||'Meta') +
+            '</div>' +
+            '<div class="meta-titulo">' + m.titulo + '</div>' +
+            (m.desc ? '<div style="font-size:11px;color:var(--text3);margin-top:3px;line-height:1.4">' + m.desc + '</div>' : '') +
           '</div>' +
-          '<div>' +
-            '<div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.6px">' + (CAT_LABEL[m.cat]||'Meta') + '</div>' +
-            '<div style="font-weight:700;font-size:14px;color:#fff">' + m.titulo + '</div>' +
+          '<span class="meta-status-chip" style="background:' + statusBg + ';color:' + statusCor + '">' + status.label + '</span>' +
+        '</div>' +
+        '<div class="meta-prog-wrap">' +
+          '<div class="meta-prog-nums">' +
+            '<div>' +
+              '<span class="meta-prog-atual" style="color:' + progCor + '">' + formatValorMeta(m.atual, m.unidade) + '</span>' +
+              '<span class="meta-prog-alvo"> / ' + formatValorMeta(m.alvo, m.unidade) + '</span>' +
+            '</div>' +
+            '<span class="meta-prog-pct" style="color:' + progCor + '">' + pct + '%</span>' +
           '</div>' +
+          '<div class="meta-prog-bar-wrap"><div class="meta-prog-bar-fill" style="width:' + pct + '%;background:' + progCor + '"></div></div>' +
         '</div>' +
-        '<span style="background:rgba(255,255,255,.2);color:#fff;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600">' + status.label + '</span>' +
-      '</div>' +
-      // Body
-      '<div style="padding:16px 18px">' +
-        (m.desc ? '<div style="font-size:12px;color:var(--text2);margin-bottom:12px">' + m.desc + '</div>' : '') +
-        // Progresso
-        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">' +
-          '<span style="font-size:12px;color:var(--text3)">Progresso</span>' +
-          '<div style="display:flex;align-items:center;gap:8px">' +
-            '<span style="font-size:13px;color:var(--text2)">' + formatValorMeta(m.atual, m.unidade) + ' / ' + formatValorMeta(m.alvo, m.unidade) + '</span>' +
-            '<span style="font-family:Syne,sans-serif;font-size:18px;font-weight:700;color:' + progCor + '">' + pct + '%</span>' +
-          '</div>' +
+        '<div class="meta-info-row">' +
+          '<span class="meta-periodo">' + (m.inicio?m.inicio.split('-').reverse().join('/'):'-') + ' → ' + (m.fim?m.fim.split('-').reverse().join('/'):'-') + '</span>' +
+          diasHtml +
         '</div>' +
-        '<div class="meta-prog" style="height:8px;margin-bottom:10px"><div class="meta-prog-bar" style="width:' + pct + '%;background:' + progCor + '"></div></div>' +
-        // Periodo + dias
-        '<div style="display:flex;align-items:center;justify-content:space-between">' +
-          '<span style="font-size:11px;color:var(--text3)">' + (m.inicio?m.inicio.split('-').reverse().join('/'):'-') + ' ate ' + (m.fim?m.fim.split('-').reverse().join('/'):'-') + '</span>' +
-          diasInfo +
-        '</div>' +
-        // Acoes
-        '<div style="display:flex;gap:7px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">' +
-          '<button class="btn btn-p btn-sm" style="flex:1" data-darg="' + m.id + '" onclick="abrirModalResultado(this.dataset.darg)">Atualizar Resultado</button>' +
-          '<button class="btn btn-g btn-xs" data-darg="' + m.id + '" onclick="abrirModalMeta(this.dataset.darg)">Editar</button>' +
-          '<button class="btn btn-d btn-xs" data-darg="' + m.id + '" onclick="excluirMeta(this.dataset.darg)">x</button>' +
+        '<div class="meta-actions">' +
+          '<button class="btn btn-p btn-sm" style="flex:1;font-size:12px" data-darg="' + m.id + '" onclick="abrirModalResultado(this.dataset.darg)">↑ Atualizar</button>' +
+          '<button class="btn btn-g btn-xs" title="Editar" data-darg="' + m.id + '" onclick="abrirModalMeta(this.dataset.darg)" style="padding:5px 10px">' +
+            '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' +
+          '</button>' +
+          '<button class="btn btn-d btn-xs" title="Excluir" data-darg="' + m.id + '" onclick="excluirMeta(this.dataset.darg)" style="padding:5px 10px">' +
+            '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>' +
+          '</button>' +
         '</div>' +
       '</div>' +
     '</div>';
   });
 
-  var addCard = '<div class="meta-card" style="border-style:dashed;cursor:pointer;justify-content:center;align-items:center;flex-direction:column;gap:8px;min-height:160px;background:var(--bg3)" onclick="abrirModalMeta()">' +
-    '<div style="width:40px;height:40px;border-radius:50%;background:var(--bg4);border:1.5px dashed var(--border2);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:22px">+</div>' +
-    '<div style="font-size:13px;color:var(--text3);font-weight:500">Nova meta</div>' +
+  var semResultado = filtroAtivo && !metasFiltradas.length
+    ? '<div style="text-align:center;padding:32px 16px;color:var(--text3);font-size:13px">Nenhuma meta ' + filtroAtivo.toLowerCase() + ' no momento.</div>'
+    : '';
+
+  var addCard = '<div class="meta-add-card" onclick="abrirModalMeta()">' +
+    '<div style="width:28px;height:28px;border-radius:50%;background:var(--bg4);border:1.5px dashed var(--border2);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--text3);flex-shrink:0">+</div>' +
+    '<span>Nova meta</span>' +
   '</div>';
 
-  grid.innerHTML = cards.join('') + addCard;
+  grid.innerHTML = semResultado || (cards.join('') + addCard);
 }
+
+function filtrarMetas(btn) {
+  document.querySelectorAll('.meta-filtro-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  renderMetas();
+}
+
 
 // ── ROTINA COMERCIAL ──
 var _rotinas = JSON.parse(localStorage.getItem('slp_rotinas') || '[]');
