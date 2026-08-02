@@ -280,6 +280,35 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 
 /* MESSAGES */
 .msg-b{font-size:13px;color:var(--text2);line-height:1.6;white-space:pre-wrap;background:var(--bg4);border:1px solid var(--border);border-radius:var(--rs);padding:12px 14px}
+/* CENTRAL DE ATENDIMENTO */
+.ca-section{display:none}
+.ca-section.active{display:block}
+.ca-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:0;box-shadow:var(--sh);margin-bottom:12px;overflow:hidden;transition:box-shadow .2s}
+.ca-card:hover{box-shadow:var(--sh-md)}
+.ca-card-header{display:flex;align-items:flex-start;justify-content:space-between;padding:16px 18px 14px;gap:12px;cursor:pointer}
+.ca-card-body{display:none;padding:0 18px 16px;border-top:1px solid var(--border)}
+.ca-card.open .ca-card-body{display:block}
+.ca-card-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;font-family:Syne,sans-serif}
+.ca-cat-badge{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px;margin-bottom:6px}
+.ca-preview{font-size:12px;color:var(--text3);line-height:1.5;max-height:2.8em;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.ca-actions{display:flex;gap:6px;align-items:center;flex-shrink:0}
+.ca-body-text{font-size:13px;color:var(--text2);line-height:1.65;white-space:pre-wrap;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:14px 16px;margin:12px 0;user-select:text}
+.ca-fav-btn{background:none;border:none;cursor:pointer;font-size:18px;padding:2px;line-height:1;transition:transform .15s}
+.ca-fav-btn:hover{transform:scale(1.2)}
+.ca-empty{text-align:center;padding:40px 20px;color:var(--text3)}
+.ca-search-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rs);padding:13px 16px;margin-bottom:8px;cursor:pointer;transition:all .15s}
+.ca-search-item:hover{border-color:var(--green);background:var(--green-l)}
+.ca-search-type{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:3px}
+.ca-search-title{font-size:13px;font-weight:700;color:var(--text)}
+.ca-search-preview{font-size:12px;color:var(--text3);margin-top:2px}
+.ca-com-bloco{display:flex;flex-direction:column;gap:6px}
+.ca-com-bloco label{font-size:12px;font-weight:700;color:var(--text2)}
+.ca-group-header{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);padding:8px 0 10px;border-bottom:1px solid var(--border);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.ca-step{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.ca-step:last-child{border-bottom:none}
+.ca-step-num{width:24px;height:24px;border-radius:50%;background:var(--green);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+@media(max-width:600px){#ca-com-grid{grid-template-columns:1fr}}
+
 
 /* WA */
 .wa{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;background:#e6f9ee;border:1px solid rgba(37,211,102,.2);border-radius:var(--rs);color:#1a7a3a;font-size:12px;font-weight:600;text-decoration:none;transition:all .18s;white-space:nowrap}
@@ -673,7 +702,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
  </div>
  <div class="nav-i" data-page="messages" onclick="showPage('messages')">
  <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
- Mensagens
+ Central
  </div>
  <div class="nav-i" data-page="salespeople" onclick="showPage('salespeople')">
  <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -805,12 +834,90 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
  </div>
 
  <div id="page-messages" class="page">
- <div class="ph">
- <div><h1 class="pt">Mensagens</h1><p class="ps">Modelos prontos para cada oportunidade</p></div>
- <button class="btn btn-o" onclick="openNewMsg()">+ Novo Modelo</button>
+ <div class="ph" style="flex-wrap:wrap;gap:12px">
+  <div>
+   <h1 class="pt">Central de Atendimento</h1>
+   <p class="ps">Mensagens, roteiros e materiais de apoio para sua equipe</p>
+  </div>
  </div>
- <div id="msgs-container"></div>
+
+ <!-- BUSCA GLOBAL -->
+ <div style="position:relative;margin-bottom:20px">
+  <input id="ca-search" class="fi" type="search" placeholder="Buscar em mensagens, roteiros e objeções..." style="padding-left:40px;font-size:14px;border-radius:var(--r)">
+  <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
  </div>
+ <div id="ca-search-results" style="display:none"></div>
+
+ <!-- TABS -->
+ <div class="escrit-tabs" style="margin-bottom:20px">
+  <button class="escrit-tab active" onclick="switchCA('msgs',this)">💬 Mensagens</button>
+  <button class="escrit-tab" onclick="switchCA('roteiros',this)">📋 Roteiros</button>
+  <button class="escrit-tab" onclick="switchCA('objecoes',this)">🛡️ Objeções</button>
+  <button class="escrit-tab" onclick="switchCA('comunicacao',this)">🎨 Comunicação</button>
+  <button class="escrit-tab" onclick="switchCA('favoritos',this)">⭐ Favoritos</button>
+ </div>
+
+ <!-- ABA: MENSAGENS -->
+ <div id="ca-msgs" class="ca-section active">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+   <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+    <select id="ca-msg-cat" class="fi" style="width:auto;min-width:180px" onchange="renderCAMsgs()">
+     <option value="">Todas as categorias</option>
+     <option value="primeiro_atendimento">Primeiro atendimento</option>
+     <option value="whatsapp">Atendimento via WhatsApp</option>
+     <option value="direct">Atendimento via Direct</option>
+     <option value="aniversario">Aniversário</option>
+     <option value="pos_venda">Pós-venda</option>
+     <option value="reativacao">Reativação</option>
+     <option value="nao_respondeu">Cliente que não respondeu</option>
+     <option value="agradecimento">Agradecimento</option>
+     <option value="entrega">Entrega</option>
+     <option value="outro">Outras</option>
+    </select>
+   </div>
+   <button class="btn btn-p btn-sm" onclick="abrirModalCAMsg()">+ Nova Mensagem</button>
+  </div>
+  <div id="ca-msgs-list"></div>
+ </div>
+
+ <!-- ABA: ROTEIROS -->
+ <div id="ca-roteiros" class="ca-section">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+   <p style="font-size:13px;color:var(--text3)">Fluxos de atendimento da sua equipe</p>
+   <button class="btn btn-p btn-sm" onclick="abrirModalCARoteiro()">+ Novo Roteiro</button>
+  </div>
+  <div id="ca-roteiros-list"></div>
+ </div>
+
+ <!-- ABA: OBJEÇÕES -->
+ <div id="ca-objecoes" class="ca-section">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+   <p style="font-size:13px;color:var(--text3)">Respostas prontas para as objeções mais comuns</p>
+   <button class="btn btn-p btn-sm" onclick="abrirModalCAObj()">+ Nova Objeção</button>
+  </div>
+  <div id="ca-obj-list"></div>
+ </div>
+
+ <!-- ABA: COMUNICAÇÃO -->
+ <div id="ca-comunicacao" class="ca-section">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+   <p style="font-size:13px;color:var(--text3)">Diretrizes de comunicação da marca para a equipe</p>
+   <button class="btn btn-p btn-sm" onclick="salvarCAComunicacao()">Salvar</button>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px" id="ca-com-grid">
+   <div class="ca-com-bloco"><label class="fl">Como queremos nos comunicar</label><textarea id="ca-com-tom" class="fi" rows="5" placeholder="Ex: Com proximidade, sem formalidade excessiva, usando o nome do cliente..."></textarea></div>
+   <div class="ca-com-bloco"><label class="fl">Palavras que preferimos usar</label><textarea id="ca-com-positivo" class="fi" rows="5" placeholder="Ex: Adorei, perfeito para você, exclusivo, novidade..."></textarea></div>
+   <div class="ca-com-bloco"><label class="fl">Palavras que evitamos</label><textarea id="ca-com-evitar" class="fi" rows="5" placeholder="Ex: Barato, produto, mercadoria, calma..."></textarea></div>
+   <div class="ca-com-bloco"><label class="fl">Orientações importantes para a equipe</label><textarea id="ca-com-obs" class="fi" rows="5" placeholder="Ex: Sempre perguntar o nome do cliente, confirmar tamanho antes de embalar..."></textarea></div>
+  </div>
+ </div>
+
+ <!-- ABA: FAVORITOS -->
+ <div id="ca-favoritos" class="ca-section">
+  <p style="font-size:13px;color:var(--text3);margin-bottom:16px">Seus conteúdos marcados como favoritos para acesso rápido</p>
+  <div id="ca-fav-list"></div>
+ </div>
+</div>
 
  <div id="page-salespeople" class="page">
  <div class="ph">
@@ -2092,46 +2199,524 @@ async function saveObs(cid){
 }
 
 // ── MESSAGES ──
-function renderMsgs(){
-  const msgs=gM(), el=document.getElementById('msgs-container');
-  if(!msgs.length){el.innerHTML='<div class="card"><div class="empty"><div class="empty-t">Nenhum modelo</div><div class="empty-d">Clique em Novo Modelo</div></div></div>';return;}
-  const byType={aniversario:[],pos_venda:[],inativos:[],outro:[]};
-  msgs.forEach(m=>{if(byType[m.type])byType[m.type].push(m);});
-  el.innerHTML=Object.entries(byType).filter(([,v])=>v.length).map(([type,list])=>
-    '<div style="margin-bottom:18px"><h3 style="font-size:13px;font-weight:700;margin-bottom:10px;color:var(--text2)">'+MTL[type]+'</h3>'+
-    list.map(m=>'<div class="card card-sm" style="margin-bottom:9px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px"><div style="font-weight:700;font-size:13px">'+m.title+'</div><div style="display:flex;gap:5px"><button class="btn btn-g btn-xs" onclick="openEditMsg(\''+m.id+'\')">Editar</button><button class="btn btn-d btn-xs" onclick="delMsg(\''+m.id+'\')">Excluir</button></div></div><div class="msg-b">'+m.body+'</div></div>').join('')+
-    '</div>'
-  ).join('');
-}
-function openNewMsg(){editMSGID=null;document.getElementById('msg-title').textContent='Novo Modelo';['edit-msgid','msg-ttl','msg-body'].forEach(id=>document.getElementById(id).value='');document.getElementById('msg-type').value='aniversario';document.getElementById('msg-modal').classList.add('open');}
-function openEditMsg(id){const m=gM().find(x=>x.id===id);if(!m)return;editMSGID=id;document.getElementById('msg-title').textContent='Editar Modelo';document.getElementById('edit-msgid').value=id;document.getElementById('msg-type').value=m.type;document.getElementById('msg-ttl').value=m.title;document.getElementById('msg-body').value=m.body;document.getElementById('msg-modal').classList.add('open');}
-function closeMsgModal(){document.getElementById('msg-modal').classList.remove('open');}
-async function saveMsg(){
-  const type=document.getElementById('msg-type').value, title=document.getElementById('msg-ttl').value.trim(), body=document.getElementById('msg-body').value.trim();
-  if(!title||!body){toast('Preencha titulo e mensagem','e');return;}
-  if(editMSGID){await _sb.from('messages').update({type,title,body}).eq('id',editMSGID);}
-  else{await _sb.from('messages').insert({store_id:CU.id,type,title,body});}
-  closeMsgModal(); toast('Modelo salvo!'); await loadAll(); renderMsgs();
-}
-async function delMsg(id){if(!confirm('Excluir?'))return;await _sb.from('messages').delete().eq('id',id);toast('Excluido.');await loadAll();renderMsgs();}
+// ════════════════════════════════════════════════
+// CENTRAL DE ATENDIMENTO
+// ════════════════════════════════════════════════
+var _caMsgs = JSON.parse(localStorage.getItem('slp_ca_msgs') || '[]');
+var _caRoteiros = JSON.parse(localStorage.getItem('slp_ca_roteiros') || '[]');
+var _caObjecoes = JSON.parse(localStorage.getItem('slp_ca_objecoes') || '[]');
+var _caCom = JSON.parse(localStorage.getItem('slp_ca_com') || '{}');
+var _caFavs = JSON.parse(localStorage.getItem('slp_ca_favs') || '[]');
 
-function openSendModal(cid){
-  document.getElementById('sm-cid').value=cid;
-  const msgs=gM();
-  document.getElementById('sm-msg').innerHTML='<option value="">Selecionar modelo...</option>'+msgs.map(m=>'<option value="'+m.id+'">'+MTL[m.type]+' - '+m.title+'</option>').join('');
-  document.getElementById('sm-sp').innerHTML='<option value="">Sem vendedora</option>'+gSP().map(s=>'<option value="'+s.id+'">'+s.name+'</option>').join('');
-  document.getElementById('sm-prev-wrap').style.display='none';
-  document.getElementById('send-modal').classList.add('open');
+var CA_CATS = {
+  primeiro_atendimento: {label:'Primeiro atendimento', cor:'var(--blue)', bg:'var(--blue-l)'},
+  whatsapp:  {label:'WhatsApp', cor:'#128c7e', bg:'#e6f9ee'},
+  direct:    {label:'Direct', cor:'var(--purple)', bg:'var(--purple-l)'},
+  aniversario:{label:'Aniversário', cor:'var(--gold)', bg:'var(--gold-l)'},
+  pos_venda: {label:'Pós-venda', cor:'var(--green)', bg:'var(--green-l)'},
+  reativacao:{label:'Reativação', cor:'var(--red)', bg:'var(--red-l)'},
+  nao_respondeu:{label:'Não respondeu', cor:'#5c5c3a', bg:'#f5f5e8'},
+  agradecimento:{label:'Agradecimento', cor:'var(--green2)', bg:'var(--green-l)'},
+  entrega:   {label:'Entrega', cor:'var(--blue)', bg:'var(--blue-l)'},
+  outro:     {label:'Outras', cor:'var(--text3)', bg:'var(--bg4)'}
+};
+
+// ── IDs para vinculação com CRM (preparação futura) ──
+var CA_VINC = {
+  aniversario: 'birthdays',
+  pos_venda: 'postsale',
+  reativacao: 'inactive'
+};
+
+function saveCA(key, data) {
+  localStorage.setItem('slp_ca_' + key, JSON.stringify(data));
 }
-function closeSendModal(){document.getElementById('send-modal').classList.remove('open');}
-function previewMsg(){
-  const mid=document.getElementById('sm-msg').value, cid=document.getElementById('sm-cid').value;
-  if(!mid){document.getElementById('sm-prev-wrap').style.display='none';return;}
-  const m=gM().find(x=>x.id===mid), c=gC().find(x=>x.id===cid);
-  if(!m||!c)return;
-  document.getElementById('sm-prev').textContent=m.body.replace(/\{nome\}/g,c.name.split(' ')[0]).replace(/\{loja\}/g,CU.store);
-  document.getElementById('sm-prev-wrap').style.display='block';
+
+function isFav(tipo, id) {
+  return _caFavs.some(function(f){ return f.tipo===tipo && f.id===id; });
 }
+
+function toggleFav(tipo, id) {
+  var idx = _caFavs.findIndex(function(f){ return f.tipo===tipo && f.id===id; });
+  if (idx !== -1) { _caFavs.splice(idx,1); }
+  else { _caFavs.push({tipo:tipo, id:id}); }
+  saveCA('favs', _caFavs);
+  renderMsgs(); // re-render página atual
+}
+
+function switchCA(section, btn) {
+  document.querySelectorAll('.ca-section').forEach(function(el){ el.classList.remove('active'); });
+  document.querySelectorAll('#page-messages .escrit-tab').forEach(function(el){ el.classList.remove('active'); });
+  var el = document.getElementById('ca-' + section);
+  if (el) el.classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (section === 'msgs') renderCAMsgs();
+  else if (section === 'roteiros') renderCARoteiros();
+  else if (section === 'objecoes') renderCAObjecoes();
+  else if (section === 'comunicacao') carregarCAComunicacao();
+  else if (section === 'favoritos') renderCAFavoritos();
+}
+
+// ── BUSCA GLOBAL ──
+function initCASearch() {
+  var inp = document.getElementById('ca-search');
+  if (!inp) return;
+  inp.addEventListener('input', function() {
+    var q = this.value.trim().toLowerCase();
+    var res = document.getElementById('ca-search-results');
+    var msgsSection = document.getElementById('ca-msgs');
+    if (!q) {
+      res.style.display = 'none';
+      if (msgsSection) msgsSection.style.display = '';
+      return;
+    }
+    if (msgsSection) msgsSection.style.display = 'none';
+    var results = [];
+    // Buscar em mensagens
+    _caMsgs.forEach(function(m){
+      if ((m.titulo||'').toLowerCase().includes(q) || (m.corpo||'').toLowerCase().includes(q)) {
+        results.push({tipo:'Mensagem', titulo:m.titulo, preview:(m.corpo||'').substring(0,80), cat: CA_CATS[m.cat]?.label||m.cat, _ref:'msg', _id:m.id});
+      }
+    });
+    // Buscar em roteiros
+    _caRoteiros.forEach(function(r){
+      if ((r.nome||'').toLowerCase().includes(q) || (r.objetivo||'').toLowerCase().includes(q) || (r.passos||'').toLowerCase().includes(q)) {
+        results.push({tipo:'Roteiro', titulo:r.nome, preview:(r.objetivo||'').substring(0,80), _ref:'rot', _id:r.id});
+      }
+    });
+    // Buscar em objeções
+    _caObjecoes.forEach(function(o){
+      if ((o.objecao||'').toLowerCase().includes(q) || (o.resposta||'').toLowerCase().includes(q)) {
+        results.push({tipo:'Objeção', titulo:o.objecao, preview:(o.resposta||'').substring(0,80), _ref:'obj', _id:o.id});
+      }
+    });
+    // Buscar em mensagens antigas do Supabase (_msgs)
+    (_msgs||[]).forEach(function(m){
+      if ((m.title||'').toLowerCase().includes(q) || (m.body||'').toLowerCase().includes(q)) {
+        results.push({tipo:'Mensagem', titulo:m.title, preview:(m.body||'').substring(0,80), _ref:'msg_sb', _id:m.id});
+      }
+    });
+    if (!results.length) {
+      res.innerHTML = '<div class="ca-empty">Nenhum resultado para "<strong>' + q + '</strong>"</div>';
+    } else {
+      res.innerHTML = '<div style="font-size:12px;color:var(--text3);margin-bottom:10px">' + results.length + ' resultado(s) para "' + q + '"</div>' +
+        results.map(function(r){
+          return '<div class="ca-search-item" data-ref="' + r._ref + '" data-id="' + r._id + '" onclick="caSearchClick(this.dataset.ref,this.dataset.id)">' +
+            '<div class="ca-search-type">' + r.tipo + (r.cat ? ' · ' + r.cat : '') + '</div>' +
+            '<div class="ca-search-title">' + r.titulo + '</div>' +
+            (r.preview ? '<div class="ca-search-preview">' + r.preview + '…</div>' : '') +
+          '</div>';
+        }).join('');
+    }
+    res.style.display = 'block';
+  });
+}
+
+function caSearchClick(ref, id) {
+  var inp = document.getElementById('ca-search');
+  if (inp) inp.value = '';
+  var res = document.getElementById('ca-search-results');
+  if (res) res.style.display = 'none';
+  var msgsSection = document.getElementById('ca-msgs');
+  if (msgsSection) msgsSection.style.display = '';
+  if (ref === 'rot') {
+    switchCA('roteiros', document.querySelector('#page-messages .escrit-tab:nth-child(2)'));
+    setTimeout(function(){ var el=document.getElementById('ca-rot-'+id); if(el){el.classList.add('open');el.scrollIntoView({behavior:'smooth',block:'center'});} }, 100);
+  } else if (ref === 'obj') {
+    switchCA('objecoes', document.querySelector('#page-messages .escrit-tab:nth-child(3)'));
+    setTimeout(function(){ var el=document.getElementById('ca-obj-'+id); if(el){el.classList.add('open');el.scrollIntoView({behavior:'smooth',block:'center'});} }, 100);
+  } else {
+    switchCA('msgs', document.querySelector('#page-messages .escrit-tab:nth-child(1)'));
+    setTimeout(function(){ var el=document.getElementById('ca-msg-'+id); if(el){el.classList.add('open');el.scrollIntoView({behavior:'smooth',block:'center'});} }, 100);
+  }
+}
+
+// ── MENSAGENS ──
+function renderCAMsgs() {
+  var el = document.getElementById('ca-msgs-list');
+  if (!el) return;
+  var catFiltro = (document.getElementById('ca-msg-cat')||{}).value || '';
+  
+  // Combinar mensagens locais + Supabase (antigas)
+  var todos = _caMsgs.slice();
+  // Migrar mensagens do Supabase para o novo sistema se ainda não migradas
+  var migradas = JSON.parse(localStorage.getItem('slp_ca_migrated') || 'false');
+  if (!migradas && (_msgs||[]).length) {
+    (_msgs||[]).forEach(function(m){
+      var catMap = {aniversario:'aniversario', pos_venda:'pos_venda', inativos:'reativacao', outro:'outro'};
+      if (!_caMsgs.find(function(x){ return x._sb_id===m.id; })) {
+        _caMsgs.push({id:uid(), _sb_id:m.id, titulo:m.title, corpo:m.body, cat:catMap[m.type]||'outro', criadaEm:m.created_at});
+      }
+    });
+    saveCA('msgs', _caMsgs);
+    localStorage.setItem('slp_ca_migrated', 'true');
+    todos = _caMsgs.slice();
+  }
+  
+  var lista = catFiltro ? todos.filter(function(m){ return m.cat===catFiltro; }) : todos;
+  if (!lista.length) {
+    el.innerHTML = '<div class="ca-empty"><div style="font-size:32px;margin-bottom:10px">💬</div><div style="font-weight:600;margin-bottom:4px">Nenhuma mensagem' + (catFiltro?' nesta categoria':'') + '</div><div style="font-size:12px">Clique em "+ Nova Mensagem" para adicionar</div></div>';
+    return;
+  }
+  
+  // Agrupar por categoria
+  var grupos = {};
+  lista.forEach(function(m){
+    if (!grupos[m.cat]) grupos[m.cat] = [];
+    grupos[m.cat].push(m);
+  });
+  
+  el.innerHTML = Object.keys(grupos).map(function(cat){
+    var catInfo = CA_CATS[cat] || {label:cat, cor:'var(--text3)', bg:'var(--bg4)'};
+    var msgs = grupos[cat];
+    return '<div style="margin-bottom:20px">' +
+      '<div class="ca-group-header">' +
+        '<span style="display:flex;align-items:center;gap:8px">' +
+          '<span style="width:8px;height:8px;border-radius:50%;background:' + catInfo.cor + ';display:inline-block"></span>' +
+          catInfo.label + ' <span style="font-weight:400;color:var(--text3)">(' + msgs.length + ')</span>' +
+        '</span>' +
+      '</div>' +
+      msgs.map(function(m){ return renderCAMsgCard(m); }).join('') +
+    '</div>';
+  }).join('');
+}
+
+function renderCAMsgCard(m) {
+  var fav = isFav('msg', m.id);
+  var catInfo = CA_CATS[m.cat] || {label:m.cat, cor:'var(--text3)', bg:'var(--bg4)'};
+  return '<div class="ca-card" id="ca-msg-' + m.id + '">' +
+    '<div class="ca-card-header" data-id="' + m.id + '" onclick="toggleCACard(this.parentElement)">' +
+      '<div style="flex:1;min-width:0">' +
+        '<div class="ca-cat-badge" style="background:' + catInfo.bg + ';color:' + catInfo.cor + '">' + catInfo.label + '</div>' +
+        '<div class="ca-card-title">' + m.titulo + '</div>' +
+        '<div class="ca-preview">' + (m.corpo||'') + '</div>' +
+      '</div>' +
+      '<div class="ca-actions">' +
+        '<button class="ca-fav-btn" title="Favoritar" data-tipo="msg" data-id="' + m.id + '" onclick="event.stopPropagation();toggleFav(this.dataset.tipo,this.dataset.id)">' + (fav?'⭐':'☆') + '</button>' +
+        '<span style="color:var(--text3);font-size:14px">▾</span>' +
+      '</div>' +
+    '</div>' +
+    '<div class="ca-card-body">' +
+      '<div class="ca-body-text" id="ca-body-msg-' + m.id + '">' + (m.corpo||'') + '</div>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
+        '<button class="btn btn-g btn-xs" data-id="' + m.id + '" onclick="copiarCAMsg(this.dataset.id)">📋 Copiar</button>' +
+        '<button class="btn btn-g btn-xs" data-id="' + m.id + '" onclick="editarCAMsg(this.dataset.id)">✏️ Editar</button>' +
+        '<button class="btn btn-d btn-xs" data-id="' + m.id + '" onclick="excluirCAMsg(this.dataset.id)">×</button>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+function toggleCACard(card) {
+  card.classList.toggle('open');
+}
+
+function copiarCAMsg(id) {
+  var m = _caMsgs.find(function(x){ return x.id===id; });
+  if (!m) return;
+  var texto = (m.corpo||'').replace(/\{nome\}/g,'[nome do cliente]').replace(/\{loja\}/g, (window.CU&&CU.store)||'[nome da loja]');
+  navigator.clipboard.writeText(texto).then(function(){ toast('Mensagem copiada!'); }).catch(function(){
+    var ta = document.createElement('textarea'); ta.value = texto; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); toast('Mensagem copiada!');
+  });
+}
+
+function editarCAMsg(id) {
+  var m = _caMsgs.find(function(x){ return x.id===id; });
+  if (!m) return;
+  abrirModalCAMsg(m);
+}
+
+function excluirCAMsg(id) {
+  if (!confirm('Excluir esta mensagem?')) return;
+  _caMsgs = _caMsgs.filter(function(x){ return x.id!==id; });
+  saveCA('msgs', _caMsgs);
+  renderCAMsgs();
+  toast('Mensagem excluída.');
+}
+
+function abrirModalCAMsg(m) {
+  var mo = document.getElementById('mo-ca-msg');
+  if (!mo) {
+    mo = document.createElement('div');
+    mo.id = 'mo-ca-msg'; mo.className = 'mo';
+    mo.addEventListener('click', function(e){ if(e.target===this) mo.classList.remove('open'); });
+    document.body.appendChild(mo);
+  }
+  var catOpts = Object.keys(CA_CATS).map(function(k){
+    return '<option value="' + k + '"' + ((m&&m.cat===k)?' selected':'') + '>' + CA_CATS[k].label + '</option>';
+  }).join('');
+  mo.innerHTML = '<div class="modal" style="max-width:520px">' +
+    '<div class="mh"><h3 class="mt">' + (m?'Editar Mensagem':'Nova Mensagem') + '</h3><button class="mc" id="btn-fecha-ca-msg"></button></div>' +
+    '<div class="mb">' +
+      '<input type="hidden" id="ca-msg-edit-id" value="' + (m?m.id:'') + '">' +
+      '<div class="fg"><label class="fl">Categoria</label><select id="ca-msg-cat-modal" class="fi">' + catOpts + '</select></div>' +
+      '<div class="fg"><label class="fl">Nome da mensagem *</label><input id="ca-msg-titulo" class="fi" type="text" value="' + (m?m.titulo:'') + '" placeholder="Ex: Primeiro contato WhatsApp"></div>' +
+      '<div class="fg"><label class="fl">Mensagem *</label><p style="font-size:11px;color:var(--text3);margin-bottom:6px">Use {nome} para o nome do cliente e {loja} para o nome da loja</p><textarea id="ca-msg-corpo" class="fi" rows="6" style="resize:vertical">' + (m?m.corpo:'') + '</textarea></div>' +
+      '<div style="display:flex;gap:10px;justify-content:flex-end;padding-top:14px;border-top:1px solid var(--border)">' +
+        '<button class="btn btn-g btn-sm" id="btn-cancela-ca-msg">Cancelar</button>' +
+        '<button class="btn btn-p btn-sm" onclick="salvarCAMsg()">Salvar Mensagem</button>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+  mo.classList.add('open');
+  document.getElementById('btn-fecha-ca-msg').onclick = function(){ mo.classList.remove('open'); };
+  document.getElementById('btn-cancela-ca-msg').onclick = function(){ mo.classList.remove('open'); };
+}
+
+function salvarCAMsg() {
+  var titulo = (document.getElementById('ca-msg-titulo').value||'').trim();
+  var corpo = (document.getElementById('ca-msg-corpo').value||'').trim();
+  if (!titulo || !corpo) { toast('Preencha título e mensagem','e'); return; }
+  var editId = document.getElementById('ca-msg-edit-id').value;
+  var cat = document.getElementById('ca-msg-cat-modal').value;
+  if (editId) {
+    var idx = _caMsgs.findIndex(function(x){ return x.id===editId; });
+    if (idx !== -1) { _caMsgs[idx].titulo=titulo; _caMsgs[idx].corpo=corpo; _caMsgs[idx].cat=cat; }
+  } else {
+    _caMsgs.unshift({id:uid(), titulo:titulo, corpo:corpo, cat:cat, criadaEm:new Date().toISOString()});
+  }
+  saveCA('msgs', _caMsgs);
+  var mo = document.getElementById('mo-ca-msg');
+  if (mo) mo.classList.remove('open');
+  renderCAMsgs();
+  toast('Mensagem salva!');
+}
+
+// ── ROTEIROS ──
+function renderCARoteiros() {
+  var el = document.getElementById('ca-roteiros-list');
+  if (!el) return;
+  if (!_caRoteiros.length) {
+    el.innerHTML = '<div class="ca-empty"><div style="font-size:32px;margin-bottom:10px">📋</div><div style="font-weight:600;margin-bottom:4px">Nenhum roteiro cadastrado</div><div style="font-size:12px">Crie roteiros de atendimento para sua equipe</div></div>';
+    return;
+  }
+  el.innerHTML = _caRoteiros.map(function(r){ return renderCARoteiroCard(r); }).join('');
+}
+
+function renderCARoteiroCard(r) {
+  var fav = isFav('rot', r.id);
+  var passos = (r.passos||'').split('\n').filter(function(p){ return p.trim(); });
+  return '<div class="ca-card" id="ca-rot-' + r.id + '">' +
+    '<div class="ca-card-header" onclick="toggleCACard(this.parentElement)">' +
+      '<div style="flex:1;min-width:0">' +
+        '<div class="ca-card-title">' + r.nome + '</div>' +
+        (r.objetivo ? '<div class="ca-preview">' + r.objetivo + '</div>' : '') +
+      '</div>' +
+      '<div class="ca-actions">' +
+        '<button class="ca-fav-btn" data-tipo="rot" data-id="' + r.id + '" onclick="event.stopPropagation();toggleFav(this.dataset.tipo,this.dataset.id)">' + (fav?'⭐':'☆') + '</button>' +
+        '<span style="color:var(--text3);font-size:14px">▾</span>' +
+      '</div>' +
+    '</div>' +
+    '<div class="ca-card-body">' +
+      (r.objetivo ? '<div style="font-size:12px;font-weight:600;color:var(--text3);margin-bottom:8px;margin-top:10px">OBJETIVO</div><div style="font-size:13px;color:var(--text2);margin-bottom:14px">' + r.objetivo + '</div>' : '') +
+      (passos.length ? '<div style="font-size:12px;font-weight:600;color:var(--text3);margin-bottom:10px">PASSO A PASSO</div>' +
+        passos.map(function(p,i){ return '<div class="ca-step"><div class="ca-step-num">' + (i+1) + '</div><div style="font-size:13px;color:var(--text2);padding-top:3px">' + p + '</div></div>'; }).join('') : '') +
+      (r.obs ? '<div style="font-size:12px;color:var(--text3);margin-top:12px;padding-top:10px;border-top:1px solid var(--border)"><strong>Obs:</strong> ' + r.obs + '</div>' : '') +
+      '<div style="display:flex;gap:8px;margin-top:14px">' +
+        '<button class="btn btn-g btn-xs" data-id="' + r.id + '" onclick="editarCARoteiro(this.dataset.id)">✏️ Editar</button>' +
+        '<button class="btn btn-d btn-xs" data-id="' + r.id + '" onclick="excluirCARoteiro(this.dataset.id)">×</button>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+function abrirModalCARoteiro(rot) {
+  var mo = document.getElementById('mo-ca-rot');
+  if (!mo) {
+    mo = document.createElement('div'); mo.id = 'mo-ca-rot'; mo.className = 'mo';
+    mo.addEventListener('click', function(e){ if(e.target===this) mo.classList.remove('open'); });
+    document.body.appendChild(mo);
+  }
+  mo.innerHTML = '<div class="modal" style="max-width:560px;max-height:90vh;overflow-y:auto">' +
+    '<div class="mh"><h3 class="mt">' + (rot?'Editar Roteiro':'Novo Roteiro de Atendimento') + '</h3><button class="mc" id="btn-fecha-ca-rot"></button></div>' +
+    '<div class="mb">' +
+      '<input type="hidden" id="ca-rot-id" value="' + (rot?rot.id:'') + '">' +
+      '<div class="fg"><label class="fl">Nome do roteiro *</label><input id="ca-rot-nome" class="fi" type="text" value="' + (rot?rot.nome:'') + '" placeholder="Ex: Cliente vindo de anúncio"></div>' +
+      '<div class="fg"><label class="fl">Objetivo</label><input id="ca-rot-obj" class="fi" type="text" value="' + (rot?rot.objetivo||'':'') + '" placeholder="Ex: Converter contato em primeira compra"></div>' +
+      '<div class="fg"><label class="fl">Passo a passo</label><p style="font-size:11px;color:var(--text3);margin-bottom:6px">Um passo por linha. Ex: 1. Cumprimentar pelo nome</p><textarea id="ca-rot-passos" class="fi" rows="8" style="resize:vertical" placeholder="Cumprimentar o cliente&#10;Identificar como conheceu a loja&#10;Apresentar os produtos mais recentes&#10;Perguntar preferências de estilo e tamanho&#10;Oferecer para experimentar&#10;Apresentar formas de pagamento&#10;Registrar contato do cliente">' + (rot?rot.passos||'':'') + '</textarea></div>' +
+      '<div class="fg"><label class="fl">Observações</label><textarea id="ca-rot-obs" class="fi" rows="3" style="resize:vertical" placeholder="Dicas importantes para a equipe...">' + (rot?rot.obs||'':'') + '</textarea></div>' +
+      '<div style="display:flex;gap:10px;justify-content:flex-end;padding-top:14px;border-top:1px solid var(--border)">' +
+        '<button class="btn btn-g btn-sm" id="btn-cancela-ca-rot">Cancelar</button>' +
+        '<button class="btn btn-p btn-sm" onclick="salvarCARoteiro()">Salvar Roteiro</button>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+  mo.classList.add('open');
+  document.getElementById('btn-fecha-ca-rot').onclick = function(){ mo.classList.remove('open'); };
+  document.getElementById('btn-cancela-ca-rot').onclick = function(){ mo.classList.remove('open'); };
+}
+
+function salvarCARoteiro() {
+  var nome = (document.getElementById('ca-rot-nome').value||'').trim();
+  if (!nome) { toast('Informe o nome do roteiro','e'); return; }
+  var editId = document.getElementById('ca-rot-id').value;
+  var obj = {id: editId||uid(), nome:nome, objetivo:document.getElementById('ca-rot-obj').value, passos:document.getElementById('ca-rot-passos').value, obs:document.getElementById('ca-rot-obs').value};
+  if (editId) {
+    var idx = _caRoteiros.findIndex(function(x){ return x.id===editId; });
+    if (idx !== -1) _caRoteiros[idx] = obj; else _caRoteiros.unshift(obj);
+  } else { _caRoteiros.unshift(obj); }
+  saveCA('roteiros', _caRoteiros);
+  var mo = document.getElementById('mo-ca-rot'); if(mo) mo.classList.remove('open');
+  renderCARoteiros(); toast('Roteiro salvo!');
+}
+
+function editarCARoteiro(id) {
+  abrirModalCARoteiro(_caRoteiros.find(function(x){ return x.id===id; }));
+}
+
+function excluirCARoteiro(id) {
+  if (!confirm('Excluir este roteiro?')) return;
+  _caRoteiros = _caRoteiros.filter(function(x){ return x.id!==id; });
+  saveCA('roteiros', _caRoteiros); renderCARoteiros(); toast('Roteiro excluído.');
+}
+
+// ── OBJEÇÕES ──
+function renderCAObjecoes() {
+  var el = document.getElementById('ca-obj-list');
+  if (!el) return;
+  if (!_caObjecoes.length) {
+    el.innerHTML = '<div class="ca-empty"><div style="font-size:32px;margin-bottom:10px">🛡️</div><div style="font-weight:600;margin-bottom:4px">Nenhuma objeção cadastrada</div><div style="font-size:12px">Registre as objeções mais comuns e as respostas ideais</div></div>';
+    return;
+  }
+  el.innerHTML = _caObjecoes.map(function(o){ return renderCAObjCard(o); }).join('');
+}
+
+function renderCAObjCard(o) {
+  var fav = isFav('obj', o.id);
+  return '<div class="ca-card" id="ca-obj-' + o.id + '">' +
+    '<div class="ca-card-header" onclick="toggleCACard(this.parentElement)">' +
+      '<div style="flex:1;min-width:0">' +
+        '<div class="ca-card-title" style="color:var(--red)">"' + o.objecao + '"</div>' +
+        '<div class="ca-preview">' + (o.resposta||'') + '</div>' +
+      '</div>' +
+      '<div class="ca-actions">' +
+        '<button class="ca-fav-btn" data-tipo="obj" data-id="' + o.id + '" onclick="event.stopPropagation();toggleFav(this.dataset.tipo,this.dataset.id)">' + (fav?'⭐':'☆') + '</button>' +
+        '<span style="color:var(--text3);font-size:14px">▾</span>' +
+      '</div>' +
+    '</div>' +
+    '<div class="ca-card-body">' +
+      '<div style="font-size:12px;font-weight:600;color:var(--text3);margin-top:10px;margin-bottom:6px">RESPOSTA SUGERIDA</div>' +
+      '<div class="ca-body-text">' + (o.resposta||'') + '</div>' +
+      (o.obs ? '<div style="font-size:12px;color:var(--text3);margin-top:10px"><strong>Obs:</strong> ' + o.obs + '</div>' : '') +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">' +
+        '<button class="btn btn-g btn-xs" data-id="' + o.id + '" onclick="copiarCAObj(this.dataset.id)">📋 Copiar resposta</button>' +
+        '<button class="btn btn-g btn-xs" data-id="' + o.id + '" onclick="editarCAObj(this.dataset.id)">✏️ Editar</button>' +
+        '<button class="btn btn-d btn-xs" data-id="' + o.id + '" onclick="excluirCAObj(this.dataset.id)">×</button>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+function abrirModalCAObj(o) {
+  var mo = document.getElementById('mo-ca-obj');
+  if (!mo) {
+    mo = document.createElement('div'); mo.id = 'mo-ca-obj'; mo.className = 'mo';
+    mo.addEventListener('click', function(e){ if(e.target===this) mo.classList.remove('open'); });
+    document.body.appendChild(mo);
+  }
+  mo.innerHTML = '<div class="modal" style="max-width:500px">' +
+    '<div class="mh"><h3 class="mt">' + (o?'Editar Objeção':'Nova Objeção') + '</h3><button class="mc" id="btn-fecha-ca-obj"></button></div>' +
+    '<div class="mb">' +
+      '<input type="hidden" id="ca-obj-id" value="' + (o?o.id:'') + '">' +
+      '<div class="fg"><label class="fl">Objeção do cliente *</label><input id="ca-obj-obj" class="fi" type="text" value="' + (o?o.objecao:'') + '" placeholder="Ex: Está caro."></div>' +
+      '<div class="fg"><label class="fl">Resposta sugerida *</label><textarea id="ca-obj-resp" class="fi" rows="5" style="resize:vertical" placeholder="Ex: Entendo! Esse modelo é feito com tecido exclusivo e tem caimento diferenciado. Vamos experimentar para você sentir a diferença?">' + (o?o.resposta||'':'') + '</textarea></div>' +
+      '<div class="fg"><label class="fl">Observações</label><input id="ca-obj-obs" class="fi" type="text" value="' + (o?o.obs||'':'') + '" placeholder="Dica extra para a equipe..."></div>' +
+      '<div style="display:flex;gap:10px;justify-content:flex-end;padding-top:14px;border-top:1px solid var(--border)">' +
+        '<button class="btn btn-g btn-sm" id="btn-cancela-ca-obj">Cancelar</button>' +
+        '<button class="btn btn-p btn-sm" onclick="salvarCAObj()">Salvar</button>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+  mo.classList.add('open');
+  document.getElementById('btn-fecha-ca-obj').onclick = function(){ mo.classList.remove('open'); };
+  document.getElementById('btn-cancela-ca-obj').onclick = function(){ mo.classList.remove('open'); };
+}
+
+function salvarCAObj() {
+  var obj_texto = (document.getElementById('ca-obj-obj').value||'').trim();
+  var resp = (document.getElementById('ca-obj-resp').value||'').trim();
+  if (!obj_texto || !resp) { toast('Preencha a objeção e a resposta','e'); return; }
+  var editId = document.getElementById('ca-obj-id').value;
+  var novo = {id:editId||uid(), objecao:obj_texto, resposta:resp, obs:document.getElementById('ca-obj-obs').value};
+  if (editId) {
+    var idx = _caObjecoes.findIndex(function(x){ return x.id===editId; });
+    if (idx !== -1) _caObjecoes[idx] = novo; else _caObjecoes.unshift(novo);
+  } else { _caObjecoes.unshift(novo); }
+  saveCA('objecoes', _caObjecoes);
+  var mo = document.getElementById('mo-ca-obj'); if(mo) mo.classList.remove('open');
+  renderCAObjecoes(); toast('Objeção salva!');
+}
+
+function editarCAObj(id) { abrirModalCAObj(_caObjecoes.find(function(x){ return x.id===id; })); }
+function excluirCAObj(id) {
+  if (!confirm('Excluir?')) return;
+  _caObjecoes = _caObjecoes.filter(function(x){ return x.id!==id; });
+  saveCA('objecoes', _caObjecoes); renderCAObjecoes(); toast('Excluído.');
+}
+function copiarCAObj(id) {
+  var o = _caObjecoes.find(function(x){ return x.id===id; });
+  if (!o) return;
+  navigator.clipboard.writeText(o.resposta||'').then(function(){ toast('Resposta copiada!'); }).catch(function(){
+    var ta=document.createElement('textarea');ta.value=o.resposta||'';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast('Copiado!');
+  });
+}
+
+// ── COMUNICAÇÃO ──
+function carregarCAComunicacao() {
+  var campos = ['tom','positivo','evitar','obs'];
+  campos.forEach(function(f){
+    var el = document.getElementById('ca-com-' + f);
+    if (el) el.value = _caCom[f] || '';
+  });
+}
+
+function salvarCAComunicacao() {
+  _caCom = {
+    tom: (document.getElementById('ca-com-tom').value||''),
+    positivo: (document.getElementById('ca-com-positivo').value||''),
+    evitar: (document.getElementById('ca-com-evitar').value||''),
+    obs: (document.getElementById('ca-com-obs').value||'')
+  };
+  saveCA('com', _caCom);
+  toast('Comunicação salva!');
+}
+
+// ── FAVORITOS ──
+function renderCAFavoritos() {
+  var el = document.getElementById('ca-fav-list');
+  if (!el) return;
+  if (!_caFavs.length) {
+    el.innerHTML = '<div class="ca-empty"><div style="font-size:32px;margin-bottom:10px">⭐</div><div style="font-weight:600;margin-bottom:4px">Nenhum favorito ainda</div><div style="font-size:12px">Clique em ☆ em qualquer mensagem, roteiro ou objeção para favoritar</div></div>';
+    return;
+  }
+  var html = '';
+  _caFavs.forEach(function(fav){
+    if (fav.tipo === 'msg') {
+      var m = _caMsgs.find(function(x){ return x.id===fav.id; });
+      if (m) html += '<div style="margin-bottom:8px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text3);margin-bottom:5px">💬 Mensagem</div>' + renderCAMsgCard(m) + '</div>';
+    } else if (fav.tipo === 'rot') {
+      var r = _caRoteiros.find(function(x){ return x.id===fav.id; });
+      if (r) html += '<div style="margin-bottom:8px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text3);margin-bottom:5px">📋 Roteiro</div>' + renderCARoteiroCard(r) + '</div>';
+    } else if (fav.tipo === 'obj') {
+      var o = _caObjecoes.find(function(x){ return x.id===fav.id; });
+      if (o) html += '<div style="margin-bottom:8px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text3);margin-bottom:5px">🛡️ Objeção</div>' + renderCAObjCard(o) + '</div>';
+    }
+  });
+  el.innerHTML = html || '<div class="ca-empty">Nenhum favorito encontrado.</div>';
+}
+
+// ── INIT ──
+function renderMsgs() {
+  // Redireciona para o novo sistema
+  renderCAMsgs();
+  // Inicializar busca se ainda não foi
+  if (!document.getElementById('ca-search').__caInit) {
+    initCASearch();
+    document.getElementById('ca-search').__caInit = true;
+  }
+}
+
+
 async function sendMsg(){
   const mid=document.getElementById('sm-msg').value, cid=document.getElementById('sm-cid').value, spid=document.getElementById('sm-sp').value;
   if(!mid){toast('Selecione um modelo','e');return;}
