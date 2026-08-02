@@ -392,15 +392,58 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 .rotina-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;margin-left:auto;flex-shrink:0}
 
 /* FUNIS */
-.funil-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);transition:box-shadow .2s}
-.funil-card:hover{box-shadow:var(--sh-md)}
-.funil-header{padding:18px 20px;border-bottom:1px solid var(--border)}
-.funil-stages{display:flex;padding:16px 20px;gap:6px;overflow-x:auto}
-.funil-stage{flex:1;min-width:80px;text-align:center}
-.funil-stage-bar{height:8px;border-radius:20px;margin-bottom:6px;position:relative}
-.funil-stage-label{font-size:10px;color:var(--text3);font-weight:500}
-.funil-stage-val{font-family:"Syne",sans-serif;font-size:14px;font-weight:700;margin-bottom:2px}
-.funil-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.funil-list{display:flex;flex-direction:column;gap:16px}
+.funil-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);transition:box-shadow .2s}
+.funil-item:hover{box-shadow:var(--sh-md)}
+.funil-item-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px 16px;cursor:pointer;gap:12px}
+.funil-item-header:hover{background:var(--bg3)}
+.funil-tipo-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;letter-spacing:.3px}
+.funil-item-title{font-size:15px;font-weight:700;font-family:Syne,sans-serif;color:var(--text);margin-bottom:3px}
+.funil-item-meta{font-size:12px;color:var(--text3);display:flex;gap:12px;flex-wrap:wrap}
+.funil-item-body{border-top:1px solid var(--border);display:none}
+.funil-item-body.open{display:block}
+.funil-body-tabs{display:flex;border-bottom:1px solid var(--border);background:var(--bg3)}
+.funil-body-tab{padding:10px 18px;font-size:12px;font-weight:600;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+.funil-body-tab.active{color:var(--green);border-bottom-color:var(--green);background:var(--bg2)}
+.funil-body-panel{display:none;padding:22px}
+.funil-body-panel.active{display:block}
+.funil-section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:10px;margin-top:18px}
+.funil-section-label:first-child{margin-top:0}
+.funil-fields-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:600px){.funil-fields-grid{grid-template-columns:1fr}}
+.funil-field{display:flex;flex-direction:column;gap:4px}
+.funil-field label{font-size:11px;color:var(--text3);font-weight:600}
+.funil-field .fval{font-size:13px;color:var(--text);font-weight:500;padding:7px 10px;background:var(--bg3);border-radius:var(--rs);border:1px solid var(--border);min-height:32px}
+.funil-field textarea.fval{min-height:70px;resize:vertical;font-family:inherit}
+.funil-checklist{display:flex;flex-direction:column;gap:8px}
+.funil-check-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg3);border-radius:var(--rs);border:1px solid var(--border);cursor:pointer;transition:all .15s}
+.funil-check-item.done{background:var(--green-l);border-color:var(--green)}
+.funil-check-box{width:18px;height:18px;border:2px solid var(--border2);border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.funil-check-item.done .funil-check-box{background:var(--green);border-color:var(--green);color:#fff}
+.funil-check-text{flex:1;font-size:13px;color:var(--text2)}
+.funil-check-item.done .funil-check-text{color:var(--green);text-decoration:line-through}
+.funil-check-del{color:var(--text3);font-size:14px;cursor:pointer;padding:0 4px;opacity:.5}
+.funil-check-del:hover{opacity:1;color:var(--red)}
+.funil-progress-bar{height:6px;background:var(--border);border-radius:20px;overflow:hidden;margin-bottom:6px}
+.funil-progress-fill{height:100%;background:var(--green);border-radius:20px;transition:width .4s}
+.funil-resultado-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:600px){.funil-resultado-grid{grid-template-columns:1fr 1fr}}
+.funil-res-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:14px;text-align:center}
+.funil-res-label{font-size:11px;color:var(--text3);margin-bottom:4px}
+.funil-empty{text-align:center;padding:48px 20px;color:var(--text3)}
+.funil-empty-icon{font-size:36px;margin-bottom:12px}
+.funil-tipo-escolha{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:8px 0}
+@media(max-width:500px){.funil-tipo-escolha{grid-template-columns:1fr}}
+.funil-modelo-card{padding:14px 16px;border:2px solid var(--border);border-radius:var(--rs);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:12px}
+.funil-modelo-card:hover,.funil-modelo-card.selected{border-color:var(--green);background:var(--green-l)}
+.funil-modelo-icon{font-size:22px;width:36px;text-align:center;flex-shrink:0}
+.funil-modelo-label{font-size:13px;font-weight:600;color:var(--text)}
+.funil-modelo-desc{font-size:11px;color:var(--text3);margin-top:2px}
+.funil-status-pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px}
+.funil-header-actions{display:flex;gap:6px;align-items:center;flex-shrink:0}
+.funil-chevron{font-size:14px;color:var(--text3);transition:transform .2s}
+.funil-item.open .funil-chevron{transform:rotate(180deg)}
+.funil-grid{display:none}
 
 /* DASHBOARD NOVO */
 .dash-prior-item{display:flex;align-items:center;gap:14px;padding:14px 18px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;transition:all .2s;margin-bottom:8px;box-shadow:var(--sh)}
@@ -1134,99 +1177,15 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 
   <!-- FUNIS -->
   <div id="escrit-funis" class="escrit-section">
-   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
-    <div>
-     <h2 style="font-size:16px;font-weight:700;font-family:'Syne',sans-serif">Funis Comerciais</h2>
-     <p style="font-size:12px;color:var(--text3);margin-top:2px">Organize suas estrategias e acompanhe resultados</p>
-    </div>
-    <button class="btn btn-p btn-sm" onclick="abrirModalFunil()">+ Novo Funil</button>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+   <div>
+    <h2 style="font-size:16px;font-weight:700;font-family:Syne,sans-serif">Funis Comerciais</h2>
+    <p style="font-size:12px;color:var(--text3);margin-top:2px">Planeje, execute e acompanhe suas campanhas</p>
    </div>
-
-   <div class="funil-grid">
-    <!-- Funil exemplo 1 -->
-    <div class="funil-card">
-     <div class="funil-header">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-       <div style="font-weight:700;font-size:14px;font-family:'Syne',sans-serif">Campanha de Lancamento</div>
-       <span class="badge bg-go">Planejando</span>
-      </div>
-      <div style="font-size:12px;color:var(--text2)">Funil de campanha comercial</div>
-     </div>
-     <div class="funil-stages">
-      <div class="funil-stage">
-       <div class="funil-stage-val">0</div>
-       <div class="funil-stage-bar" style="background:rgba(31,92,58,.15)"><div style="height:100%;width:0%;background:var(--green);border-radius:20px"></div></div>
-       <div class="funil-stage-label">Alcance</div>
-      </div>
-      <div style="display:flex;align-items:center;padding-bottom:20px;color:var(--border2)">›</div>
-      <div class="funil-stage">
-       <div class="funil-stage-val">0</div>
-       <div class="funil-stage-bar" style="background:rgba(26,92,138,.12)"><div style="height:100%;width:0%;background:var(--blue);border-radius:20px"></div></div>
-       <div class="funil-stage-label">Interesse</div>
-      </div>
-      <div style="display:flex;align-items:center;padding-bottom:20px;color:var(--border2)">›</div>
-      <div class="funil-stage">
-       <div class="funil-stage-val">0</div>
-       <div class="funil-stage-bar" style="background:rgba(160,120,48,.12)"><div style="height:100%;width:0%;background:var(--gold);border-radius:20px"></div></div>
-       <div class="funil-stage-label">Contato</div>
-      </div>
-      <div style="display:flex;align-items:center;padding-bottom:20px;color:var(--border2)">›</div>
-      <div class="funil-stage">
-       <div class="funil-stage-val">0</div>
-       <div class="funil-stage-bar" style="background:rgba(184,50,50,.1)"><div style="height:100%;width:0%;background:var(--red);border-radius:20px"></div></div>
-       <div class="funil-stage-label">Venda</div>
-      </div>
-     </div>
-    </div>
-
-    <!-- Funil exemplo 2 -->
-    <div class="funil-card">
-     <div class="funil-header">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-       <div style="font-weight:700;font-size:14px;font-family:'Syne',sans-serif">Reativacao de Clientes</div>
-       <span class="badge bg-g">Ativo</span>
-      </div>
-      <div style="font-size:12px;color:var(--text2)">Funil de reativacao via WhatsApp</div>
-     </div>
-     <div class="funil-stages">
-      <div class="funil-stage">
-       <div class="funil-stage-val">0</div>
-       <div class="funil-stage-bar" style="background:var(--green-l)"><div style="height:100%;width:0%;background:var(--green);border-radius:20px"></div></div>
-       <div class="funil-stage-label">Listadas</div>
-      </div>
-      <div style="display:flex;align-items:center;padding-bottom:20px;color:var(--border2)">›</div>
-      <div class="funil-stage">
-       <div class="funil-stage-val">0</div>
-       <div class="funil-stage-bar" style="background:var(--blue-l)"><div style="height:100%;width:0%;background:var(--blue);border-radius:20px"></div></div>
-       <div class="funil-stage-label">Contactadas</div>
-      </div>
-      <div style="display:flex;align-items:center;padding-bottom:20px;color:var(--border2)">›</div>
-      <div class="funil-stage">
-       <div class="funil-stage-val">0</div>
-       <div class="funil-stage-bar" style="background:var(--gold-l)"><div style="height:100%;width:0%;background:var(--gold);border-radius:20px"></div></div>
-       <div class="funil-stage-label">Responderam</div>
-      </div>
-      <div style="display:flex;align-items:center;padding-bottom:20px;color:var(--border2)">›</div>
-      <div class="funil-stage">
-       <div class="funil-stage-val">0</div>
-       <div class="funil-stage-bar" style="background:var(--green-l)"><div style="height:100%;width:0%;background:var(--green);border-radius:20px"></div></div>
-       <div class="funil-stage-label">Compraram</div>
-      </div>
-     </div>
-    </div>
-
-    <!-- Card novo funil -->
-    <div class="funil-card" style="border-style:dashed;background:var(--bg3);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:140px" onclick="abrirModalFunil()">
-     <div style="width:40px;height:40px;border-radius:50%;background:var(--bg4);border:1.5px dashed var(--border2);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:20px">+</div>
-     <div style="font-size:13px;color:var(--text3);font-weight:500">Criar novo funil</div>
-    </div>
-   </div>
-
-   <div style="margin-top:16px;background:var(--purple-l);border:1px solid rgba(92,58,138,.12);border-radius:var(--r);padding:14px;display:flex;align-items:flex-start;gap:10px">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-    <div style="font-size:12px;color:var(--purple);line-height:1.6"><strong>Em breve:</strong> Crie funis personalizados para campanhas, grupos, lives e lancamentos. Registre etapas, resultados e acompanhe a conversao de cada estrategia.</div>
-   </div>
+   <button class="btn btn-p btn-sm" onclick="abrirEscolhaTipoFunil()">+ Novo Funil</button>
   </div>
+  <div id="funis-list" class="funil-list"></div>
+ </div>
 
  </div>
  <!-- FIM ESCRITORIO -->
@@ -4057,17 +4016,434 @@ function abrirModalTarefa() { abrirModalAtividade(); }
 function salvarTarefa() { salvarAtividade(); }
 
 // ── FUNIS ──
-function abrirModalFunil() {
-  ['fun-nome','fun-desc'].forEach(function(id){ document.getElementById(id).value=''; });
-  document.getElementById('fun-tipo').value = 'campanha';
-  document.getElementById('modal-funil').classList.add('open');
+// ══════════════════════════════════════════════════
+// FUNIS COMERCIAIS v2
+// ══════════════════════════════════════════════════
+var _funis = JSON.parse(localStorage.getItem('slp_funis') || '[]');
+
+var FUNIL_TIPOS = [
+  {id:'aquisicao', label:'Funil de Aquisicao', icon:'🎯', desc:'Captacao e conversao de novos clientes', cor:'var(--blue)', corL:'var(--blue-l)'},
+  {id:'live', label:'Funil de Live', icon:'📱', desc:'Planejamento e execucao de lives', cor:'var(--purple)', corL:'var(--purple-l)'},
+  {id:'whatsapp', label:'Funil de Grupo de WhatsApp', icon:'💬', desc:'Estrategia via grupo de WhatsApp', cor:'var(--green)', corL:'var(--green-l)'},
+  {id:'venda_direta', label:'Funil de Venda Direta', icon:'🛍️', desc:'Abordagem e fechamento direto', cor:'var(--gold)', corL:'var(--gold-l)'},
+  {id:'personalizado', label:'Funil Personalizado', icon:'⚙️', desc:'Crie sua propria estrutura', cor:'var(--text2)', corL:'var(--bg4)'}
+];
+
+var FUNIL_STATUS = [
+  {id:'planejando', label:'Planejando', cor:'var(--blue)', bg:'var(--blue-l)'},
+  {id:'ativo', label:'Em andamento', cor:'var(--green)', bg:'var(--green-l)'},
+  {id:'pausado', label:'Pausado', cor:'var(--gold)', bg:'var(--gold-l)'},
+  {id:'encerrado', label:'Encerrado', cor:'var(--text3)', bg:'var(--bg4)'}
+];
+
+var FUNIL_CHECK_DEFAULTS = [
+  'Planejamento realizado',
+  'Comunicacao preparada',
+  'Conteudos produzidos',
+  'Divulgacao iniciada',
+  'Campanha em andamento',
+  'Encerramento realizado'
+];
+
+var _funilTipoSelecionado = null;
+
+function saveFunis() {
+  localStorage.setItem('slp_funis', JSON.stringify(_funis));
+}
+
+function getFunilTipo(id) {
+  return FUNIL_TIPOS.find(function(t){ return t.id === id; }) || FUNIL_TIPOS[4];
+}
+
+function getFunilStatus(id) {
+  return FUNIL_STATUS.find(function(s){ return s.id === id; }) || FUNIL_STATUS[0];
+}
+
+function renderFunis() {
+  var el = document.getElementById('funis-list');
+  if (!el) return;
+  if (!_funis.length) {
+    el.innerHTML = '<div class="funil-empty"><div class="funil-empty-icon">🎯</div><div style="font-size:14px;font-weight:600;margin-bottom:6px">Nenhum funil criado ainda</div><div style="font-size:12px">Crie seu primeiro funil para comecar a organizar suas campanhas</div></div>';
+    return;
+  }
+  el.innerHTML = _funis.map(function(f) {
+    var tipo = getFunilTipo(f.tipo);
+    var status = getFunilStatus(f.status);
+    var checks = f.checklist || [];
+    var done = checks.filter(function(ch){ return ch.done; }).length;
+    var pct = checks.length ? Math.round(done/checks.length*100) : 0;
+    var isOpen = f._open ? 'open' : '';
+    return '<div class="funil-item ' + isOpen + '" id="funil-' + f.id + '">' +
+      '<div class="funil-item-header" data-fid="' + f.id + '" onclick="toggleFunil(this.dataset.fid)">' +
+        '<div style="flex:1;min-width:0">' +
+          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap">' +
+            '<span class="funil-tipo-badge" style="background:' + tipo.corL + ';color:' + tipo.cor + '">' + tipo.icon + ' ' + tipo.label + '</span>' +
+            '<span class="funil-status-pill" style="background:' + status.bg + ';color:' + status.cor + '">' + status.label + '</span>' +
+          '</div>' +
+          '<div class="funil-item-title">' + f.nome + '</div>' +
+          '<div class="funil-item-meta">' +
+            (f.inicio ? '<span>📅 ' + f.inicio.split('-').reverse().join('/') + (f.fim ? ' → ' + f.fim.split('-').reverse().join('/') : '') + '</span>' : '') +
+            (f.responsavel ? '<span>👤 ' + f.responsavel + '</span>' : '') +
+            (checks.length ? '<span>✓ ' + done + '/' + checks.length + ' etapas</span>' : '') +
+          '</div>' +
+          (checks.length ? '<div style="margin-top:8px"><div class="funil-progress-bar"><div class="funil-progress-fill" style="width:' + pct + '%"></div></div><div style="font-size:10px;color:var(--text3);margin-top:2px">' + pct + '% concluido</div></div>' : '') +
+        '</div>' +
+        '<div class="funil-header-actions">' +
+          '<button class="btn btn-g btn-xs" data-fid="' + f.id + '" onclick="event.stopPropagation();editarFunil(this.dataset.fid)">Editar</button>' +
+          '<button class="btn btn-d btn-xs" data-fid="' + f.id + '" onclick="event.stopPropagation();excluirFunil(this.dataset.fid)">×</button>' +
+          '<span class="funil-chevron">▾</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="funil-item-body ' + isOpen + '" id="funil-body-' + f.id + '">' +
+        renderFunilBodyTabs(f) +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function renderFunilBodyTabs(f) {
+  return '<div class="funil-body-tabs">' +
+    '<div class="funil-body-tab active" data-fid="' + f.id + '" data-tab="info" onclick="switchFunilTab(this.dataset.fid,this.dataset.tab,this)">Informacoes</div>' +
+    '<div class="funil-body-tab" data-fid="' + f.id + '" data-tab="execucao" onclick="switchFunilTab(this.dataset.fid,this.dataset.tab,this)">Execucao</div>' +
+    '<div class="funil-body-tab" data-fid="' + f.id + '" data-tab="resultados" onclick="switchFunilTab(this.dataset.fid,this.dataset.tab,this)">Resultados</div>' +
+  '</div>' +
+  '<div id="ftab-info-' + f.id + '" class="funil-body-panel active">' + renderFunilInfo(f) + '</div>' +
+  '<div id="ftab-execucao-' + f.id + '" class="funil-body-panel">' + renderFunilExecucao(f) + '</div>' +
+  '<div id="ftab-resultados-' + f.id + '" class="funil-body-panel">' + renderFunilResultados(f) + '</div>';
+}
+
+function renderFunilInfo(f) {
+  var statusOpts = FUNIL_STATUS.map(function(s){
+    return '<option value="' + s.id + '"' + (f.status===s.id?' selected':'') + '>' + s.label + '</option>';
+  }).join('');
+  return '<div class="funil-section-label">Informacoes Gerais</div>' +
+  '<div class="funil-fields-grid">' +
+    '<div class="funil-field"><label>Objetivo</label><div class="fval">' + (f.objetivo||'—') + '</div></div>' +
+    '<div class="funil-field"><label>Status</label>' +
+      '<select class="fval" data-fid="' + f.id + '" data-campo="status" onchange="atualizarCampoFunil(this.dataset.fid,this.dataset.campo,this.value)">' + statusOpts + '</select>' +
+    '</div>' +
+    '<div class="funil-field"><label>Inicio</label><div class="fval">' + (f.inicio ? f.inicio.split('-').reverse().join('/') : '—') + '</div></div>' +
+    '<div class="funil-field"><label>Encerramento</label><div class="fval">' + (f.fim ? f.fim.split('-').reverse().join('/') : '—') + '</div></div>' +
+    '<div class="funil-field"><label>Responsavel</label><div class="fval">' + (f.responsavel||'—') + '</div></div>' +
+    '<div class="funil-field"><label>Canal</label><div class="fval">' + (f.canal||'—') + '</div></div>' +
+  '</div>' +
+  '<div class="funil-section-label">Estrategia</div>' +
+  '<div class="funil-field"><div class="fval">' + (f.descricao||'—') + '</div></div>' +
+  '<div class="funil-section-label">Publico e Observacoes</div>' +
+  '<div class="funil-fields-grid">' +
+    '<div class="funil-field"><label>Publico-alvo</label><div class="fval">' + (f.publico||'—') + '</div></div>' +
+    '<div class="funil-field"><label>Observacoes</label><div class="fval">' + (f.obs||'—') + '</div></div>' +
+  '</div>';
+}
+
+function renderFunilExecucao(f) {
+  var checks = f.checklist || [];
+  var done = checks.filter(function(ch){ return ch.done; }).length;
+  var pct = checks.length ? Math.round(done/checks.length*100) : 0;
+  var html = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">' +
+    '<div class="funil-section-label" style="margin:0">Checklist de Execucao</div>' +
+    '<button class="btn btn-g btn-xs" data-fid="' + f.id + '" onclick="addCheckFunil(this.dataset.fid)">+ Etapa</button>' +
+  '</div>';
+  if (checks.length) {
+    html += '<div style="margin-bottom:14px"><div class="funil-progress-bar" style="height:8px"><div class="funil-progress-fill" style="width:' + pct + '%"></div></div>' +
+      '<div style="font-size:11px;color:var(--text3);margin-top:4px">' + done + ' de ' + checks.length + ' etapas concluidas (' + pct + '%)</div></div>';
+  }
+  html += '<div class="funil-checklist">';
+  checks.forEach(function(ch, i) {
+    html += '<div class="funil-check-item' + (ch.done?' done':'') + '" data-fid="' + f.id + '" data-idx="' + i + '" onclick="toggleCheckFunil(this.dataset.fid,this.dataset.idx)">' +
+      '<div class="funil-check-box">' + (ch.done ? '✓' : '') + '</div>' +
+      '<div class="funil-check-text">' + ch.texto + '</div>' +
+      '<span class="funil-check-del" data-fid="' + f.id + '" data-idx="' + i + '" onclick="event.stopPropagation();delCheckFunil(this.dataset.fid,this.dataset.idx)">×</span>' +
+    '</div>';
+  });
+  html += '</div>';
+  if (!checks.length) {
+    html += '<div style="text-align:center;padding:24px;color:var(--text3);font-size:13px">Nenhuma etapa. Clique em "+ Etapa" para adicionar.</div>';
+  }
+  return html;
+}
+
+function renderFunilResultados(f) {
+  var r = f.resultados || {};
+  return '<div class="funil-section-label">Resultados da Campanha</div>' +
+  '<div class="funil-resultado-grid">' +
+    funilResCard('Novos clientes', r.novos_clientes||'', '👥', f.id, 'novos_clientes') +
+    funilResCard('Novos seguidores', r.novos_seguidores||'', '📲', f.id, 'novos_seguidores') +
+    funilResCard('Participantes', r.participantes||'', '🙋', f.id, 'participantes') +
+    funilResCard('Qtd de vendas', r.qtd_vendas||'', '🛍️', f.id, 'qtd_vendas') +
+    funilResCard('Faturamento (R$)', r.faturamento||'', '💰', f.id, 'faturamento') +
+  '</div>' +
+  '<div class="funil-section-label" style="margin-top:18px">Observacoes Finais</div>' +
+  '<textarea class="fval" style="width:100%;box-sizing:border-box;font-family:inherit;font-size:13px" rows="3" placeholder="Aprendizados, pontos de melhoria..." data-fid="' + f.id + '" data-campo="obs_final" onblur="atualizarResultadoFunil(this.dataset.fid,this.dataset.campo,this.value)">' + (r.obs_final||'') + '</textarea>';
+}
+
+function funilResCard(label, val, icon, fid, campo) {
+  return '<div class="funil-res-card">' +
+    '<div style="font-size:20px;margin-bottom:4px">' + icon + '</div>' +
+    '<div class="funil-res-label">' + label + '</div>' +
+    '<input type="text" style="border:none;background:transparent;text-align:center;width:100%;font-size:20px;font-weight:700;font-family:Syne,sans-serif;color:var(--green);outline:none" ' +
+    'data-fid="' + fid + '" data-campo="' + campo + '" value="' + val + '" placeholder="—" ' +
+    'onblur="atualizarResultadoFunil(this.dataset.fid,this.dataset.campo,this.value)">' +
+  '</div>';
+}
+
+function toggleFunil(fid) {
+  var f = _funis.find(function(x){ return x.id===fid; });
+  if (!f) return;
+  f._open = !f._open;
+  saveFunis();
+  renderFunis();
+}
+
+function switchFunilTab(fid, tab, el) {
+  var body = document.getElementById('funil-body-' + fid);
+  if (!body) return;
+  body.querySelectorAll('.funil-body-tab').forEach(function(t){ t.classList.remove('active'); });
+  body.querySelectorAll('.funil-body-panel').forEach(function(p){ p.classList.remove('active'); });
+  el.classList.add('active');
+  var panel = document.getElementById('ftab-' + tab + '-' + fid);
+  if (panel) panel.classList.add('active');
+}
+
+function toggleCheckFunil(fid, idx) {
+  var f = _funis.find(function(x){ return x.id===fid; });
+  if (!f || !f.checklist[idx]) return;
+  f.checklist[idx].done = !f.checklist[idx].done;
+  saveFunis();
+  var execTab = document.querySelector('#funil-body-' + fid + ' [data-tab="execucao"]');
+  renderFunis();
+  setTimeout(function(){
+    if (execTab) switchFunilTab(fid, 'execucao', document.querySelector('#funil-body-' + fid + ' [data-tab="execucao"]'));
+  }, 30);
+}
+
+function addCheckFunil(fid) {
+  var texto = prompt('Nome da etapa:');
+  if (!texto || !texto.trim()) return;
+  var f = _funis.find(function(x){ return x.id===fid; });
+  if (!f) return;
+  if (!f.checklist) f.checklist = [];
+  f.checklist.push({texto: texto.trim(), done: false});
+  saveFunis();
+  renderFunis();
+  setTimeout(function(){
+    var el = document.querySelector('#funil-body-' + fid + ' [data-tab="execucao"]');
+    if (el) switchFunilTab(fid, 'execucao', el);
+  }, 30);
+}
+
+function delCheckFunil(fid, idx) {
+  var f = _funis.find(function(x){ return x.id===fid; });
+  if (!f) return;
+  f.checklist.splice(parseInt(idx), 1);
+  saveFunis();
+  renderFunis();
+  setTimeout(function(){
+    var el = document.querySelector('#funil-body-' + fid + ' [data-tab="execucao"]');
+    if (el) switchFunilTab(fid, 'execucao', el);
+  }, 30);
+}
+
+function atualizarCampoFunil(fid, campo, valor) {
+  var f = _funis.find(function(x){ return x.id===fid; });
+  if (!f) return;
+  f[campo] = valor;
+  saveFunis();
+  renderFunis();
+}
+
+function atualizarResultadoFunil(fid, campo, valor) {
+  var f = _funis.find(function(x){ return x.id===fid; });
+  if (!f) return;
+  if (!f.resultados) f.resultados = {};
+  f.resultados[campo] = valor;
+  saveFunis();
+}
+
+function abrirEscolhaTipoFunil() {
+  var modalId = 'modal-funil-tipo';
+  var modal = document.getElementById(modalId);
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = modalId;
+    modal.className = 'modal';
+    document.body.appendChild(modal);
+  }
+  var tiposHtml = FUNIL_TIPOS.map(function(t) {
+    return '<div class="funil-modelo-card" data-tid="' + t.id + '" onclick="selecionarModeloFunil(this.dataset.tid,this)">' +
+      '<div class="funil-modelo-icon">' + t.icon + '</div>' +
+      '<div><div class="funil-modelo-label">' + t.label + '</div><div class="funil-modelo-desc">' + t.desc + '</div></div>' +
+    '</div>';
+  }).join('');
+  modal.innerHTML = '<div class="modal-box" style="max-width:520px">' +
+    '<div class="modal-header"><span class="modal-title">Novo Funil — Escolha o modelo</span><button class="modal-close" data-mid="' + modalId + '" onclick="fecharModalFunil(this.dataset.mid)">×</button></div>' +
+    '<div class="modal-body"><p style="font-size:13px;color:var(--text2);margin-bottom:14px">Selecione o tipo de funil para comecar:</p>' +
+      '<div class="funil-tipo-escolha">' + tiposHtml + '</div>' +
+      '<div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end">' +
+        '<button class="btn btn-g btn-sm" data-mid="' + modalId + '" onclick="fecharModalFunil(this.dataset.mid)">Cancelar</button>' +
+        '<button class="btn btn-p btn-sm" id="btn-continuar-funil" onclick="continuarCriarFunil()" disabled>Continuar</button>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+  _funilTipoSelecionado = null;
+  modal.style.display = 'flex';
+}
+
+function fecharModalFunil(id) {
+  var m = document.getElementById(id);
+  if (m) m.style.display = 'none';
+}
+
+function selecionarModeloFunil(tid, el) {
+  document.querySelectorAll('.funil-modelo-card').forEach(function(card){ card.classList.remove('selected'); });
+  el.classList.add('selected');
+  _funilTipoSelecionado = tid;
+  var btn = document.getElementById('btn-continuar-funil');
+  if (btn) btn.disabled = false;
+}
+
+function continuarCriarFunil() {
+  if (!_funilTipoSelecionado) return;
+  fecharModalFunil('modal-funil-tipo');
+  abrirFormFunil(null, _funilTipoSelecionado);
+}
+
+function abrirFormFunil(fid, tipoPreset) {
+  var f = fid ? _funis.find(function(x){ return x.id===fid; }) : null;
+  var tipo = tipoPreset || (f ? f.tipo : 'personalizado');
+  var tipoObj = getFunilTipo(tipo);
+  var checks = f ? (f.checklist||[]) : FUNIL_CHECK_DEFAULTS.map(function(t){ return {texto:t,done:false}; });
+  var statusOpts = FUNIL_STATUS.map(function(s){
+    return '<option value="' + s.id + '"' + ((f?f.status:'planejando')===s.id?' selected':'') + '>' + s.label + '</option>';
+  }).join('');
+  var checksHtml = checks.map(function(ch){
+    return '<div class="funil-check-item" style="cursor:default">' +
+      '<div class="funil-check-box" style="border-color:var(--border2)">' + (ch.done?'✓':'') + '</div>' +
+      '<input type="text" class="ff-check-input" value="' + (ch.texto||'') + '" style="flex:1;border:none;background:transparent;font-size:13px;color:var(--text);outline:none" placeholder="Nome da etapa">' +
+      '<span style="color:var(--text3);cursor:pointer;padding:0 4px;font-size:16px" onclick="this.parentElement.remove()">×</span>' +
+    '</div>';
+  }).join('');
+  var modalId = 'modal-funil-form';
+  var modal = document.getElementById(modalId);
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = modalId;
+    modal.className = 'modal';
+    document.body.appendChild(modal);
+  }
+  modal.innerHTML = '<div class="modal-box" style="max-width:600px;max-height:90vh;overflow-y:auto">' +
+    '<div class="modal-header">' +
+      '<span class="modal-title">' + (f ? 'Editar Funil' : 'Novo Funil — ' + tipoObj.label) + '</span>' +
+      '<button class="modal-close" data-mid="' + modalId + '" onclick="fecharModalFunil(this.dataset.mid)">×</button>' +
+    '</div>' +
+    '<div class="modal-body">' +
+      '<input type="hidden" id="ff-id" value="' + (f?f.id:'') + '">' +
+      '<input type="hidden" id="ff-tipo" value="' + tipo + '">' +
+      '<div class="funil-section-label">Informacoes Gerais</div>' +
+      '<div class="funil-fields-grid" style="margin-bottom:12px">' +
+        '<div class="funil-field" style="grid-column:1/-1"><label>Nome do funil *</label><input id="ff-nome" class="input" type="text" value="' + (f?f.nome:'') + '" placeholder="Ex: Live de Lancamento - Agosto"></div>' +
+        '<div class="funil-field" style="grid-column:1/-1"><label>Objetivo</label><input id="ff-objetivo" class="input" type="text" value="' + (f?f.objetivo||'':'') + '" placeholder="Ex: Vender 30 pecas, captar 50 novos clientes"></div>' +
+        '<div class="funil-field"><label>Data de inicio</label><input id="ff-inicio" class="input" type="date" value="' + (f?f.inicio||'':'') + '"></div>' +
+        '<div class="funil-field"><label>Data de encerramento</label><input id="ff-fim" class="input" type="date" value="' + (f?f.fim||'':'') + '"></div>' +
+        '<div class="funil-field"><label>Responsavel</label><input id="ff-responsavel" class="input" type="text" value="' + (f?f.responsavel||'':'') + '" placeholder="Nome ou setor"></div>' +
+        '<div class="funil-field"><label>Canal principal</label><input id="ff-canal" class="input" type="text" value="' + (f?f.canal||'':'') + '" placeholder="Instagram, WhatsApp, Loja fisica..."></div>' +
+      '</div>' +
+      '<div class="funil-section-label">Estrategia</div>' +
+      '<div class="funil-field" style="margin-bottom:12px"><textarea id="ff-descricao" class="input" rows="3" style="resize:vertical" placeholder="Descreva a estrategia e o plano de acao...">' + (f?f.descricao||'':'') + '</textarea></div>' +
+      '<div class="funil-fields-grid" style="margin-bottom:12px">' +
+        '<div class="funil-field"><label>Publico-alvo</label><textarea id="ff-publico" class="input" rows="2" style="resize:vertical" placeholder="Quem e o publico desta campanha?">' + (f?f.publico||'':'') + '</textarea></div>' +
+        '<div class="funil-field"><label>Observacoes</label><textarea id="ff-obs" class="input" rows="2" style="resize:vertical" placeholder="Informacoes adicionais...">' + (f?f.obs||'':'') + '</textarea></div>' +
+      '</div>' +
+      '<div class="funil-section-label">Status</div>' +
+      '<div class="funil-field" style="margin-bottom:16px"><select id="ff-status" class="input">' + statusOpts + '</select></div>' +
+      '<div class="funil-section-label">Checklist de Execucao</div>' +
+      '<div id="ff-checks" class="funil-checklist" style="margin-bottom:10px">' + checksHtml + '</div>' +
+      '<button class="btn btn-g btn-xs" style="margin-bottom:16px" onclick="addCheckFormFunil()">+ Adicionar etapa</button>' +
+      '<div style="display:flex;gap:10px;justify-content:flex-end;padding-top:16px;border-top:1px solid var(--border)">' +
+        '<button class="btn btn-g btn-sm" data-mid="' + modalId + '" onclick="fecharModalFunil(this.dataset.mid)">Cancelar</button>' +
+        '<button class="btn btn-p btn-sm" onclick="salvarFunil()">Salvar Funil</button>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+  modal.style.display = 'flex';
+}
+
+function addCheckFormFunil() {
+  var cont = document.getElementById('ff-checks');
+  if (!cont) return;
+  var div = document.createElement('div');
+  div.className = 'funil-check-item';
+  div.style.cursor = 'default';
+  div.innerHTML = '<div class="funil-check-box" style="border-color:var(--border2)"></div>' +
+    '<input type="text" class="ff-check-input" value="" style="flex:1;border:none;background:transparent;font-size:13px;color:var(--text);outline:none" placeholder="Nome da etapa">' +
+    '<span style="color:var(--text3);cursor:pointer;padding:0 4px;font-size:16px" onclick="this.parentElement.remove()">×</span>';
+  cont.appendChild(div);
+  div.querySelector('input').focus();
 }
 
 function salvarFunil() {
-  var nome = document.getElementById('fun-nome').value.trim();
-  if (!nome) { toast('Informe o nome do funil', 'e'); return; }
-  toast('Funil "' + nome + '" criado! Em breve voce podera configurar as etapas.');
-  document.getElementById('modal-funil').classList.remove('open');
+  var nome = (document.getElementById('ff-nome').value||'').trim();
+  if (!nome) { alert('Informe o nome do funil.'); return; }
+  var checks = [];
+  document.querySelectorAll('.ff-check-input').forEach(function(inp){
+    if (inp.value.trim()) checks.push({texto: inp.value.trim(), done: false});
+  });
+  var fid = document.getElementById('ff-id').value;
+  var existing = fid ? _funis.find(function(x){ return x.id===fid; }) : null;
+  if (existing) {
+    existing.nome = nome;
+    existing.objetivo = document.getElementById('ff-objetivo').value;
+    existing.inicio = document.getElementById('ff-inicio').value;
+    existing.fim = document.getElementById('ff-fim').value;
+    existing.responsavel = document.getElementById('ff-responsavel').value;
+    existing.canal = document.getElementById('ff-canal').value;
+    existing.descricao = document.getElementById('ff-descricao').value;
+    existing.publico = document.getElementById('ff-publico').value;
+    existing.obs = document.getElementById('ff-obs').value;
+    existing.status = document.getElementById('ff-status').value;
+    checks.forEach(function(ch, i){
+      if (existing.checklist && existing.checklist[i]) ch.done = existing.checklist[i].done;
+    });
+    existing.checklist = checks;
+  } else {
+    _funis.unshift({
+      id: uid(),
+      tipo: document.getElementById('ff-tipo').value,
+      nome: nome,
+      objetivo: document.getElementById('ff-objetivo').value,
+      inicio: document.getElementById('ff-inicio').value,
+      fim: document.getElementById('ff-fim').value,
+      responsavel: document.getElementById('ff-responsavel').value,
+      canal: document.getElementById('ff-canal').value,
+      descricao: document.getElementById('ff-descricao').value,
+      publico: document.getElementById('ff-publico').value,
+      obs: document.getElementById('ff-obs').value,
+      status: document.getElementById('ff-status').value,
+      checklist: checks,
+      resultados: {},
+      _open: true
+    });
+  }
+  saveFunis();
+  fecharModalFunil('modal-funil-form');
+  renderFunis();
+  toast('Funil salvo!');
+}
+
+function editarFunil(fid) {
+  abrirFormFunil(fid, null);
+}
+
+function excluirFunil(fid) {
+  if (!confirm('Excluir este funil?')) return;
+  _funis = _funis.filter(function(x){ return x.id!==fid; });
+  saveFunis();
+  renderFunis();
+  toast('Funil excluido.');
+}
+
+function abrirModalFunil() {
+  abrirEscolhaTipoFunil();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
