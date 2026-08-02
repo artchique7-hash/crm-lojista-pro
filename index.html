@@ -3111,6 +3111,7 @@ function switchEscrit(section, btn) {
 }
 
 function renderEscritorio() {
+  renderMetas();
   renderPlanMes();
   renderRotinas();
   renderAtividades();
@@ -4299,37 +4300,36 @@ function atualizarResultadoFunil(fid, campo, valor) {
 }
 
 function abrirEscolhaTipoFunil() {
-  var modalId = 'modal-funil-tipo';
-  var modal = document.getElementById(modalId);
-  if (!modal) {
-    modal = document.createElement('div');
-    modal.id = modalId;
-    modal.className = 'modal';
-    document.body.appendChild(modal);
-  }
+  _funilTipoSelecionado = null;
   var tiposHtml = FUNIL_TIPOS.map(function(t) {
     return '<div class="funil-modelo-card" data-tid="' + t.id + '" onclick="selecionarModeloFunil(this.dataset.tid,this)">' +
       '<div class="funil-modelo-icon">' + t.icon + '</div>' +
       '<div><div class="funil-modelo-label">' + t.label + '</div><div class="funil-modelo-desc">' + t.desc + '</div></div>' +
     '</div>';
   }).join('');
-  modal.innerHTML = '<div class="modal-box" style="max-width:520px">' +
-    '<div class="modal-header"><span class="modal-title">Novo Funil — Escolha o modelo</span><button class="modal-close" data-mid="' + modalId + '" onclick="fecharModalFunil(this.dataset.mid)">×</button></div>' +
-    '<div class="modal-body"><p style="font-size:13px;color:var(--text2);margin-bottom:14px">Selecione o tipo de funil para comecar:</p>' +
+  var mo = document.getElementById('mo-funil-tipo');
+  if (!mo) {
+    mo = document.createElement('div');
+    mo.id = 'mo-funil-tipo';
+    mo.className = 'mo';
+    mo.addEventListener('click', function(e){ if(e.target===this) mo.classList.remove('open'); });
+    document.body.appendChild(mo);
+  }
+  mo.innerHTML = '<div class="modal" style="max-width:520px">' +
+    '<div class="mh"><h3 class="mt">Novo Funil</h3><button class="mc" id="btn-fecha-funil-tipo"></button></div>' +
+    '<div class="mb">' +
+      '<p style="font-size:13px;color:var(--text2);margin-bottom:14px">Selecione o tipo de funil para comecar:</p>' +
       '<div class="funil-tipo-escolha">' + tiposHtml + '</div>' +
       '<div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end">' +
-        '<button class="btn btn-g btn-sm" data-mid="' + modalId + '" onclick="fecharModalFunil(this.dataset.mid)">Cancelar</button>' +
-        '<button class="btn btn-p btn-sm" id="btn-continuar-funil" onclick="continuarCriarFunil()" disabled>Continuar</button>' +
+        '<button class="btn btn-g btn-sm" id="btn-cancela-funil-tipo">Cancelar</button>' +
+        '<button class="btn btn-p btn-sm" id="btn-continuar-funil" disabled>Continuar</button>' +
       '</div>' +
     '</div>' +
   '</div>';
-  _funilTipoSelecionado = null;
-  modal.style.display = 'flex';
-}
-
-function fecharModalFunil(id) {
-  var m = document.getElementById(id);
-  if (m) m.style.display = 'none';
+  mo.classList.add('open');
+  document.getElementById('btn-fecha-funil-tipo').onclick = function(){ mo.classList.remove('open'); };
+  document.getElementById('btn-cancela-funil-tipo').onclick = function(){ mo.classList.remove('open'); };
+  document.getElementById('btn-continuar-funil').onclick = continuarCriarFunil;
 }
 
 function selecionarModeloFunil(tid, el) {
@@ -4342,7 +4342,8 @@ function selecionarModeloFunil(tid, el) {
 
 function continuarCriarFunil() {
   if (!_funilTipoSelecionado) return;
-  fecharModalFunil('modal-funil-tipo');
+  var mo = document.getElementById('mo-funil-tipo');
+  if (mo) mo.classList.remove('open');
   abrirFormFunil(null, _funilTipoSelecionado);
 }
 
@@ -4361,20 +4362,17 @@ function abrirFormFunil(fid, tipoPreset) {
       '<span style="color:var(--text3);cursor:pointer;padding:0 4px;font-size:16px" onclick="this.parentElement.remove()">×</span>' +
     '</div>';
   }).join('');
-  var modalId = 'modal-funil-form';
-  var modal = document.getElementById(modalId);
-  if (!modal) {
-    modal = document.createElement('div');
-    modal.id = modalId;
-    modal.className = 'modal';
-    document.body.appendChild(modal);
+  var mo = document.getElementById('mo-funil-form');
+  if (!mo) {
+    mo = document.createElement('div');
+    mo.id = 'mo-funil-form';
+    mo.className = 'mo';
+    mo.addEventListener('click', function(e){ if(e.target===this) mo.classList.remove('open'); });
+    document.body.appendChild(mo);
   }
-  modal.innerHTML = '<div class="modal-box" style="max-width:600px;max-height:90vh;overflow-y:auto">' +
-    '<div class="modal-header">' +
-      '<span class="modal-title">' + (f ? 'Editar Funil' : 'Novo Funil — ' + tipoObj.label) + '</span>' +
-      '<button class="modal-close" data-mid="' + modalId + '" onclick="fecharModalFunil(this.dataset.mid)">×</button>' +
-    '</div>' +
-    '<div class="modal-body">' +
+  mo.innerHTML = '<div class="modal modal-lg" style="max-height:90vh;overflow-y:auto">' +
+    '<div class="mh"><h3 class="mt">' + (f ? 'Editar Funil' : 'Novo Funil — ' + tipoObj.label) + '</h3><button class="mc" id="btn-fecha-funil-form"></button></div>' +
+    '<div class="mb">' +
       '<input type="hidden" id="ff-id" value="' + (f?f.id:'') + '">' +
       '<input type="hidden" id="ff-tipo" value="' + tipo + '">' +
       '<div class="funil-section-label">Informacoes Gerais</div>' +
@@ -4398,12 +4396,14 @@ function abrirFormFunil(fid, tipoPreset) {
       '<div id="ff-checks" class="funil-checklist" style="margin-bottom:10px">' + checksHtml + '</div>' +
       '<button class="btn btn-g btn-xs" style="margin-bottom:16px" onclick="addCheckFormFunil()">+ Adicionar etapa</button>' +
       '<div style="display:flex;gap:10px;justify-content:flex-end;padding-top:16px;border-top:1px solid var(--border)">' +
-        '<button class="btn btn-g btn-sm" data-mid="' + modalId + '" onclick="fecharModalFunil(this.dataset.mid)">Cancelar</button>' +
+        '<button class="btn btn-g btn-sm" id="btn-cancela-funil-form">Cancelar</button>' +
         '<button class="btn btn-p btn-sm" onclick="salvarFunil()">Salvar Funil</button>' +
       '</div>' +
     '</div>' +
   '</div>';
-  modal.style.display = 'flex';
+  mo.classList.add('open');
+  document.getElementById('btn-fecha-funil-form').onclick = function(){ mo.classList.remove('open'); };
+  document.getElementById('btn-cancela-funil-form').onclick = function(){ mo.classList.remove('open'); };
 }
 
 function addCheckFormFunil() {
@@ -4463,7 +4463,8 @@ function salvarFunil() {
     });
   }
   saveFunis();
-  fecharModalFunil('modal-funil-form');
+  var mo = document.getElementById('mo-funil-form');
+  if (mo) mo.classList.remove('open');
   renderFunis();
   toast('Funil salvo!');
 }
