@@ -1373,6 +1373,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
     <div class="fg"><label class="fl">Resultado Atual</label><input type="number" id="meta-atual" class="fi" placeholder="0" value="0" step="0.01"></div>
    </div>
    <div class="fg"><label class="fl">Descricao (opcional)</label><input type="text" id="meta-desc" class="fi" placeholder="Ex: Faturamento via Lives de maio"></div>
+   <div class="fg"><label class="fl">Vincular a um Funil (opcional)</label><select id="meta-funil-id" class="fi"><option value="">— Sem vinculo —</option></select></div>
   </div>
   <div class="mf">
    <button class="btn btn-g btn-sm" onclick="fecharModalMeta()">Cancelar</button>
@@ -3475,7 +3476,14 @@ function abrirModalMeta(id) {
   document.getElementById('meta-alvo').value = m ? m.alvo : '';
   document.getElementById('meta-atual').value = m ? m.atual : '0';
   document.getElementById('meta-desc').value = m ? (m.desc||'') : '';
-  document.getElementById('modal-meta').classList.add('open');
+  // Popular select de funis
+  var selFunil = document.getElementById('meta-funil-id');
+  if (selFunil) {
+    selFunil.innerHTML = '<option value="">— Sem vinculo —</option>' +
+      _funis.map(function(f){ return '<option value="' + f.id + '">' + f.nome + '</option>'; }).join('');
+    selFunil.value = m ? (m.funil_id||'') : '';
+  }
+    document.getElementById('modal-meta').classList.add('open');
 }
 
 function fecharModalMeta() {
@@ -3502,6 +3510,7 @@ function salvarMeta() {
     alvo: alvo,
     atual: parseFloat(document.getElementById('meta-atual').value) || 0,
     desc: document.getElementById('meta-desc').value.trim(),
+    funil_id: document.getElementById('meta-funil-id').value || null,
     criadaEm: editId ? (_metas.find(function(x){ return x.id===editId; })||{}).criadaEm : new Date().toISOString()
   };
 
@@ -4166,7 +4175,9 @@ function renderFunilInfo(f) {
     '<div class="funil-field"><label>Responsavel</label><div class="fval">' + (f.responsavel||'—') + '</div></div>' +
     '<div class="funil-field"><label>Canal</label><div class="fval">' + (f.canal||'—') + '</div></div>' +
   '</div>' +
-  '<div class="funil-section-label">Estrategia</div>' +
+  '<div class="funil-section-label">Meta Vinculada</div>' +
+  renderMetaVinculadaFunil(f) +
+    '<div class="funil-section-label">Estrategia</div>' +
   '<div class="funil-field"><div class="fval">' + (f.descricao||'—') + '</div></div>' +
   '<div class="funil-section-label">Publico e Observacoes</div>' +
   '<div class="funil-fields-grid">' +
@@ -4204,8 +4215,26 @@ function renderFunilExecucao(f) {
 
 function renderFunilResultados(f) {
   var r = f.resultados || {};
-  return '<div class="funil-section-label">Resultados da Campanha</div>' +
-  '<div class="funil-resultado-grid">' +
+  var mVinc = f.meta_id ? _metas.find(function(m){ return m.id === f.meta_id; }) : null;
+  
+  var metaDestaque = '';
+  if (mVinc) {
+    var pct = mVinc.alvo > 0 ? Math.min(100, Math.round((mVinc.atual/mVinc.alvo)*100)) : 0;
+    metaDestaque = '<div style="background:var(--green-l);border:1px solid var(--green);border-radius:var(--rs);padding:14px;margin-bottom:18px;display:flex;align-items:center;gap:14px">' +
+      '<div style="font-size:24px">🎯</div>' +
+      '<div style="flex:1">' +
+        '<div style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">Meta vinculada</div>' +
+        '<div style="font-size:14px;font-weight:700;color:var(--text)">' + mVinc.titulo + '</div>' +
+        '<div style="font-size:12px;color:var(--green2);margin-top:2px">' + formatValorMeta(mVinc.atual, mVinc.unidade) + ' de ' + formatValorMeta(mVinc.alvo, mVinc.unidade) + ' · ' + pct + '% atingido</div>' +
+      '</div>' +
+      '<button class="btn btn-p btn-xs" data-fid="' + f.id + '" onclick="abrirResultadoViaFunil(this.dataset.fid)">Atualizar meta</button>' +
+    '</div>';
+  }
+
+  return metaDestaque +
+  '<div class="funil-section-label">Resultados da Campanha</div>' +
+  '<div style="font-size:12px;color:var(--text3);margin-bottom:12px">Preencha os resultados ao encerrar a campanha e clique em Salvar.</div>' +
+  '<div class="funil-resultado-grid" id="fres-grid-' + f.id + '">' +
     funilResCard('Novos clientes', r.novos_clientes||'', '👥', f.id, 'novos_clientes') +
     funilResCard('Novos seguidores', r.novos_seguidores||'', '📲', f.id, 'novos_seguidores') +
     funilResCard('Participantes', r.participantes||'', '🙋', f.id, 'participantes') +
@@ -4213,18 +4242,119 @@ function renderFunilResultados(f) {
     funilResCard('Faturamento (R$)', r.faturamento||'', '💰', f.id, 'faturamento') +
   '</div>' +
   '<div class="funil-section-label" style="margin-top:18px">Observacoes Finais</div>' +
-  '<textarea class="fval" style="width:100%;box-sizing:border-box;font-family:inherit;font-size:13px" rows="3" placeholder="Aprendizados, pontos de melhoria..." data-fid="' + f.id + '" data-campo="obs_final" onblur="atualizarResultadoFunil(this.dataset.fid,this.dataset.campo,this.value)">' + (r.obs_final||'') + '</textarea>';
+  '<textarea id="fres-obs-' + f.id + '" class="fval" style="width:100%;box-sizing:border-box;font-family:inherit;font-size:13px;margin-bottom:14px" rows="3" placeholder="Aprendizados, pontos de melhoria...">' + (r.obs_final||'') + '</textarea>' +
+  '<button class="btn btn-p btn-sm" data-fid="' + f.id + '" onclick="salvarResultadoFunil(this.dataset.fid)" style="width:100%">Salvar Resultados</button>';
 }
+
+
+function renderMetaVinculadaFunil(f) {
+  var metaVinc = f.meta_id ? _metas.find(function(m){ return m.id === f.meta_id; }) : null;
+  var optsHtml = '<option value="">— Sem vinculo —</option>' +
+    _metas.map(function(m){
+      return '<option value="' + m.id + '"' + (f.meta_id===m.id?' selected':'') + '>' + m.titulo + '</option>';
+    }).join('');
+  if (!metaVinc) {
+    return '<div style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg3);border:1px dashed var(--border2);border-radius:var(--rs)">' +
+      '<div style="flex:1">' +
+        '<select style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--rs);background:var(--bg2);font-size:13px;color:var(--text)" ' +
+          'data-fid="' + f.id + '" onchange="vincularMetaFunil(this.dataset.fid,this.value)">' +
+          optsHtml +
+        '</select>' +
+        '<div style="font-size:11px;color:var(--text3);margin-top:5px">Vincule uma meta para acompanhar o progresso automaticamente</div>' +
+      '</div>' +
+    '</div>';
+  }
+  var pct = metaVinc.alvo > 0 ? Math.min(100, Math.round((metaVinc.atual/metaVinc.alvo)*100)) : 0;
+  var progCor = pct >= 100 ? 'var(--green)' : pct >= 60 ? 'var(--gold)' : 'var(--blue)';
+  return '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:16px">' +
+    '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px">' +
+      '<div>' +
+        '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px">' + metaVinc.titulo + '</div>' +
+        '<div style="font-size:11px;color:var(--text3)">Resultado atual: ' + formatValorMeta(metaVinc.atual, metaVinc.unidade) + ' / ' + formatValorMeta(metaVinc.alvo, metaVinc.unidade) + '</div>' +
+      '</div>' +
+      '<button class="btn btn-g btn-xs" data-fid="' + f.id + '" onclick="desvincularMetaFunil(this.dataset.fid)">Desvincular</button>' +
+    '</div>' +
+    '<div style="height:8px;background:var(--border);border-radius:20px;overflow:hidden;margin-bottom:6px">' +
+      '<div style="height:100%;width:' + pct + '%;background:' + progCor + ';border-radius:20px;transition:width .4s"></div>' +
+    '</div>' +
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">' +
+      '<span style="font-size:12px;color:var(--text3)">' + pct + '% atingido</span>' +
+      '<button class="btn btn-p btn-xs" data-fid="' + f.id + '" onclick="abrirResultadoViaFunil(this.dataset.fid)">Atualizar resultado</button>' +
+    '</div>' +
+    '<div style="padding-top:10px;border-top:1px solid var(--border)">' +
+      '<div style="font-size:11px;color:var(--text3);margin-bottom:5px">Trocar meta vinculada:</div>' +
+      '<select style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--rs);background:var(--bg2);font-size:12px;color:var(--text)" ' +
+        'data-fid="' + f.id + '" onchange="vincularMetaFunil(this.dataset.fid,this.value)">' +
+        optsHtml +
+      '</select>' +
+    '</div>' +
+  '</div>';
+}
+
+function vincularMetaFunil(fid, metaId) {
+  var f = _funis.find(function(x){ return x.id===fid; });
+  if (!f) return;
+  f.meta_id = metaId || null;
+  saveFunis();
+  renderFunis();
+  setTimeout(function(){
+    var tab = document.querySelector('#funil-body-' + fid + ' [data-tab="info"]');
+    if (tab) switchFunilTab(fid, 'info', tab);
+  }, 30);
+  toast(metaId ? 'Meta vinculada!' : 'Vinculo removido.');
+}
+
+function desvincularMetaFunil(fid) {
+  vincularMetaFunil(fid, null);
+}
+
+function abrirResultadoViaFunil(fid) {
+  var f = _funis.find(function(x){ return x.id===fid; });
+  if (!f || !f.meta_id) return;
+  abrirModalResultado(f.meta_id);
+}
+
 
 function funilResCard(label, val, icon, fid, campo) {
   return '<div class="funil-res-card">' +
     '<div style="font-size:20px;margin-bottom:4px">' + icon + '</div>' +
     '<div class="funil-res-label">' + label + '</div>' +
-    '<input type="text" style="border:none;background:transparent;text-align:center;width:100%;font-size:20px;font-weight:700;font-family:Syne,sans-serif;color:var(--green);outline:none" ' +
-    'data-fid="' + fid + '" data-campo="' + campo + '" value="' + val + '" placeholder="—" ' +
-    'onblur="atualizarResultadoFunil(this.dataset.fid,this.dataset.campo,this.value)">' +
+    '<input type="text" id="fres-' + fid + '-' + campo + '" style="border:none;background:transparent;text-align:center;width:100%;font-size:20px;font-weight:700;font-family:Syne,sans-serif;color:var(--green);outline:none;padding:0" ' +
+    'value="' + val + '" placeholder="—">' +
   '</div>';
 }
+
+function salvarResultadoFunil(fid) {
+  var f = _funis.find(function(x){ return x.id===fid; });
+  if (!f) return;
+  if (!f.resultados) f.resultados = {};
+  var campos = ['novos_clientes','novos_seguidores','participantes','qtd_vendas','faturamento'];
+  campos.forEach(function(campo){
+    var el = document.getElementById('fres-' + fid + '-' + campo);
+    if (el) f.resultados[campo] = el.value;
+  });
+  var obsEl = document.getElementById('fres-obs-' + fid);
+  if (obsEl) f.resultados.obs_final = obsEl.value;
+  saveFunis();
+  toast('Resultados salvos!');
+  // Se tem meta vinculada e tem faturamento, oferecer atualizar meta
+  if (f.meta_id && f.resultados.faturamento) {
+    var m = _metas.find(function(x){ return x.id===f.meta_id; });
+    if (m && m.unidade === 'reais') {
+      var val = parseFloat(f.resultados.faturamento.toString().replace(',','.'));
+      if (!isNaN(val) && confirm('Atualizar tambem o resultado da meta "' + m.titulo + '" com R$ ' + val.toFixed(2) + '?')) {
+        var idx = _metas.findIndex(function(x){ return x.id===m.id; });
+        if (idx !== -1) {
+          _metas[idx].atual = val;
+          localStorage.setItem('slp_metas', JSON.stringify(_metas));
+          renderMetas();
+          toast('Meta atualizada tambem!');
+        }
+      }
+    }
+  }
+}
+
 
 function toggleFunil(fid) {
   var f = _funis.find(function(x){ return x.id===fid; });
