@@ -3099,6 +3099,25 @@ var _calMes = new Date().getMonth();
 var _eventos = JSON.parse(localStorage.getItem('slp_eventos') || '[]');
 var _metas = JSON.parse(localStorage.getItem('slp_metas') || '[]');
 var _tarefas = JSON.parse(localStorage.getItem('slp_tarefas') || '[]');
+// HELPER vendedoras
+function spSelectHtml(valorAtual) {
+  return '<option value="">— Selecionar —</option>' +
+    (_sp||[]).map(function(s){
+      return '<option value="' + s.name + '"' + (valorAtual===s.name?' selected':'') + '>' + s.name + '</option>';
+    }).join('') +
+    '<option value="__manual__"' + (valorAtual&&!(_sp||[]).find(function(s){return s.name===valorAtual;})?'  selected':'') + '>Outro (digitar)</option>';
+}
+function getResponsavelValue(selectId, inputId) {
+  var sel = document.getElementById(selectId);
+  var inp = document.getElementById(inputId);
+  if (!sel) return '';
+  return sel.value === '__manual__' ? (inp ? inp.value.trim() : '') : sel.value;
+}
+function onRespChange(selEl, manualId) {
+  var m = document.getElementById(manualId);
+  if (m) m.style.display = selEl.value === '__manual__' ? 'block' : 'none';
+}
+
 var _funis = JSON.parse(localStorage.getItem('slp_funis') || '[]');
 
 function switchEscrit(section, btn) {
@@ -3383,11 +3402,22 @@ function abrirModalConteudo(id, statusDefault, dataDefault) {
   document.getElementById('ev-tipo').value = ev ? (ev.tipo||'stories') : 'stories';
   document.getElementById('ev-status').value = ev ? (ev.status||'ideias') : (statusDefault||'ideias');
   document.getElementById('ev-data').value = ev ? (ev.data||'') : (dataDefault||new Date().toISOString().split('T')[0]);
-  document.getElementById('ev-resp').value = ev ? (ev.resp||'') : '';
+  getResponsavelValue('ev-resp','ev-resp-manual') = ev ? (ev.resp||'') : '';
   document.getElementById('ev-objetivo').value = ev ? (ev.objetivo||'') : '';
   document.getElementById('ev-campanha').value = ev ? (ev.campanha||'') : '';
   document.getElementById('ev-obs').value = ev ? (ev.obs||'') : '';
-  document.getElementById('modal-evento').classList.add('open');
+  // Pop ev sp
+  var selEv = document.getElementById('ev-resp');
+  if (selEv) {
+    selEv.innerHTML = spSelectHtml(ev ? (ev.resp||'') : '');
+    selEv.setAttribute('data-mid','ev-resp-manual');
+    selEv.onchange = function(){ onRespChange(this,this.getAttribute('data-mid')); };
+    var mEv = document.getElementById('ev-resp-manual');
+    var isMEv = ev&&ev.resp&&!(_sp||[]).find(function(s){return s.name===ev.resp;});
+    if(mEv){mEv.style.display=isMEv?'block':'none';mEv.value=isMEv?(ev.resp||''):'';}
+    if(isMEv) selEv.value='__manual__';
+  }
+    document.getElementById('modal-evento').classList.add('open');
 }
 
 function fecharModalConteudo() {
@@ -3404,7 +3434,7 @@ function salvarEvento() {
     tipo: document.getElementById('ev-tipo').value,
     status: document.getElementById('ev-status').value,
     data: document.getElementById('ev-data').value,
-    resp: document.getElementById('ev-resp').value.trim(),
+    resp: getResponsavelValue('ev-resp','ev-resp-manual').trim(),
     objetivo: document.getElementById('ev-objetivo').value.trim(),
     campanha: document.getElementById('ev-campanha').value.trim(),
     obs: document.getElementById('ev-obs').value.trim()
@@ -3731,12 +3761,23 @@ function abrirModalRotina(id) {
   document.getElementById('rot-nome').value = rot ? rot.nome : '';
   document.getElementById('rot-dia').value = rot ? (rot.dia||'segunda') : 'segunda';
   document.getElementById('rot-hora').value = rot ? (rot.hora||'') : '';
-  document.getElementById('rot-resp').value = rot ? (rot.resp||'') : '';
+  getResponsavelValue('rot-resp','rot-resp-manual') = rot ? (rot.resp||'') : '';
   document.getElementById('rot-desc').value = rot ? (rot.desc||'') : '';
   document.getElementById('rot-check-input').value = '';
   _rotCheckTemp = rot ? (rot.checklist||[]).map(function(item){ return {texto:item.texto, done:false}; }) : [];
   renderCheckTempRotina();
-  document.getElementById('modal-rotina').classList.add('open');
+  // Pop rot sp
+  var selR = document.getElementById('rot-resp');
+  if (selR) {
+    selR.innerHTML = spSelectHtml(rot ? (rot.responsavel||'') : '');
+    selR.setAttribute('data-mid','rot-resp-manual');
+    selR.onchange = function(){ onRespChange(this,this.getAttribute('data-mid')); };
+    var mR = document.getElementById('rot-resp-manual');
+    var isM = rot&&rot.responsavel&&!(_sp||[]).find(function(s){return s.name===rot.responsavel;});
+    if(mR){mR.style.display=isM?'block':'none';mR.value=isM?(rot.responsavel||''):'';}
+    if(isM) selR.value='__manual__';
+  }
+    document.getElementById('modal-rotina').classList.add('open');
   setTimeout(function(){ document.getElementById('rot-nome').focus(); }, 100);
 }
 
@@ -4316,11 +4357,12 @@ function abrirResultadoViaFunil(fid) {
 
 
 function funilResCard(label, val, icon, fid, campo) {
-  return '<div class="funil-res-card">' +
+  return '<div class="funil-res-card" style="cursor:text">' +
     '<div style="font-size:20px;margin-bottom:4px">' + icon + '</div>' +
     '<div class="funil-res-label">' + label + '</div>' +
-    '<input type="text" id="fres-' + fid + '-' + campo + '" style="border:none;background:transparent;text-align:center;width:100%;font-size:20px;font-weight:700;font-family:Syne,sans-serif;color:var(--green);outline:none;padding:0" ' +
-    'value="' + val + '" placeholder="—">' +
+    '<input type="text" id="fres-' + fid + '-' + campo + '"' +
+    ' style="border:none;border-bottom:2px solid var(--border2);background:transparent;text-align:center;width:80%;font-size:20px;font-weight:700;font-family:Syne,sans-serif;color:var(--green);outline:none;padding:4px 0"' +
+    ' value="' + val + '" placeholder="0">' +
   '</div>';
 }
 
@@ -4511,7 +4553,7 @@ function abrirFormFunil(fid, tipoPreset) {
         '<div class="funil-field" style="grid-column:1/-1"><label>Objetivo</label><input id="ff-objetivo" class="input" type="text" value="' + (f?f.objetivo||'':'') + '" placeholder="Ex: Vender 30 pecas, captar 50 novos clientes"></div>' +
         '<div class="funil-field"><label>Data de inicio</label><input id="ff-inicio" class="input" type="date" value="' + (f?f.inicio||'':'') + '"></div>' +
         '<div class="funil-field"><label>Data de encerramento</label><input id="ff-fim" class="input" type="date" value="' + (f?f.fim||'':'') + '"></div>' +
-        '<div class="funil-field"><label>Responsavel</label><input id="ff-responsavel" class="input" type="text" value="' + (f?f.responsavel||'':'') + '" placeholder="Nome ou setor"></div>' +
+        '<div class="funil-field"><label>Responsavel</label><select id="ff-resp-sel" class="input" data-mid="ff-resp-inp" onchange="onRespChange(this,this.dataset.mid)">' +spSelectHtml(f?f.responsavel||'':'') +'</select><input type="text" id="ff-resp-inp" class="input" style="margin-top:6px;display:none" placeholder="Nome do responsavel"></div>' +
         '<div class="funil-field"><label>Canal principal</label><input id="ff-canal" class="input" type="text" value="' + (f?f.canal||'':'') + '" placeholder="Instagram, WhatsApp, Loja fisica..."></div>' +
       '</div>' +
       '<div class="funil-section-label">Estrategia</div>' +
@@ -4563,7 +4605,7 @@ function salvarFunil() {
     existing.objetivo = document.getElementById('ff-objetivo').value;
     existing.inicio = document.getElementById('ff-inicio').value;
     existing.fim = document.getElementById('ff-fim').value;
-    existing.responsavel = document.getElementById('ff-responsavel').value;
+    existing.responsavel = getResponsavelValue('ff-resp-sel','ff-resp-inp');
     existing.canal = document.getElementById('ff-canal').value;
     existing.descricao = document.getElementById('ff-descricao').value;
     existing.publico = document.getElementById('ff-publico').value;
@@ -4581,7 +4623,7 @@ function salvarFunil() {
       objetivo: document.getElementById('ff-objetivo').value,
       inicio: document.getElementById('ff-inicio').value,
       fim: document.getElementById('ff-fim').value,
-      responsavel: document.getElementById('ff-responsavel').value,
+      responsavel: getResponsavelValue('ff-resp-sel','ff-resp-inp'),
       canal: document.getElementById('ff-canal').value,
       descricao: document.getElementById('ff-descricao').value,
       publico: document.getElementById('ff-publico').value,
