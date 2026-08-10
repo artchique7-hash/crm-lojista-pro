@@ -388,42 +388,54 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 .escrit-section{display:none}.escrit-section.active{display:block;animation:fadeUp .22s ease}
 
 /* OBJETIVOS */
-/* METAS v2 */
-.meta-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);transition:box-shadow .2s,border-color .2s;box-shadow:var(--sh);overflow:hidden}
-.meta-card:hover{box-shadow:var(--sh-md);border-color:var(--border2)}
-.meta-card-accent{height:3px;border-radius:3px 3px 0 0}
-.meta-card-inner{padding:14px 16px}
-.meta-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}
-.meta-cat-chip{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;padding:2px 8px;border-radius:20px;margin-bottom:5px}
-.meta-titulo{font-size:14px;font-weight:700;color:var(--text);line-height:1.3;font-family:Syne,sans-serif}
-.meta-status-chip{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0}
-.meta-prog-wrap{margin:10px 0 6px}
-.meta-prog-nums{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:5px}
-.meta-prog-atual{font-size:15px;font-weight:700;font-family:Syne,sans-serif;color:var(--text)}
-.meta-prog-alvo{font-size:12px;color:var(--text3);margin-left:3px}
-.meta-prog-pct{font-size:13px;font-weight:700}
-.meta-prog-bar-wrap{height:5px;background:var(--border);border-radius:20px;overflow:hidden}
-.meta-prog-bar-fill{height:100%;border-radius:20px;transition:width .6s cubic-bezier(.4,0,.2,1)}
-.meta-info-row{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
-.meta-periodo{font-size:11px;color:var(--text3)}
-.meta-dias{font-size:11px;font-weight:600}
-.meta-actions{display:flex;align-items:center;gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border)}
-.meta-icon{display:none}
-.meta-prog{height:6px;background:var(--border);border-radius:20px;overflow:hidden;margin-top:10px}
-.meta-prog-bar{height:100%;border-radius:20px;transition:width .6s cubic-bezier(.4,0,.2,1)}
-.meta-grid{display:flex;flex-direction:column;gap:10px}
-.meta-filtros{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
-.meta-filtro-btn{padding:5px 13px;border-radius:20px;border:1px solid var(--border);background:var(--bg2);font-size:12px;font-weight:600;color:var(--text3);cursor:pointer;transition:all .15s}
-.meta-filtro-btn:hover{border-color:var(--green);color:var(--green)}
-.meta-filtro-btn.active{background:var(--green);border-color:var(--green);color:#fff}
-.meta-resumo-v2{display:flex;align-items:center;gap:16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;margin-bottom:16px;box-shadow:var(--sh);flex-wrap:wrap}
+/* METAS v3 — layout lista compacta */
+.meta-resumo-v2{display:flex;align-items:center;gap:16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 18px;margin-bottom:14px;box-shadow:var(--sh);flex-wrap:wrap}
 .meta-resumo-stat{display:flex;align-items:center;gap:8px;padding:0 14px;border-right:1px solid var(--border)}
 .meta-resumo-stat:last-child{border-right:none}
-.meta-resumo-num{font-size:20px;font-weight:700;font-family:Syne,sans-serif;line-height:1}
-.meta-resumo-label{font-size:11px;color:var(--text3);margin-top:2px}
-.meta-add-card{border:1.5px dashed var(--border2);border-radius:var(--r);padding:14px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;color:var(--text3);font-size:13px;font-weight:500;transition:all .15s;background:var(--bg3)}
-.meta-add-card:hover{border-color:var(--green);color:var(--green);background:var(--green-l)}
-@media(max-width:600px){.meta-resumo-v2{gap:10px}.meta-resumo-stat{padding:0 10px}}
+.meta-resumo-num{font-size:18px;font-weight:700;font-family:Syne,sans-serif;line-height:1}
+.meta-resumo-label{font-size:11px;color:var(--text3);margin-top:1px}
+.meta-grid{display:flex;flex-direction:column;gap:0}
+.meta-filtros{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.meta-filtro-btn{padding:4px 12px;border-radius:20px;border:1px solid var(--border);background:var(--bg2);font-size:12px;font-weight:600;color:var(--text3);cursor:pointer;transition:all .15s}
+.meta-filtro-btn:hover{border-color:var(--green);color:var(--green)}
+.meta-filtro-btn.active{background:var(--green);border-color:var(--green);color:#fff}
+/* Header de colunas */
+.meta-table-head{display:grid;grid-template-columns:1fr 220px 130px 100px 120px;gap:0;padding:7px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r) var(--r) 0 0;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text3)}
+/* Linha de meta */
+.meta-row{display:grid;grid-template-columns:1fr 220px 130px 100px 120px;gap:0;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-top:none;align-items:center;transition:background .15s}
+.meta-row:last-of-type{border-radius:0 0 var(--r) var(--r)}
+.meta-row:hover{background:var(--bg3)}
+.meta-row-nome{min-width:0}
+.meta-cat-chip{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:2px 7px;border-radius:20px;margin-bottom:3px}
+.meta-titulo{font-size:13px;font-weight:700;color:var(--text);font-family:Syne,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meta-row-prog{display:flex;flex-direction:column;gap:4px;padding:0 12px}
+.meta-prog-nums{display:flex;align-items:baseline;justify-content:space-between}
+.meta-prog-atual{font-size:13px;font-weight:700;color:var(--text)}
+.meta-prog-alvo{font-size:11px;color:var(--text3);margin-left:2px}
+.meta-prog-pct{font-size:12px;font-weight:700}
+.meta-prog-bar-wrap{height:4px;background:var(--border);border-radius:20px;overflow:hidden}
+.meta-prog-bar-fill{height:100%;border-radius:20px;transition:width .5s}
+.meta-row-periodo{font-size:11px;color:var(--text3);line-height:1.5;padding:0 8px}
+.meta-status-chip{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap}
+.meta-row-acoes{display:flex;align-items:center;gap:5px;justify-content:flex-end}
+.meta-btn-atualizar{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:5px 9px;border-radius:var(--rs);border:1px solid var(--green);background:var(--green-l);color:var(--green);cursor:pointer;white-space:nowrap;transition:all .15s}
+.meta-btn-atualizar:hover{background:var(--green);color:#fff}
+.meta-btn-icon{width:26px;height:26px;border-radius:var(--rs);border:1px solid var(--border);background:var(--bg3);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;color:var(--text3)}
+.meta-btn-icon:hover{border-color:var(--border2);color:var(--text)}
+.meta-btn-icon.del:hover{border-color:var(--red);color:var(--red);background:var(--red-l)}
+.meta-add-card{border:1.5px dashed var(--border2);border-radius:0 0 var(--r) var(--r);padding:10px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;color:var(--text3);font-size:12px;font-weight:500;transition:all .15s;background:var(--bg3);border-top:none}
+.meta-add-card:hover{border-color:var(--green);color:var(--green)}
+/* Mobile */
+@media(max-width:700px){
+  .meta-table-head{display:none}
+  .meta-row{grid-template-columns:1fr;gap:8px;border-top:none;border-radius:0;padding:12px 14px}
+  .meta-row:first-of-type{border-radius:var(--r) var(--r) 0 0;border-top:1px solid var(--border)}
+  .meta-row-prog{padding:0}
+  .meta-row-periodo{padding:0}
+  .meta-row-acoes{justify-content:flex-start}
+  .meta-resumo-v2{gap:8px}
+  .meta-resumo-stat{padding:0 8px}
+}
 
 /* CALENDARIO */
 .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
@@ -1777,31 +1789,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
  </div>
 </div>
 
-<!-- MODAL CLIENTE RAPIDO -->
-<div class="mo" id="modal-cliente-rapido">
- <div class="modal" style="max-width:380px">
-  <div class="mh">
-   <h3 class="mt2">Cadastro Rapido</h3>
-   <button class="mc" onclick="fecharModalClienteRapido()">x</button>
-  </div>
-  <div class="mb">
-   <p style="font-size:13px;color:var(--text2);margin-bottom:18px">Cadastro minimo para vincular a esta perda. Voce pode completar os dados depois na tela de Clientes.</p>
-   <div class="fg"><label class="fl">Nome *</label><input type="text" id="cr-nome" class="fi" placeholder="Nome da cliente"></div>
-   <div class="fg"><label class="fl">WhatsApp</label><input type="tel" id="cr-phone" class="fi" placeholder="51999999999"></div>
-  </div>
-  <div class="mf">
-   <button class="btn btn-g btn-sm" onclick="fecharModalClienteRapido()">Cancelar</button>
-   <button class="btn btn-p btn-sm" onclick="salvarClienteRapido()">Salvar e Vincular</button>
-  </div>
- </div>
-</div>
-
-<div class="tc" id="toast-c"></div>
-
-
-</body>
-</html>
-<script>
+<!--
 
 // ── CONFIG SUPABASE ──
 const _sb = supabase.createClient('https://ihpfexmourrvixtsxhrt.supabase.co', 'sb_publishable_M7vZQ1VPi_7BP3HQAp-ngA_cMB22bEG');
@@ -4315,39 +4303,30 @@ function renderMetas() {
   var resumoEl = document.getElementById('metas-resumo');
   if (!grid) return;
 
-  // ── Resumo compacto ──
+  // ── Resumo ──
   if (resumoEl && _metas.length) {
-    var con = _metas.filter(function(m){ return getStatusMeta(m).label==='Concluida'; }).length;
+    var con  = _metas.filter(function(m){ return getStatusMeta(m).label==='Concluida'; }).length;
     var and_ = _metas.filter(function(m){ return getStatusMeta(m).label==='Em andamento'; }).length;
-    var atr = _metas.filter(function(m){ return getStatusMeta(m).label==='Atrasada'; }).length;
+    var atr  = _metas.filter(function(m){ return getStatusMeta(m).label==='Atrasada'; }).length;
     var total = _metas.length;
-    var pctGeral = total ? Math.round(con/total*100) : 0;
+    var pctG = total ? Math.round(con/total*100) : 0;
     resumoEl.style.display = 'flex';
     resumoEl.className = 'meta-resumo-v2';
     resumoEl.innerHTML =
-      '<div style="flex:1;min-width:160px">' +
-        '<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px">' + total + ' meta' + (total!==1?'s':'') + ' cadastrada' + (total!==1?'s':'') + '</div>' +
-        '<div style="height:6px;background:var(--border);border-radius:20px;overflow:hidden;margin-bottom:5px">' +
-          '<div style="height:100%;width:' + pctGeral + '%;background:var(--green);border-radius:20px;transition:width .5s"></div>' +
-        '</div>' +
-        '<div style="font-size:11px;color:var(--text3)">' + pctGeral + '% das metas concluídas</div>' +
+      '<div style="flex:1;min-width:140px">' +
+        '<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px">' + total + ' meta' + (total!==1?'s':'') + ' cadastrada' + (total!==1?'s':'') + '</div>' +
+        '<div style="height:5px;background:var(--border);border-radius:20px;overflow:hidden;margin-bottom:4px"><div style="height:100%;width:' + pctG + '%;background:var(--green);border-radius:20px;transition:width .5s"></div></div>' +
+        '<div style="font-size:11px;color:var(--text3)">' + pctG + '% concluídas</div>' +
       '</div>' +
       '<div style="display:flex;gap:0;flex-shrink:0">' +
-        '<div class="meta-resumo-stat">' +
-          '<div><div class="meta-resumo-num" style="color:var(--green)">' + con + '</div><div class="meta-resumo-label">Concluída' + (con!==1?'s':'') + '</div></div>' +
-        '</div>' +
-        '<div class="meta-resumo-stat">' +
-          '<div><div class="meta-resumo-num" style="color:var(--blue)">' + and_ + '</div><div class="meta-resumo-label">Em andamento</div></div>' +
-        '</div>' +
-        '<div class="meta-resumo-stat">' +
-          '<div><div class="meta-resumo-num" style="color:var(--red)">' + atr + '</div><div class="meta-resumo-label">Atrasada' + (atr!==1?'s':'') + '</div></div>' +
-        '</div>' +
+        '<div class="meta-resumo-stat"><div class="meta-resumo-num" style="color:var(--green)">' + con + '</div><div class="meta-resumo-label">Concluída' + (con!==1?'s':'') + '</div></div>' +
+        '<div class="meta-resumo-stat"><div class="meta-resumo-num" style="color:var(--blue)">' + and_ + '</div><div class="meta-resumo-label">Em andamento</div></div>' +
+        '<div class="meta-resumo-stat"><div class="meta-resumo-num" style="color:var(--red)">' + atr + '</div><div class="meta-resumo-label">Atrasada' + (atr!==1?'s':'') + '</div></div>' +
       '</div>';
   } else if (resumoEl) {
     resumoEl.style.display = 'none';
   }
 
-  // Filtro ativo
   var filtroAtivo = '';
   var filtroBtn = document.querySelector('.meta-filtro-btn.active');
   if (filtroBtn) filtroAtivo = filtroBtn.dataset.filtro || '';
@@ -4359,8 +4338,8 @@ function renderMetas() {
   if (!_metas.length) {
     grid.innerHTML =
       '<div style="text-align:center;padding:48px 20px">' +
-      '<div style="width:52px;height:52px;border-radius:50%;background:var(--bg4);display:flex;align-items:center;justify-content:center;margin:0 auto 14px">' +
-      '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div>' +
+      '<div style="width:48px;height:48px;border-radius:50%;background:var(--bg4);display:flex;align-items:center;justify-content:center;margin:0 auto 12px">' +
+      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div>' +
       '<div style="font-weight:700;font-size:14px;color:var(--text2);margin-bottom:5px">Nenhuma meta cadastrada</div>' +
       '<div style="font-size:12px;color:var(--text3);margin-bottom:16px">Defina seus objetivos para acompanhar o progresso da loja</div>' +
       '<button class="btn btn-p btn-sm" onclick="abrirModalMeta()">+ Criar primeira meta</button>' +
@@ -4368,79 +4347,79 @@ function renderMetas() {
     return;
   }
 
-  var cards = metasFiltradas.map(function(m) {
+  var rows = metasFiltradas.map(function(m) {
     var pct = m.alvo > 0 ? Math.min(100, Math.round((m.atual/m.alvo)*100)) : 0;
     var cor = CAT_COR[m.cat] || 'var(--green)';
-    var corL = cor.replace('var(--', 'var(--').replace(')', '-l)');
+    var corL = cor.replace(')', '-l)');
     var status = getStatusMeta(m);
     var dias = diasRestantes(m.fim);
     var icone = CAT_ICONE[m.cat] || CAT_ICONE.personalizada;
-
-    // Cor de status
     var statusCor = status.label==='Concluida' ? 'var(--green)' : status.label==='Atrasada' ? 'var(--red)' : 'var(--blue)';
     var statusBg  = status.label==='Concluida' ? 'var(--green-l)' : status.label==='Atrasada' ? 'var(--red-l)' : 'var(--blue-l)';
     var progCor   = pct >= 100 ? 'var(--green)' : pct >= 60 ? 'var(--gold)' : cor;
 
-    // Info de dias
-    var diasHtml = '';
+    var periodoHtml = '';
+    if (m.inicio || m.fim) {
+      periodoHtml += (m.inicio ? m.inicio.split('-').reverse().join('/') : '—') + ' → ' + (m.fim ? m.fim.split('-').reverse().join('/') : '—');
+    } else {
+      periodoHtml = '—';
+    }
     if (dias !== null) {
-      if (dias > 0)     diasHtml = '<span class="meta-dias" style="color:var(--text3)">' + dias + 'd restante' + (dias!==1?'s':'') + '</span>';
-      else if (dias===0) diasHtml = '<span class="meta-dias" style="color:var(--gold)">Termina hoje</span>';
-      else               diasHtml = '<span class="meta-dias" style="color:var(--red)">Encerrada</span>';
+      if (dias > 0)      periodoHtml += '<br><span style="color:var(--text3)">' + dias + 'd restante' + (dias!==1?'s':'') + '</span>';
+      else if (dias===0) periodoHtml += '<br><span style="color:var(--gold);font-weight:600">Termina hoje</span>';
+      else               periodoHtml += '<br><span style="color:var(--red);font-weight:600">Encerrada</span>';
     }
 
-    return '<div class="meta-card">' +
-      '<div class="meta-card-accent" style="background:' + cor + '"></div>' +
-      '<div class="meta-card-inner">' +
-        '<div class="meta-card-head">' +
-          '<div style="min-width:0">' +
-            '<div class="meta-cat-chip" style="background:' + corL + ';color:' + cor + '">' +
-              '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">' + icone + '</svg>' +
-              (CAT_LABEL[m.cat]||'Meta') +
-            '</div>' +
-            '<div class="meta-titulo">' + m.titulo + '</div>' +
-            (m.desc ? '<div style="font-size:11px;color:var(--text3);margin-top:3px;line-height:1.4">' + m.desc + '</div>' : '') +
-          '</div>' +
-          '<span class="meta-status-chip" style="background:' + statusBg + ';color:' + statusCor + '">' + status.label + '</span>' +
+    var svgEdit = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+    var svgDel  = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>';
+    var svgUpd  = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>';
+
+    return '<div class="meta-row">' +
+      // COLUNA 1: nome
+      '<div class="meta-row-nome">' +
+        '<div class="meta-cat-chip" style="background:' + corL + ';color:' + cor + '">' +
+          '<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">' + icone + '</svg>' +
+          (CAT_LABEL[m.cat]||'Meta') +
         '</div>' +
-        '<div class="meta-prog-wrap">' +
-          '<div class="meta-prog-nums">' +
-            '<div>' +
-              '<span class="meta-prog-atual" style="color:' + progCor + '">' + formatValorMeta(m.atual, m.unidade) + '</span>' +
-              '<span class="meta-prog-alvo"> / ' + formatValorMeta(m.alvo, m.unidade) + '</span>' +
-            '</div>' +
-            '<span class="meta-prog-pct" style="color:' + progCor + '">' + pct + '%</span>' +
-          '</div>' +
-          '<div class="meta-prog-bar-wrap"><div class="meta-prog-bar-fill" style="width:' + pct + '%;background:' + progCor + '"></div></div>' +
+        '<div class="meta-titulo" title="' + m.titulo + '">' + m.titulo + '</div>' +
+      '</div>' +
+      // COLUNA 2: progresso
+      '<div class="meta-row-prog">' +
+        '<div class="meta-prog-nums">' +
+          '<div><span class="meta-prog-atual" style="color:' + progCor + '">' + formatValorMeta(m.atual, m.unidade) + '</span><span class="meta-prog-alvo"> / ' + formatValorMeta(m.alvo, m.unidade) + '</span></div>' +
+          '<span class="meta-prog-pct" style="color:' + progCor + '">' + pct + '%</span>' +
         '</div>' +
-        '<div class="meta-info-row">' +
-          '<span class="meta-periodo">' + (m.inicio?m.inicio.split('-').reverse().join('/'):'-') + ' → ' + (m.fim?m.fim.split('-').reverse().join('/'):'-') + '</span>' +
-          diasHtml +
-        '</div>' +
-        '<div class="meta-actions">' +
-          '<button class="btn btn-p btn-sm" style="flex:1;font-size:12px" data-darg="' + m.id + '" onclick="abrirModalResultado(this.dataset.darg)">↑ Atualizar</button>' +
-          '<button class="btn btn-g btn-xs" title="Editar" data-darg="' + m.id + '" onclick="abrirModalMeta(this.dataset.darg)" style="padding:5px 10px">' +
-            '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' +
-          '</button>' +
-          '<button class="btn btn-d btn-xs" title="Excluir" data-darg="' + m.id + '" onclick="excluirMeta(this.dataset.darg)" style="padding:5px 10px">' +
-            '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>' +
-          '</button>' +
-        '</div>' +
+        '<div class="meta-prog-bar-wrap"><div class="meta-prog-bar-fill" style="width:' + pct + '%;background:' + progCor + '"></div></div>' +
+      '</div>' +
+      // COLUNA 3: período
+      '<div class="meta-row-periodo">' + periodoHtml + '</div>' +
+      // COLUNA 4: status
+      '<div><span class="meta-status-chip" style="background:' + statusBg + ';color:' + statusCor + '">' + status.label + '</span></div>' +
+      // COLUNA 5: ações
+      '<div class="meta-row-acoes">' +
+        '<button class="meta-btn-atualizar" data-darg="' + m.id + '" onclick="abrirModalResultado(this.dataset.darg)" title="Atualizar resultado">' + svgUpd + ' Atualizar</button>' +
+        '<button class="meta-btn-icon" data-darg="' + m.id + '" onclick="abrirModalMeta(this.dataset.darg)" title="Editar">' + svgEdit + '</button>' +
+        '<button class="meta-btn-icon del" data-darg="' + m.id + '" onclick="excluirMeta(this.dataset.darg)" title="Excluir">' + svgDel + '</button>' +
       '</div>' +
     '</div>';
   });
 
   var semResultado = filtroAtivo && !metasFiltradas.length
-    ? '<div style="text-align:center;padding:32px 16px;color:var(--text3);font-size:13px">Nenhuma meta ' + filtroAtivo.toLowerCase() + ' no momento.</div>'
+    ? '<div style="text-align:center;padding:24px;color:var(--text3);font-size:13px">Nenhuma meta ' + filtroAtivo.toLowerCase() + ' no momento.</div>'
     : '';
 
-  var addCard = '<div class="meta-add-card" onclick="abrirModalMeta()">' +
-    '<div style="width:28px;height:28px;border-radius:50%;background:var(--bg4);border:1.5px dashed var(--border2);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--text3);flex-shrink:0">+</div>' +
+  var header = '<div class="meta-table-head">' +
+    '<span>Meta</span><span>Progresso</span><span>Período</span><span>Status</span><span style="text-align:right">Ações</span>' +
+  '</div>';
+
+  var addRow = '<div class="meta-add-card" onclick="abrirModalMeta()">' +
+    '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
     '<span>Nova meta</span>' +
   '</div>';
 
-  grid.innerHTML = semResultado || (cards.join('') + addCard);
+  grid.innerHTML = semResultado || (header + rows.join('') + addRow);
 }
+
 
 function filtrarMetas(btn) {
   document.querySelectorAll('.meta-filtro-btn').forEach(function(b){ b.classList.remove('active'); });
@@ -5421,6 +5400,32 @@ function editarClienteAtual() {
     return;
   }
   _preencherFormEdicao(cl);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Tags input
+  const inp=document.getElementById('tag-inp');
+  if(inp){
+    inp.addEventListener('keydown', e=>{
+      if(e.key==='Enter'||e.key===','){e.preventDefault();const v=inp.value.replace(',','').trim();if(v&&!TAGS.includes(v)){TAGS.push(v);renderTagsDisp();}inp.value='';}
+      else if(e.key==='Backspace'&&!inp.value&&TAGS.length){TAGS.pop();renderTagsDisp();}
+    });
+  }
+  // Tag filter
+  const tagInp=document.getElementById('tag-q');
+  if(tagInp){ tagInp.addEventListener('input', filterByTag); }
+  // Modal close on overlay
+  ['client-modal','purch-modal','contact-modal','sp-modal','msg-modal','send-modal'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.addEventListener('click', function(e){if(e.target===this)this.classList.remove('open');});
+  });
+  // Verificar se e formulario publico ANTES de qualquer outra coisa
+  if (!verificarCaptacaoPublica()) {
+    checkSession();
+  }
+});
+
+FormEdicao(cl);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
