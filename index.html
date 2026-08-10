@@ -2296,6 +2296,7 @@ async function showDetail(id) {
       '</div>'+
     '</div>';
 
+  window._detailClient = c;
   document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
   document.getElementById('page-client-detail').classList.add('active');
 }
@@ -3180,32 +3181,39 @@ function openNewClient(){
   fillSPSelect('c-sp',''); renderTagsDisp();
   document.getElementById('client-modal').classList.add('open');
 }
-async function openEditClient(id){
-  // Buscar em memória primeiro, senão vai ao Supabase
-  let c = gC().find(x=>x.id===id);
-  if (!c) {
-    const {data} = await _sb.from('clients').select('*').eq('id',id).single();
-    if (!data) { alert('Cliente não encontrado.'); return; }
-    c = data;
+function openEditClient(id){
+  // Buscar em memória primeiro, depois no cache do detalhe atual
+  let cl = gC().find(x=>x.id===id) || (window._detailClient&&window._detailClient.id===id?window._detailClient:null);
+  if (cl) {
+    _preencherFormEdicao(cl);
+  } else {
+    // Buscar no Supabase (fallback)
+    _sb.from('clients').select('*').eq('id',id).single().then(function(res){
+      if (!res.data) { alert('Cliente não encontrado.'); return; }
+      _preencherFormEdicao(res.data);
+    });
   }
-  editCID=id; TAGS=[...(c.tags||[])];
+}
+
+function _preencherFormEdicao(cl){
+  editCID=cl.id; TAGS=[...(cl.tags||[])];
   document.getElementById('cm-title').textContent='Editar Cliente';
-  document.getElementById('edit-cid').value=id;
-  document.getElementById('c-name').value=c.name||'';
-  document.getElementById('c-phone').value=c.phone||'';
-  document.getElementById('c-birth').value=c.birth_date||'';
-  document.getElementById('c-city').value=c.city||'';
-  document.getElementById('c-region').value=c.region||'';
-  document.getElementById('c-addr').value=c.address||'';
-  document.getElementById('c-origin').value=c.origin||'';
-  document.getElementById('c-status').value=c.status||'ainda_nao_comprou';
-  document.getElementById('c-loyalty').value=c.loyalty||'regular';
-  document.getElementById('c-style').value=c.style||'';
-  document.getElementById('c-remind').value=(c.reminder||'').substring(0,10);
+  document.getElementById('edit-cid').value=cl.id;
+  document.getElementById('c-name').value=cl.name||'';
+  document.getElementById('c-phone').value=cl.phone||'';
+  document.getElementById('c-birth').value=cl.birth_date||'';
+  document.getElementById('c-city').value=cl.city||'';
+  document.getElementById('c-region').value=cl.region||'';
+  document.getElementById('c-addr').value=cl.address||'';
+  document.getElementById('c-origin').value=cl.origin||'';
+  document.getElementById('c-status').value=cl.status||'ainda_nao_comprou';
+  document.getElementById('c-loyalty').value=cl.loyalty||'regular';
+  document.getElementById('c-style').value=cl.style||'';
+  document.getElementById('c-remind').value=(cl.reminder||'').substring(0,10);
   document.getElementById('c-obs').value='';
-  document.querySelectorAll('#pay-group .ci').forEach(el=>el.classList.toggle('checked',(c.payment_methods||[]).includes(el.dataset.val)));
-  document.querySelectorAll('#chan-group .ci').forEach(el=>el.classList.toggle('checked',(c.channels||[]).includes(el.dataset.val)));
-  fillSPSelect('c-sp',c.salesperson_id||''); renderTagsDisp();
+  document.querySelectorAll('#pay-group .ci').forEach(function(el){ el.classList.toggle('checked',(cl.payment_methods||[]).includes(el.dataset.val)); });
+  document.querySelectorAll('#chan-group .ci').forEach(function(el){ el.classList.toggle('checked',(cl.channels||[]).includes(el.dataset.val)); });
+  fillSPSelect('c-sp',cl.salesperson_id||''); renderTagsDisp();
   document.getElementById('client-modal').classList.add('open');
 }
 function closeClientModal(){document.getElementById('client-modal').classList.remove('open');}
