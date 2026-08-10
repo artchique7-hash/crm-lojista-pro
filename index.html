@@ -3180,8 +3180,14 @@ function openNewClient(){
   fillSPSelect('c-sp',''); renderTagsDisp();
   document.getElementById('client-modal').classList.add('open');
 }
-function openEditClient(id){
-  const c=gC().find(x=>x.id===id); if(!c)return;
+async function openEditClient(id){
+  // Buscar em memória primeiro, senão vai ao Supabase
+  let c = gC().find(x=>x.id===id);
+  if (!c) {
+    const {data} = await _sb.from('clients').select('*').eq('id',id).single();
+    if (!data) { alert('Cliente não encontrado.'); return; }
+    c = data;
+  }
   editCID=id; TAGS=[...(c.tags||[])];
   document.getElementById('cm-title').textContent='Editar Cliente';
   document.getElementById('edit-cid').value=id;
