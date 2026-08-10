@@ -213,7 +213,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 .fsel:focus{border-color:var(--green)}
 
 /* MODALS */
-.mo{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}
 .mo.open{display:flex}
 .modal{background:var(--bg2);border-radius:20px;width:100%;max-width:580px;max-height:92vh;overflow-y:auto;box-shadow:var(--sh-lg)}
 .modal-lg{max-width:700px}
@@ -3182,14 +3182,16 @@ function openNewClient(){
   document.getElementById('client-modal').classList.add('open');
 }
 function openEditClient(id){
-  // Buscar em memória primeiro, depois no cache do detalhe atual
-  let cl = gC().find(x=>x.id===id) || (window._detailClient&&window._detailClient.id===id?window._detailClient:null);
+  console.log('[SLP] openEditClient chamado com id:', id);
+  let cl = gC().find(function(x){ return x.id===id; }) || (window._detailClient&&window._detailClient.id===id?window._detailClient:null);
+  console.log('[SLP] cliente encontrado em memoria:', cl ? cl.name : 'nao');
   if (cl) {
     _preencherFormEdicao(cl);
   } else {
-    // Buscar no Supabase (fallback)
+    console.log('[SLP] buscando no Supabase...');
     _sb.from('clients').select('*').eq('id',id).single().then(function(res){
-      if (!res.data) { alert('Cliente não encontrado.'); return; }
+      console.log('[SLP] Supabase retornou:', res.data ? res.data.name : 'null', res.error);
+      if (!res.data) { alert('Cliente nao encontrado. Id: '+id); return; }
       _preencherFormEdicao(res.data);
     });
   }
