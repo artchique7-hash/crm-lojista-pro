@@ -4481,7 +4481,12 @@ function abrirModalRotina(id) {
   document.getElementById('rot-nome').value = rot ? rot.nome : '';
   document.getElementById('rot-dia').value = rot ? (rot.dia||'segunda') : 'segunda';
   document.getElementById('rot-hora').value = rot ? (rot.hora||'') : '';
-  getResponsavelValue('rot-resp','rot-resp-manual') = rot ? (rot.resp||'') : '';
+  var selR = document.getElementById('rot-resp');
+  var inpR = document.getElementById('rot-resp-manual');
+  var respVal = rot ? (rot.responsavel||rot.resp||'') : '';
+  var isManR = respVal && !(_sp||[]).find(function(s){ return s.name===respVal; });
+  if (selR) { selR.innerHTML = spSelectHtml(isManR ? '' : respVal); selR.value = isManR ? '__manual__' : respVal; }
+  if (inpR) { inpR.style.display = isManR ? 'block' : 'none'; inpR.value = isManR ? respVal : ''; }
   document.getElementById('rot-desc').value = rot ? (rot.desc||'') : '';
   document.getElementById('rot-check-input').value = '';
   _rotCheckTemp = rot ? (rot.checklist||[]).map(function(item){ return {texto:item.texto, done:false}; }) : [];
