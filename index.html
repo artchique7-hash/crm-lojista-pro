@@ -1789,8 +1789,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
  </div>
 </div>
 
-<!--
-
+<script>
 // ── CONFIG SUPABASE ──
 const _sb = supabase.createClient('https://ihpfexmourrvixtsxhrt.supabase.co', 'sb_publishable_M7vZQ1VPi_7BP3HQAp-ngA_cMB22bEG');
 
@@ -5423,34 +5422,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!verificarCaptacaoPublica()) {
     checkSession();
   }
-});
-
-FormEdicao(cl);
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  // Tags input
-  const inp=document.getElementById('tag-inp');
-  if(inp){
-    inp.addEventListener('keydown', e=>{
-      if(e.key==='Enter'||e.key===','){e.preventDefault();const v=inp.value.replace(',','').trim();if(v&&!TAGS.includes(v)){TAGS.push(v);renderTagsDisp();}inp.value='';}
-      else if(e.key==='Backspace'&&!inp.value&&TAGS.length){TAGS.pop();renderTagsDisp();}
-    });
-  }
-  // Tag filter
-  const tagInp=document.getElementById('tag-q');
-  if(tagInp){ tagInp.addEventListener('input', filterByTag); }
-  // Modal close on overlay
-  ['client-modal','purch-modal','contact-modal','sp-modal','msg-modal','send-modal'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el) el.addEventListener('click', function(e){if(e.target===this)this.classList.remove('open');});
-  });
-  // Verificar se e formulario publico ANTES de qualquer outra coisa
-  if (!verificarCaptacaoPublica()) {
-    checkSession();
-  }
-});
-
-</script>
+});</script>
 </body>
 </html>
