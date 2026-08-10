@@ -2224,7 +2224,7 @@ async function showDetail(id) {
 
   document.getElementById('detail-content').innerHTML=
     '<div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">'+
-    '<button onclick="goBack()" class="btn btn-g btn-sm">Voltar</button>'+
+    '<button class="btn btn-g btn-sm" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff" onclick="editarClienteAtual()">Editar</button>'+
     '<span style="color:var(--text3);font-size:13px">/ '+c.name+'</span></div>'+
     '<div class="dh">'+
       '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">'+
@@ -5404,6 +5404,16 @@ var _navGroupMap = {
   salespeople:null,
   dashboard:  null
 };
+
+
+function editarClienteAtual() {
+  var cl = window._detailClient;
+  if (!cl) {
+    alert('Recarregue a pagina do cliente e tente novamente.');
+    return;
+  }
+  _preencherFormEdicao(cl);
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   // Tags input
