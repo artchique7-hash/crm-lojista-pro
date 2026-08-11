@@ -5631,6 +5631,89 @@ function salvarProdutoWpp(){
   toast('Produto adicionado!');
 }
 
+
+// ── ATENDIMENTO ONLINE COM ORIGEM ──
+var _onlineResultado = null;
+
+function abrirModalOnline() {
+  _onlineResultado = null;
+  var mo = document.getElementById('mo-online');
+  if (!mo) return;
+  document.getElementById('online-origem').value = 'instagram';
+  document.getElementById('online-origem-outro').style.display = 'none';
+  document.getElementById('online-origem-outro').value = '';
+  document.getElementById('online-perda-wrap').style.display = 'none';
+  document.getElementById('online-perda-produto').value = '';
+  document.getElementById('online-perda-motivo').value = '';
+  setResultadoOnline(null);
+  mo.classList.add('open');
+  document.getElementById('btn-fecha-online').onclick = function(){ mo.classList.remove('open'); };
+  document.getElementById('btn-cancela-online').onclick = function(){ mo.classList.remove('open'); };
+}
+
+function toggleOutroOnline(val) {
+  var inp = document.getElementById('online-origem-outro');
+  if (inp) inp.style.display = val === 'outro' ? 'block' : 'none';
+}
+
+function setResultadoOnline(val) {
+  _onlineResultado = val;
+  var btnC = document.getElementById('btn-online-comprou');
+  var btnN = document.getElementById('btn-online-nao-comprou');
+  var perdaWrap = document.getElementById('online-perda-wrap');
+  if (btnC) btnC.style.background = val === 'comprou' ? 'var(--green)' : '';
+  if (btnN) btnN.style.background = val === 'nao_comprou' ? 'var(--red)' : '';
+  if (perdaWrap) perdaWrap.style.display = val === 'nao_comprou' ? 'block' : 'none';
+}
+
+function salvarAtendOnline() {
+  if (!_onlineResultado) { toast('Selecione o resultado.', 'e'); return; }
+  var origemEl = document.getElementById('online-origem');
+  var origem = origemEl ? origemEl.value : 'instagram';
+  if (origem === 'outro') {
+    var outroEl = document.getElementById('online-origem-outro');
+    origem = outroEl && outroEl.value.trim() ? outroEl.value.trim() : 'outro';
+  }
+  var date = getFluxoDate();
+  if (!_fluxo[date]) _fluxo[date] = {fisico:0, online:0, perdas:[], id:null};
+
+  // Incrementar contador online
+  _fluxo[date].online = (_fluxo[date].online || 0) + 1;
+
+  // Registrar origem
+  if (!_fluxo[date].online_origens) _fluxo[date].online_origens = [];
+  _fluxo[date].online_origens.push({
+    origem: origem,
+    resultado: _onlineResultado,
+    ts: new Date().toISOString()
+  });
+
+  // Se comprou, incrementar vendas online
+  if (_onlineResultado === 'comprou') {
+    _fluxo[date].vendas_online = (_fluxo[date].vendas_online || 0) + 1;
+  }
+
+  // Se não comprou, registrar perda
+  if (_onlineResultado === 'nao_comprou') {
+    var produto = document.getElementById('online-perda-produto').value.trim();
+    var motivo = document.getElementById('online-perda-motivo').value.trim();
+    if (!_fluxo[date].perdas) _fluxo[date].perdas = [];
+    _fluxo[date].perdas.push({
+      canal: 'online',
+      origem: origem,
+      produto: produto,
+      motivo: motivo,
+      ts: new Date().toISOString()
+    });
+  }
+
+  saveFluxoToDB(date);
+  renderFluxo();
+  var mo = document.getElementById('mo-online');
+  if (mo) mo.classList.remove('open');
+  toast('Atendimento registrado!');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   // Tags input
   const inp=document.getElementById('tag-inp');
@@ -5655,5 +5738,47 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 </script>
+
+<!-- MODAL ATENDIMENTO ONLINE -->
+<div class="mo" id="mo-online">
+ <div class="modal" style="max-width:380px">
+  <div class="mh"><h3 class="mt">Atendimento Online</h3><button class="mc" id="btn-fecha-online"></button></div>
+  <div class="mb">
+   <div class="fg">
+    <label class="fl">Origem do atendimento *</label>
+    <select id="online-origem" class="fi" onchange="toggleOutroOnline(this.value)">
+     <option value="instagram">Instagram</option>
+     <option value="whatsapp">WhatsApp</option>
+     <option value="anuncio_instagram">Anúncio → Instagram</option>
+     <option value="anuncio_whatsapp">Anúncio → WhatsApp</option>
+     <option value="outro">Outro</option>
+    </select>
+    <input type="text" id="online-origem-outro" class="fi" style="display:none;margin-top:6px" placeholder="Especifique o canal...">
+   </div>
+   <div class="fg">
+    <label class="fl">Resultado</label>
+    <div style="display:flex;gap:8px">
+     <button class="btn btn-p btn-sm" style="flex:1" id="btn-online-comprou" onclick="setResultadoOnline('comprou')">✓ Comprou</button>
+     <button class="btn btn-g btn-sm" style="flex:1" id="btn-online-nao-comprou" onclick="setResultadoOnline('nao_comprou')">✗ Não comprou</button>
+    </div>
+   </div>
+   <div id="online-perda-wrap" style="display:none">
+    <div class="fg">
+     <label class="fl">O que buscava</label>
+     <input type="text" id="online-perda-produto" class="fi" placeholder="Ex: vestido social, calça preta G...">
+    </div>
+    <div class="fg">
+     <label class="fl">Motivo da perda</label>
+     <input type="text" id="online-perda-motivo" class="fi" placeholder="Ex: não tinha o tamanho, achou caro...">
+    </div>
+   </div>
+   <div style="display:flex;gap:10px;justify-content:flex-end;padding-top:14px;border-top:1px solid var(--border)">
+    <button class="btn btn-g btn-sm" id="btn-cancela-online">Cancelar</button>
+    <button class="btn btn-p btn-sm" onclick="salvarAtendOnline()">Registrar</button>
+   </div>
+  </div>
+ </div>
+</div>
+
 </body>
 </html>
