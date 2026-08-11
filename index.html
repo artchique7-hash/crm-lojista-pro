@@ -1126,11 +1126,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
    </div>
    <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border)">
     <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Vendas realizadas</div>
-    <div style="display:flex;align-items:center;justify-content:center;gap:10px">
-     <button class="fb fb-minus" style="width:38px;height:38px;font-size:18px" onclick="changeCount('vendas_fisico',-1)">-</button>
-     <div class="fluxo-num" id="count-vendas-fisico" style="font-size:36px;min-width:40px">0</div>
-     <button class="fb fb-plus-g" style="width:38px;height:38px;font-size:18px" onclick="changeCount('vendas_fisico',1)">+</button>
-    </div>
+    <div class="fluxo-num" id="count-vendas-fisico" style="font-size:36px">0</div>
     <div style="margin-top:10px;font-size:12px;font-weight:600;color:var(--green)" id="conv-fisico-label">Conversao: -</div>
    </div>
   </div>
@@ -1144,12 +1140,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
    </div>
    <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border)">
     <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Vendas realizadas</div>
-    <div style="display:flex;align-items:center;justify-content:center;gap:10px">
-     <button class="fb fb-minus" style="width:38px;height:38px;font-size:18px" onclick="changeCount('vendas_online',-1)">-</button>
-     <div class="fluxo-num" id="count-vendas-online" style="font-size:36px;min-width:40px">0</div>
-     <button class="fb fb-plus-b" style="width:38px;height:38px;font-size:18px" onclick="changeCount('vendas_online',1)">+</button>
-    </div>
-    <div style="margin-top:10px;font-size:12px;font-weight:600;color:var(--blue)" id="conv-online-label">Conversao: -</div>
+    <div class="fluxo-num" id="count-vendas-online" style="font-size:36px">0</div>
    </div>
   </div>
  </div>
@@ -2932,6 +2923,39 @@ function renderReports(period) {
   var convOnline = totalOnline > 0 ? Math.round((totalVendasO/totalOnline)*100) : 0;
   var convGeral = totalAtt > 0 ? Math.round((totalVendas/totalAtt)*100) : 0;
 
+  // ── CANAIS ONLINE ──
+  var canaisMap = {};
+  var canaisLabel = {
+    instagram: 'Instagram',
+    whatsapp: 'WhatsApp',
+    anuncio_instagram: 'Anúncio → Instagram',
+    anuncio_whatsapp: 'Anúncio → WhatsApp'
+  };
+  fluxoDias.forEach(function(d) {
+    (d.online_origens || []).forEach(function(o) {
+      var key = o.origem || 'outro';
+      if (!canaisMap[key]) canaisMap[key] = {att:0, vendas:0};
+      canaisMap[key].att += 1;
+      if (o.resultado === 'comprou') canaisMap[key].vendas += 1;
+    });
+  });
+  var canaisHTML = Object.keys(canaisMap).length
+    ? Object.keys(canaisMap).map(function(k) {
+        var canal = canaisMap[k];
+        var conv = canal.att > 0 ? Math.round((canal.vendas/canal.att)*100) : 0;
+        var cor = conv >= 30 ? '#93c5fd' : '#fbbf24';
+        var label = canaisLabel[k] || k;
+        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.07)">' +
+          '<span style="font-size:12px;color:rgba(255,255,255,.7)">' + label + '</span>' +
+          '<div style="display:flex;gap:16px;align-items:center">' +
+            '<span style="font-size:11px;color:rgba(255,255,255,.5)">' + canal.att + ' atend.</span>' +
+            '<span style="font-size:11px;color:#6ee7a0">' + canal.vendas + ' vendas</span>' +
+            '<span style="font-size:12px;font-weight:700;color:' + cor + ';min-width:38px;text-align:right">' + conv + '%</span>' +
+          '</div>' +
+        '</div>';
+      }).join('')
+    : '<div style="font-size:12px;color:rgba(255,255,255,.4);padding:8px 0">Nenhum atendimento online registrado com canal.</div>';
+
   // ── COMPARATIVO SEMANAL (só no modo mês) ──
   var semanasHTML = '';
   if (month > 0 || (!dataInicio && !dataFim)) {
@@ -3041,12 +3065,14 @@ function renderReports(period) {
     '<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;color:rgba(255,255,255,.6)">Vendas</span><span style="font-weight:700;color:#6ee7a0">' + totalVendasF + '</span></div>' +
     '<div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:rgba(255,255,255,.6)">Conversao</span><span style="font-weight:700;color:' + (convFisico>=30?'#6ee7a0':'#fbbf24') + '">' + convFisico + '%</span></div>' +
     '</div>' +
-    // Online
+    // Online + Canais
     '<div style="background:rgba(255,255,255,.07);border-radius:var(--rs);padding:16px;border:1px solid rgba(255,255,255,.08)">' +
-    '<div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Online</div>' +
-    '<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;color:rgba(255,255,255,.6)">Atendimentos</span><span style="font-weight:700">' + totalOnline + '</span></div>' +
-    '<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;color:rgba(255,255,255,.6)">Vendas</span><span style="font-weight:700;color:#93c5fd">' + totalVendasO + '</span></div>' +
-    '<div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:rgba(255,255,255,.6)">Conversao</span><span style="font-weight:700;color:' + (convOnline>=30?'#93c5fd':'#fbbf24') + '">' + convOnline + '%</span></div>' +
+    '<div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Online — Total</div>' +
+    '<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:rgba(255,255,255,.6)">Atendimentos</span><span style="font-weight:700">' + totalOnline + '</span></div>' +
+    '<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:rgba(255,255,255,.6)">Vendas</span><span style="font-weight:700;color:#93c5fd">' + totalVendasO + '</span></div>' +
+    '<div style="display:flex;justify-content:space-between;margin-bottom:12px"><span style="font-size:12px;color:rgba(255,255,255,.6)">Conversao</span><span style="font-weight:700;color:' + (convOnline>=30?'#93c5fd':'#fbbf24') + '">' + convOnline + '%</span></div>' +
+    '<div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding-top:10px;border-top:1px solid rgba(255,255,255,.08)">Por canal</div>' +
+    canaisHTML +
     '</div>' +
     // Geral
     '<div style="background:rgba(160,120,48,.15);border-radius:var(--rs);padding:16px;border:1px solid rgba(196,152,64,.2)">' +
@@ -5724,9 +5750,10 @@ function abrirModalAtend(canal) {
   _atendCanal = canal;
   _atendResultado = null;
   _atendClienteId = null;
+  _atendPerdaClienteId = null;
 
   // Reset campos
-  var ids = ['atend-origem-outro','atend-cliente-busca','atend-novo-nome','atend-novo-tel','atend-perda-produto','atend-perda-motivo','atend-produto-compra','atend-valor'];
+  var ids = ['atend-origem-outro','atend-cliente-busca','atend-novo-nome','atend-novo-tel','atend-perda-produto','atend-perda-motivo','atend-produto-compra','atend-valor','atend-perda-cliente-busca','atend-perda-novo-nome','atend-perda-novo-tel'];
   ids.forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
 
   // Mostrar/ocultar origem
@@ -5740,6 +5767,12 @@ function abrirModalAtend(canal) {
   document.getElementById('atend-cliente-lista').style.display = 'none';
   var selDiv = document.getElementById('atend-cliente-sel');
   if (selDiv) selDiv.style.display = 'none';
+  var perdaNovoCl = document.getElementById('atend-perda-novo-cliente');
+  if (perdaNovoCl) perdaNovoCl.style.display = 'none';
+  var perdaSel = document.getElementById('atend-perda-cliente-sel');
+  if (perdaSel) perdaSel.style.display = 'none';
+  var perdaLista = document.getElementById('atend-perda-cliente-lista');
+  if (perdaLista) perdaLista.style.display = 'none';
 
   var btnC = document.getElementById('btn-atend-comprou');
   var btnN = document.getElementById('btn-atend-nao');
@@ -5905,12 +5938,26 @@ async function salvarAtendUnificado() {
 
   // SE NÃO COMPROU
   if (_atendResultado === 'nao_comprou') {
+    // Verificar se tem novo cliente para cadastrar
+    var perdaNovoNome = (document.getElementById('atend-perda-novo-nome').value||'').trim();
+    var perdaNovoTel = (document.getElementById('atend-perda-novo-tel').value||'').trim();
+    var perdaClienteId = _atendPerdaClienteId;
+    if (perdaNovoNome && !perdaClienteId) {
+      try {
+        var resPerdaCl = await _sb.from('clients').insert({
+          store_id: CU.id, name: perdaNovoNome, phone: perdaNovoTel || null,
+          status: 'ainda_nao_comprou', origin: _atendCanal === 'online' ? origem : 'loja_fisica'
+        }).select().single();
+        if (resPerdaCl.data) { perdaClienteId = resPerdaCl.data.id; _clients.unshift(resPerdaCl.data); toast('Cliente cadastrado!'); }
+      } catch(e) {}
+    }
     if (!_fluxo[date].perdas) _fluxo[date].perdas = [];
     _fluxo[date].perdas.push({
       canal: _atendCanal,
       origem: origem,
       produto: (document.getElementById('atend-perda-produto').value||'').trim(),
       motivo: (document.getElementById('atend-perda-motivo').value||'').trim(),
+      client_id: perdaClienteId || null,
       ts: new Date().toISOString()
     });
   }
@@ -5921,6 +5968,52 @@ async function salvarAtendUnificado() {
   var mo = document.getElementById('mo-atend');
   if (mo) mo.classList.remove('open');
   toast('Atendimento registrado!');
+}
+
+// ── CLIENTE NO NÃO COMPROU ──
+var _atendPerdaClienteId = null;
+
+function buscarClientePerdaAtend(q) {
+  var lista = document.getElementById('atend-perda-cliente-lista');
+  if (!lista) return;
+  if (!q || q.length < 2) { lista.style.display = 'none'; return; }
+  var res = gC().filter(function(cl){
+    return cl.name.toLowerCase().includes(q.toLowerCase()) || (cl.phone||'').includes(q);
+  }).slice(0, 8);
+  if (!res.length) { lista.style.display = 'none'; return; }
+  lista.innerHTML = res.map(function(cl){
+    return '<div style="padding:9px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--border)" ' +
+      'data-cid="' + cl.id + '" data-nome="' + cl.name + '" ' +
+      'onmousedown="selecionarClientePerdaAtend(this.dataset.cid,this.dataset.nome)">' +
+      '<strong>' + cl.name + '</strong>' + (cl.phone ? ' · ' + cl.phone : '') +
+    '</div>';
+  }).join('');
+  lista.style.display = 'block';
+}
+
+function selecionarClientePerdaAtend(id, nome) {
+  _atendPerdaClienteId = id;
+  var busca = document.getElementById('atend-perda-cliente-busca');
+  var lista = document.getElementById('atend-perda-cliente-lista');
+  var sel = document.getElementById('atend-perda-cliente-sel');
+  var nomeEl = document.getElementById('atend-perda-cliente-nome');
+  if (busca) busca.style.display = 'none';
+  if (lista) lista.style.display = 'none';
+  if (sel) sel.style.display = 'flex';
+  if (nomeEl) nomeEl.textContent = nome;
+}
+
+function limparClientePerdaAtend() {
+  _atendPerdaClienteId = null;
+  var busca = document.getElementById('atend-perda-cliente-busca');
+  var sel = document.getElementById('atend-perda-cliente-sel');
+  if (busca) { busca.style.display = 'block'; busca.value = ''; busca.focus(); }
+  if (sel) sel.style.display = 'none';
+}
+
+function abrirCadastroRapidoPerdaAtend() {
+  var wrap = document.getElementById('atend-perda-novo-cliente');
+  if (wrap) wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
 }
 document.addEventListener('DOMContentLoaded', () => {
   // Tags input
@@ -6063,6 +6156,25 @@ document.addEventListener('DOMContentLoaded', () => {
     <div class="fg">
      <label class="fl">Motivo da perda</label>
      <input type="text" id="atend-perda-motivo" class="fi" placeholder="Ex: não tinha o tamanho, achou caro...">
+    </div>
+    <!-- Cliente (opcional) para não comprou -->
+    <div class="fg">
+     <label class="fl">Cliente (opcional)</label>
+     <div style="position:relative">
+      <input type="text" id="atend-perda-cliente-busca" class="fi" placeholder="Buscar por nome ou telefone..." autocomplete="off" oninput="buscarClientePerdaAtend(this.value)">
+      <div id="atend-perda-cliente-lista" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rs);z-index:100;max-height:140px;overflow-y:auto;box-shadow:var(--sh-md)"></div>
+     </div>
+     <div id="atend-perda-cliente-sel" style="display:none;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:8px 12px;margin-top:6px;display:flex;align-items:center;justify-content:space-between">
+      <span id="atend-perda-cliente-nome" style="font-size:13px;font-weight:600"></span>
+      <button onclick="limparClientePerdaAtend()" style="background:none;border:none;cursor:pointer;font-size:16px">×</button>
+     </div>
+     <input type="hidden" id="atend-perda-cliente-id">
+    </div>
+    <button class="btn btn-g btn-sm" style="width:100%;margin-top:4px" onclick="abrirCadastroRapidoPerdaAtend()">+ Cadastrar novo cliente</button>
+    <div id="atend-perda-novo-cliente" style="display:none;background:var(--bg3);border-radius:var(--rs);padding:12px;margin-top:8px">
+     <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px">Cadastro rápido</div>
+     <div class="fg"><input type="text" id="atend-perda-novo-nome" class="fi" placeholder="Nome *"></div>
+     <div class="fg"><input type="text" id="atend-perda-novo-tel" class="fi" placeholder="Telefone (com DDD)"></div>
     </div>
    </div>
 
