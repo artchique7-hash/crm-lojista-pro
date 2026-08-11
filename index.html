@@ -1750,6 +1750,9 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
      </select>
     </div>
     <div class="fg"><label cla
+
+<script>
+
 // ── CONFIG SUPABASE ──
 const _sb = supabase.createClient('https://ihpfexmourrvixtsxhrt.supabase.co', 'sb_publishable_M7vZQ1VPi_7BP3HQAp-ngA_cMB22bEG');
 
@@ -5629,157 +5632,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!verificarCaptacaoPublica()) {
     checkSession();
   }
-});on>' +
-        '<button class="btn btn-p btn-sm" onclick="salvarFunil()">Salvar Funil</button>' +
-      '</div>' +
-    '</div>' +
-  '</div>';
-  mo.classList.add('open');
-  document.getElementById('btn-fecha-funil-form').onclick = function(){ mo.classList.remove('open'); };
-  document.getElementById('btn-cancela-funil-form').onclick = function(){ mo.classList.remove('open'); };
-}
+});
 
-function addCheckFormFunil() {
-  var cont = document.getElementById('ff-checks');
-  if (!cont) return;
-  var div = document.createElement('div');
-  div.className = 'funil-check-item';
-  div.style.cursor = 'default';
-  div.innerHTML = '<div class="funil-check-box" style="border-color:var(--border2)"></div>' +
-    '<input type="text" class="ff-check-input" value="" style="flex:1;border:none;background:transparent;font-size:13px;color:var(--text);outline:none" placeholder="Nome da etapa">' +
-    '<span style="color:var(--text3);cursor:pointer;padding:0 4px;font-size:16px" onclick="this.parentElement.remove()">×</span>';
-  cont.appendChild(div);
-  div.querySelector('input').focus();
-}
-
-function salvarFunil() {
-  var nome = (document.getElementById('ff-nome').value||'').trim();
-  if (!nome) { alert('Informe o nome do funil.'); return; }
-  var checks = [];
-  document.querySelectorAll('.ff-check-input').forEach(function(inp){
-    if (inp.value.trim()) checks.push({texto: inp.value.trim(), done: false});
-  });
-  var fid = document.getElementById('ff-id').value;
-  var existing = fid ? _funis.find(function(x){ return x.id===fid; }) : null;
-  if (existing) {
-    existing.nome = nome;
-    existing.objetivo = document.getElementById('ff-objetivo').value;
-    existing.inicio = document.getElementById('ff-inicio').value;
-    existing.fim = document.getElementById('ff-fim').value;
-    existing.responsavel = getResponsavelValue('ff-resp-sel','ff-resp-inp');
-    existing.canal = document.getElementById('ff-canal').value;
-    existing.descricao = document.getElementById('ff-descricao').value;
-    existing.publico = document.getElementById('ff-publico').value;
-    existing.obs = document.getElementById('ff-obs').value;
-    existing.status = document.getElementById('ff-status').value;
-    checks.forEach(function(ch, i){
-      if (existing.checklist && existing.checklist[i]) ch.done = existing.checklist[i].done;
-    });
-    existing.checklist = checks;
-  } else {
-    _funis.unshift({
-      id: uid(),
-      tipo: document.getElementById('ff-tipo').value,
-      nome: nome,
-      objetivo: document.getElementById('ff-objetivo').value,
-      inicio: document.getElementById('ff-inicio').value,
-      fim: document.getElementById('ff-fim').value,
-      responsavel: getResponsavelValue('ff-resp-sel','ff-resp-inp'),
-      canal: document.getElementById('ff-canal').value,
-      descricao: document.getElementById('ff-descricao').value,
-      publico: document.getElementById('ff-publico').value,
-      obs: document.getElementById('ff-obs').value,
-      status: document.getElementById('ff-status').value,
-      checklist: checks,
-      resultados: {},
-      _open: true
-    });
-  }
-  saveFunis();
-  var mo = document.getElementById('mo-funil-form');
-  if (mo) mo.classList.remove('open');
-  renderFunis();
-  toast('Funil salvo!');
-}
-
-function editarFunil(fid) {
-  abrirFormFunil(fid, null);
-}
-
-function excluirFunil(fid) {
-  if (!confirm('Excluir este funil?')) return;
-  _funis = _funis.filter(function(x){ return x.id!==fid; });
-  saveFunis();
-  renderFunis();
-  toast('Funil excluido.');
-}
-
-function abrirModalFunil() {
-  abrirEscolhaTipoFunil();
-}
-
-
-// ── MENU EXPANSÍVEL ──
-function toggleNavGroup(id) {
-  var el = document.getElementById('ng-' + id);
-  if (!el) return;
-  el.classList.toggle('open');
-}
-
-function openNavGroup(id) {
-  var el = document.getElementById('ng-' + id);
-  if (el) el.classList.add('open');
-}
-
-// Abrir grupo correto ao navegar
-var _navGroupMap = {
-  clients:    'clientes',
-  captacao:   null,
-  fluxo:      null,
-  birthdays:  'oportunidades',
-  inactive:   'oportunidades',
-  postsale:   'oportunidades',
-  reminders:  'oportunidades',
-  filter:     'oportunidades',
-  messages:   null,
-  escritorio: 'escritorio',
-  reports:    null,
-  export:     null,
-  salespeople:null,
-  dashboard:  null
-};
-
-
-function editarClienteAtual() {
-  var cl = window._detailClient;
-  if (!cl) {
-    alert('Recarregue a pagina do cliente e tente novamente.');
-    return;
-  }
-  _preencherFormEdicao(cl);
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  // Tags input
-  const inp=document.getElementById('tag-inp');
-  if(inp){
-    inp.addEventListener('keydown', e=>{
-      if(e.key==='Enter'||e.key===','){e.preventDefault();const v=inp.value.replace(',','').trim();if(v&&!TAGS.includes(v)){TAGS.push(v);renderTagsDisp();}inp.value='';}
-      else if(e.key==='Backspace'&&!inp.value&&TAGS.length){TAGS.pop();renderTagsDisp();}
-    });
-  }
-  // Tag filter
-  const tagInp=document.getElementById('tag-q');
-  if(tagInp){ tagInp.addEventListener('input', filterByTag); }
-  // Modal close on overlay
-  ['client-modal','purch-modal','contact-modal','sp-modal','msg-modal','send-modal'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el) el.addEventListener('click', function(e){if(e.target===this)this.classList.remove('open');});
-  });
-  // Verificar se e formulario publico ANTES de qualquer outra coisa
-  if (!verificarCaptacaoPublica()) {
-    checkSession();
-  }
-});</script>
+</script>
 </body>
 </html>
