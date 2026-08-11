@@ -1122,7 +1122,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
    <div class="fluxo-label">pessoas atendidas</div>
    <div class="fluxo-btns">
     <button class="fb fb-minus" onclick="changeCount('fisico',-1)">-</button>
-    <button class="fb fb-plus-g" onclick="changeCount('fisico',1)">+</button>
+    <button class="fb fb-plus-g" onclick="abrirModalAtend('fisico')">+</button>
    </div>
    <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border)">
     <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Vendas realizadas</div>
@@ -1140,7 +1140,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
    <div class="fluxo-label">mensagens recebidas</div>
    <div class="fluxo-btns">
     <button class="fb fb-minus" onclick="changeCount('online',-1)">-</button>
-    <button class="fb fb-plus-b" onclick="abrirModalOnline()">+</button>
+    <button class="fb fb-plus-b" onclick="abrirModalAtend('online')">+</button>
    </div>
    <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border)">
     <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Vendas realizadas</div>
@@ -5714,6 +5714,214 @@ function salvarAtendOnline() {
   toast('Atendimento registrado!');
 }
 
+
+// ── MODAL ATENDIMENTO UNIFICADO ──
+var _atendCanal = 'fisico';
+var _atendResultado = null;
+var _atendClienteId = null;
+
+function abrirModalAtend(canal) {
+  _atendCanal = canal;
+  _atendResultado = null;
+  _atendClienteId = null;
+
+  // Reset campos
+  var ids = ['atend-origem-outro','atend-cliente-busca','atend-novo-nome','atend-novo-tel','atend-perda-produto','atend-perda-motivo','atend-produto-compra','atend-valor'];
+  ids.forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+
+  // Mostrar/ocultar origem
+  var origWrap = document.getElementById('atend-origem-wrap');
+  if (origWrap) origWrap.style.display = canal === 'online' ? 'block' : 'none';
+
+  // Reset resultado
+  document.getElementById('atend-comprou-wrap').style.display = 'none';
+  document.getElementById('atend-perda-wrap').style.display = 'none';
+  document.getElementById('atend-novo-cliente').style.display = 'none';
+  document.getElementById('atend-cliente-lista').style.display = 'none';
+  var selDiv = document.getElementById('atend-cliente-sel');
+  if (selDiv) selDiv.style.display = 'none';
+
+  var btnC = document.getElementById('btn-atend-comprou');
+  var btnN = document.getElementById('btn-atend-nao');
+  if (btnC) { btnC.style.background=''; btnC.style.color=''; btnC.style.borderColor='var(--border)'; }
+  if (btnN) { btnN.style.background=''; btnN.style.color=''; btnN.style.borderColor='var(--border)'; }
+
+  // Título
+  var title = document.getElementById('mo-atend-title');
+  if (title) title.textContent = canal === 'online' ? 'Atendimento Online' : 'Atendimento Físico';
+
+  // Abrir
+  var mo = document.getElementById('mo-atend');
+  if (!mo) return;
+  mo.classList.add('open');
+  document.getElementById('btn-fecha-atend').onclick = function(){ mo.classList.remove('open'); };
+  document.getElementById('btn-cancela-atend').onclick = function(){ mo.classList.remove('open'); };
+}
+
+function toggleAtendOutro(val) {
+  var el = document.getElementById('atend-origem-outro');
+  if (el) el.style.display = val === 'outro' ? 'block' : 'none';
+}
+
+function setAtendResultado(val) {
+  _atendResultado = val;
+  var btnC = document.getElementById('btn-atend-comprou');
+  var btnN = document.getElementById('btn-atend-nao');
+  var compWrap = document.getElementById('atend-comprou-wrap');
+  var perdWrap = document.getElementById('atend-perda-wrap');
+
+  if (val === 'comprou') {
+    if (btnC) { btnC.style.background='var(--green)'; btnC.style.color='#fff'; btnC.style.borderColor='var(--green)'; }
+    if (btnN) { btnN.style.background=''; btnN.style.color=''; btnN.style.borderColor='var(--border)'; }
+    if (compWrap) compWrap.style.display = 'block';
+    if (perdWrap) perdWrap.style.display = 'none';
+  } else {
+    if (btnN) { btnN.style.background='var(--red)'; btnN.style.color='#fff'; btnN.style.borderColor='var(--red)'; }
+    if (btnC) { btnC.style.background=''; btnC.style.color=''; btnC.style.borderColor='var(--border)'; }
+    if (perdWrap) perdWrap.style.display = 'block';
+    if (compWrap) compWrap.style.display = 'none';
+  }
+}
+
+function buscarClienteAtend(q) {
+  var lista = document.getElementById('atend-cliente-lista');
+  if (!lista) return;
+  if (!q || q.length < 2) { lista.style.display = 'none'; return; }
+  var resultados = gC().filter(function(cl){
+    return cl.name.toLowerCase().includes(q.toLowerCase()) || (cl.phone||'').includes(q);
+  }).slice(0, 8);
+  if (!resultados.length) { lista.style.display = 'none'; return; }
+  lista.innerHTML = resultados.map(function(cl){
+    return '<div style="padding:9px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--border)" ' +
+      'data-cid="' + cl.id + '" data-nome="' + cl.name + '" ' +
+      'onmousedown="selecionarClienteAtend(this.dataset.cid,this.dataset.nome)">' +
+      '<strong>' + cl.name + '</strong>' + (cl.phone ? ' · ' + cl.phone : '') +
+    '</div>';
+  }).join('');
+  lista.style.display = 'block';
+}
+
+function selecionarClienteAtend(id, nome) {
+  _atendClienteId = id;
+  var busca = document.getElementById('atend-cliente-busca');
+  var lista = document.getElementById('atend-cliente-lista');
+  var sel = document.getElementById('atend-cliente-sel');
+  var nomeEl = document.getElementById('atend-cliente-nome');
+  if (busca) busca.style.display = 'none';
+  if (lista) lista.style.display = 'none';
+  if (sel) sel.style.display = 'flex';
+  if (nomeEl) nomeEl.textContent = nome;
+  document.getElementById('atend-novo-cliente').style.display = 'none';
+}
+
+function limparClienteAtend() {
+  _atendClienteId = null;
+  var busca = document.getElementById('atend-cliente-busca');
+  var sel = document.getElementById('atend-cliente-sel');
+  if (busca) { busca.style.display = 'block'; busca.value = ''; busca.focus(); }
+  if (sel) sel.style.display = 'none';
+}
+
+function abrirCadastroRapidoAtend() {
+  var wrap = document.getElementById('atend-novo-cliente');
+  if (wrap) wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
+}
+
+async function salvarAtendUnificado() {
+  if (!_atendResultado) { toast('Selecione o resultado.', 'e'); return; }
+
+  var date = getFluxoDate();
+  if (!_fluxo[date]) _fluxo[date] = {fisico:0, online:0, perdas:[], id:null};
+
+  // Origem (online)
+  var origem = _atendCanal;
+  if (_atendCanal === 'online') {
+    var origEl = document.getElementById('atend-origem');
+    origem = origEl ? origEl.value : 'instagram';
+    if (origem === 'outro') {
+      var outroEl = document.getElementById('atend-origem-outro');
+      origem = outroEl && outroEl.value.trim() ? outroEl.value.trim() : 'outro';
+    }
+  }
+
+  // Incrementar contador
+  var campo = _atendCanal === 'fisico' ? 'fisico' : 'online';
+  _fluxo[date][campo] = (_fluxo[date][campo] || 0) + 1;
+
+  // Registrar origem online
+  if (_atendCanal === 'online') {
+    if (!_fluxo[date].online_origens) _fluxo[date].online_origens = [];
+    _fluxo[date].online_origens.push({origem:origem, resultado:_atendResultado, ts:new Date().toISOString()});
+  }
+
+  // SE COMPROU
+  if (_atendResultado === 'comprou') {
+    var campoVendas = _atendCanal === 'fisico' ? 'vendas_fisico' : 'vendas_online';
+    _fluxo[date][campoVendas] = (_fluxo[date][campoVendas] || 0) + 1;
+
+    // Verificar se tem novo cliente para cadastrar
+    var novoNome = (document.getElementById('atend-novo-nome').value||'').trim();
+    var novoTel = (document.getElementById('atend-novo-tel').value||'').trim();
+    var clienteId = _atendClienteId;
+
+    if (novoNome && !clienteId) {
+      // Cadastrar novo cliente rapidamente
+      try {
+        var resCliente = await _sb.from('clients').insert({
+          store_id: CU.id,
+          name: novoNome,
+          phone: novoTel || null,
+          status: 'comprou',
+          origin: _atendCanal === 'online' ? origem : 'loja_fisica'
+        }).select().single();
+        if (resCliente.data) {
+          clienteId = resCliente.data.id;
+          _clients.unshift(resCliente.data);
+          toast('Cliente cadastrado!');
+        }
+      } catch(e) {}
+    }
+
+    // Registrar compra no cliente
+    if (clienteId) {
+      var valor = document.getElementById('atend-valor').value;
+      var descricao = (document.getElementById('atend-produto-compra').value||'').trim();
+      try {
+        await _sb.from('purchases').insert({
+          store_id: CU.id,
+          client_id: clienteId,
+          date: date,
+          description: descricao || null,
+          amount: valor ? parseFloat(valor) : null
+        });
+        // Atualizar status do cliente para 'comprou'
+        await _sb.from('clients').update({status:'comprou'}).eq('id', clienteId);
+        var cl = _clients.find(function(x){ return x.id===clienteId; });
+        if (cl) cl.status = 'comprou';
+        toast('Compra registrada no histórico!');
+      } catch(e) {}
+    }
+  }
+
+  // SE NÃO COMPROU
+  if (_atendResultado === 'nao_comprou') {
+    if (!_fluxo[date].perdas) _fluxo[date].perdas = [];
+    _fluxo[date].perdas.push({
+      canal: _atendCanal,
+      origem: origem,
+      produto: (document.getElementById('atend-perda-produto').value||'').trim(),
+      motivo: (document.getElementById('atend-perda-motivo').value||'').trim(),
+      ts: new Date().toISOString()
+    });
+  }
+
+  saveFluxoToDB(date);
+  renderFluxo();
+
+  var mo = document.getElementById('mo-atend');
+  if (mo) mo.classList.remove('open');
+  toast('Atendimento registrado!');
+}
 document.addEventListener('DOMContentLoaded', () => {
   // Tags input
   const inp=document.getElementById('tag-inp');
@@ -5775,6 +5983,92 @@ document.addEventListener('DOMContentLoaded', () => {
    <div style="display:flex;gap:10px;justify-content:flex-end;padding-top:14px;border-top:1px solid var(--border)">
     <button class="btn btn-g btn-sm" id="btn-cancela-online">Cancelar</button>
     <button class="btn btn-p btn-sm" onclick="salvarAtendOnline()">Registrar</button>
+   </div>
+  </div>
+ </div>
+</div>
+
+
+<!-- MODAL ATENDIMENTO UNIFICADO -->
+<div class="mo" id="mo-atend">
+ <div class="modal" style="max-width:420px;max-height:90vh;overflow-y:auto">
+  <div class="mh"><h3 class="mt" id="mo-atend-title">Atendimento</h3><button class="mc" id="btn-fecha-atend"></button></div>
+  <div class="mb">
+
+   <!-- ORIGEM (só para online) -->
+   <div id="atend-origem-wrap" style="display:none">
+    <div class="fg">
+     <label class="fl">Origem do atendimento</label>
+     <select id="atend-origem" class="fi" onchange="toggleAtendOutro(this.value)">
+      <option value="instagram">Instagram</option>
+      <option value="whatsapp">WhatsApp</option>
+      <option value="anuncio_instagram">Anúncio → Instagram</option>
+      <option value="anuncio_whatsapp">Anúncio → WhatsApp</option>
+      <option value="outro">Outro</option>
+     </select>
+     <input type="text" id="atend-origem-outro" class="fi" style="display:none;margin-top:6px" placeholder="Especifique o canal...">
+    </div>
+   </div>
+
+   <!-- RESULTADO -->
+   <div class="fg">
+    <label class="fl">Resultado</label>
+    <div style="display:flex;gap:8px">
+     <button class="btn btn-sm" id="btn-atend-comprou" style="flex:1;border:2px solid var(--border)" onclick="setAtendResultado('comprou')">✓ Comprou</button>
+     <button class="btn btn-sm" id="btn-atend-nao" style="flex:1;border:2px solid var(--border)" onclick="setAtendResultado('nao_comprou')">✗ Não comprou</button>
+    </div>
+   </div>
+
+   <!-- SE COMPROU: vincular/cadastrar cliente -->
+   <div id="atend-comprou-wrap" style="display:none">
+    <div class="fg">
+     <label class="fl">Cliente (opcional)</label>
+     <div style="position:relative">
+      <input type="text" id="atend-cliente-busca" class="fi" placeholder="Buscar por nome ou telefone..." autocomplete="off" oninput="buscarClienteAtend(this.value)">
+      <div id="atend-cliente-lista" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rs);z-index:100;max-height:160px;overflow-y:auto;box-shadow:var(--sh-md)"></div>
+     </div>
+     <div id="atend-cliente-sel" style="display:none;background:var(--green-l);border:1px solid var(--green);border-radius:var(--rs);padding:8px 12px;margin-top:6px;display:flex;align-items:center;justify-content:space-between">
+      <span id="atend-cliente-nome" style="font-size:13px;font-weight:600;color:var(--green)"></span>
+      <button onclick="limparClienteAtend()" style="background:none;border:none;cursor:pointer;color:var(--green);font-size:16px">×</button>
+     </div>
+     <input type="hidden" id="atend-cliente-id">
+    </div>
+    <div style="text-align:center;margin:8px 0;font-size:12px;color:var(--text3)">— ou —</div>
+    <button class="btn btn-g btn-sm" style="width:100%" onclick="abrirCadastroRapidoAtend()">+ Cadastrar novo cliente</button>
+
+    <!-- Cadastro rápido inline -->
+    <div id="atend-novo-cliente" style="display:none;background:var(--bg3);border-radius:var(--rs);padding:12px;margin-top:8px">
+     <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px">Cadastro rápido</div>
+     <div class="fg"><input type="text" id="atend-novo-nome" class="fi" placeholder="Nome *"></div>
+     <div class="fg"><input type="text" id="atend-novo-tel" class="fi" placeholder="Telefone (com DDD)"></div>
+    </div>
+
+    <!-- Valor da compra -->
+    <div class="fg" style="margin-top:8px">
+     <label class="fl">Valor da compra (opcional)</label>
+     <input type="number" id="atend-valor" class="fi" placeholder="0,00" step="0.01">
+    </div>
+    <div class="fg">
+     <label class="fl">Produto(s) comprado(s)</label>
+     <input type="text" id="atend-produto-compra" class="fi" placeholder="Ex: vestido floral + calça preta">
+    </div>
+   </div>
+
+   <!-- SE NÃO COMPROU: perda -->
+   <div id="atend-perda-wrap" style="display:none">
+    <div class="fg">
+     <label class="fl">O que buscava</label>
+     <input type="text" id="atend-perda-produto" class="fi" placeholder="Ex: calça preta G, vestido social...">
+    </div>
+    <div class="fg">
+     <label class="fl">Motivo da perda</label>
+     <input type="text" id="atend-perda-motivo" class="fi" placeholder="Ex: não tinha o tamanho, achou caro...">
+    </div>
+   </div>
+
+   <div style="display:flex;gap:10px;justify-content:flex-end;padding-top:14px;border-top:1px solid var(--border);margin-top:8px">
+    <button class="btn btn-g btn-sm" id="btn-cancela-atend">Cancelar</button>
+    <button class="btn btn-p btn-sm" onclick="salvarAtendUnificado()">Registrar</button>
    </div>
   </div>
  </div>
