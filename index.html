@@ -6013,12 +6013,18 @@ function abrirCadastroRapidoPerdaAtend() {
   if (wrap) wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
 }
 
-function excluirClienteAtual() {
+async function excluirClienteAtual() {
   var cl = window._detailClient;
   if (!cl) { toast('Abra o cliente antes de excluir.','e'); return; }
-  if (!confirm('Excluir ' + cl.name + '?\nEsta ação não pode ser desfeita.')) return;
-  _sb.from('clients').delete().eq('id', cl.id).then(function(res) {
-    if (res.error) { toast('Erro ao excluir. Tente novamente.','e'); return; }
+  if (!confirm('Excluir ' + cl.name + '?\nTodo o histórico será apagado. Esta ação não pode ser desfeita.')) return;
+  try {
+    // Deletar dependências primeiro (FK constraints)
+    await _sb.from('purchases').delete().eq('client_id', cl.id);
+    await _sb.from('observations').delete().eq('client_id', cl.id);
+    await _sb.from('contacts').delete().eq('client_id', cl.id);
+    // Deletar o cliente
+    var res = await _sb.from('clients').delete().eq('id', cl.id);
+    if (res.error) { toast('Erro: ' + res.error.message, 'e'); return; }
     _clients = _clients.filter(function(x){ return x.id !== cl.id; });
     window._detailClient = null;
     var hf = document.getElementById('detail-header-fixed');
@@ -6026,7 +6032,9 @@ function excluirClienteAtual() {
     showPage('clients');
     renderClients();
     toast(cl.name + ' excluído(a) com sucesso.');
-  });
+  } catch(e) {
+    toast('Erro ao excluir: ' + (e.message||'tente novamente'), 'e');
+  }
 }
 
 
