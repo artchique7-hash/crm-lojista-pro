@@ -2216,6 +2216,7 @@ async function showDetail(id) {
           '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
             (c.phone?'<a class="wa" href="https://wa.me/55'+(c.phone||'').replace(/\D/g,'')+'\" target="_blank">WhatsApp</a>':'')+
             '<button class="btn btn-g btn-sm" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff" onclick="openSendModal(\''+c.id+'\')">Mensagem</button>'+
+            '<button class="btn btn-d btn-sm" style="background:rgba(220,50,50,.15);border-color:rgba(220,50,50,.4);color:#ff6b6b" onclick="excluirClienteAtual()">Excluir</button>'+
             ''+
           '</div>'+
         '</div>'+
@@ -6015,6 +6016,22 @@ function abrirCadastroRapidoPerdaAtend() {
   var wrap = document.getElementById('atend-perda-novo-cliente');
   if (wrap) wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
 }
+
+function excluirClienteAtual() {
+  var cl = window._detailClient;
+  if (!cl) { toast('Nenhum cliente selecionado.', 'e'); return; }
+  if (!confirm('Excluir ' + cl.name + '? Esta ação não pode ser desfeita.')) return;
+  _sb.from('clients').delete().eq('id', cl.id).then(function(res) {
+    if (res.error) { toast('Erro ao excluir.', 'e'); return; }
+    _clients = _clients.filter(function(x){ return x.id !== cl.id; });
+    window._detailClient = null;
+    document.getElementById('detail-header-fixed').style.display = 'none';
+    showPage('clients');
+    renderClients();
+    toast(cl.name + ' excluído(a).');
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   // Tags input
   const inp=document.getElementById('tag-inp');
