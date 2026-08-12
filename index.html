@@ -1521,7 +1521,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
  </div>
  <div class="fsec"><div class="fsec-t">Observação inicial</div><textarea id="c-obs" class="fta" placeholder="Ex: Gosta de calças escuras, tem filhos pequenos..."></textarea></div>
  </div>
- <div class="mf"><button class="btn btn-g" onclick="closeClientModal()">Cancelar</button><button class="btn btn-p" style="width:auto" onclick="saveClient()">Salvar Cliente</button></div>
+ <div class="mf" style="justify-content:space-between;align-items:center"><button class="btn btn-d btn-sm" id="btn-excluir-cliente" style="display:none" onclick="excluirClienteDoModal()">🗑 Excluir</button><div style="display:flex;gap:10px"><button class="btn btn-g" onclick="closeClientModal()">Cancelar</button><button class="btn btn-p" style="width:auto" onclick="saveClient()">Salvar Cliente</button></div></div>
  </div>
 </div>
 
@@ -2216,7 +2216,6 @@ async function showDetail(id) {
           '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
             (c.phone?'<a class="wa" href="https://wa.me/55'+(c.phone||'').replace(/\D/g,'')+'\" target="_blank">WhatsApp</a>':'')+
             '<button class="btn btn-g btn-sm" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff" onclick="openSendModal(\''+c.id+'\')">Mensagem</button>'+
-            '<button class="btn btn-d btn-sm" style="background:rgba(220,50,50,.15);border-color:rgba(220,50,50,.4);color:#ff6b6b" onclick="excluirCliente(\''+c.id+'\')">Excluir</button>'+
             ''+
           '</div>'+
         '</div>'+
@@ -3171,6 +3170,7 @@ function fillSPSelect(selId,selected){
 }
 function openNewClient(){
   editCID=null; TAGS=[];
+  var btnExcl=document.getElementById('btn-excluir-cliente'); if(btnExcl) btnExcl.style.display='none';
   document.getElementById('cm-title').textContent='Novo Cliente';
   document.getElementById('edit-cid').value='';
   ['c-name','c-phone','c-city','c-region','c-addr','c-obs'].forEach(id=>document.getElementById(id).value='');
@@ -3179,6 +3179,8 @@ function openNewClient(){
   document.getElementById('c-loyalty').value='regular'; document.getElementById('c-style').value='';
   document.querySelectorAll('.ci').forEach(el=>el.classList.remove('checked'));
   fillSPSelect('c-sp',''); renderTagsDisp();
+  var btnExcl = document.getElementById('btn-excluir-cliente');
+  if (btnExcl) btnExcl.style.display = 'inline-flex';
   document.getElementById('client-modal').classList.add('open');
 }
 function openEditClient(id){
@@ -5964,6 +5966,32 @@ async function excluirCliente(id) {
     toast(cl.name + ' excluido com sucesso.');
   } catch(e) {
     toast('Erro ao excluir: ' + (e.message||'tente novamente'), 'e');
+  }
+}
+
+
+async function excluirClienteDoModal() {
+  var id = (document.getElementById('edit-cid').value || '').trim();
+  if (!id) { toast('Nenhum cliente selecionado.', 'e'); return; }
+  var cl = gC().find(function(x){ return x.id === id; }) || window._detailClient;
+  var nome = cl ? cl.name : 'este cliente';
+  if (!confirm('Excluir ' + nome + '?\nTodo o histórico será apagado permanentemente.')) return;
+  try {
+    await _sb.from('purchases').delete().eq('client_id', id);
+    await _sb.from('observations').delete().eq('client_id', id);
+    await _sb.from('contacts').delete().eq('client_id', id);
+    var res = await _sb.from('clients').delete().eq('id', id);
+    if (res.error) { toast('Erro: ' + res.error.message, 'e'); return; }
+    _clients = _clients.filter(function(x){ return x.id !== id; });
+    window._detailClient = null;
+    document.getElementById('client-modal').classList.remove('open');
+    var hf = document.getElementById('detail-header-fixed');
+    if (hf) hf.style.display = 'none';
+    showPage('clients');
+    renderClients();
+    toast(nome + ' excluído com sucesso.');
+  } catch(e) {
+    toast('Erro ao excluir: ' + (e.message || 'tente novamente'), 'e');
   }
 }
 
