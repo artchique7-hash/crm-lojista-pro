@@ -2103,18 +2103,37 @@ function filterClients() {
 function renderCTable(clients,cid) {
   const el=document.getElementById(cid); if(!el)return;
   if(!clients.length){el.innerHTML='<div class="empty"><div class="empty-i" style="font-size:34px"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="empty-t">Nenhuma cliente</div><div class="empty-d">Cadastre a primeira cliente</div></div>';return;}
-  el.innerHTML='<table class="ct"><thead><tr><th>Cliente</th><th>Telefone</th><th>Status</th><th>Origem</th><th>Score</th><th>Tags</th></tr></thead><tbody>'+
-    clients.map(c=>{
-      const col=avc(c.name), sc=calcScore(c), sl=scoreLabel(sc), tags=(c.tags||[]).slice(0,2);
-      return '<tr class="cr" onclick="showDetail(\''+c.id+'\')">'+
-        '<td><div class="nc"><div class="av-sm" style="background:'+col+'18;color:'+col+'">'+ini(c.name)+'</div><div><div style="font-weight:600">'+c.name+'</div>'+(c.city?'<div style="font-size:11px;color:var(--text3)">'+c.city+'</div>':'')+'</div></div></td>'+
-        '<td style="color:var(--text2)">'+(c.phone||'&mdash;')+'</td>'+
-        '<td><span class="badge '+(SB[c.status]||'bg-gr')+'">'+(SL[c.status]||'&mdash;')+'</span></td>'+
-        '<td style="color:var(--text2);font-size:12px">'+(OL[c.origin]||'&mdash;')+'</td>'+
-        '<td><div class="score-ring '+sl.cls+'" style="width:28px;height:28px;font-size:12px">'+sl.label+'</div></td>'+
-        '<td>'+tags.map(t=>'<span class="badge bg-g" style="margin-right:3px">'+t+'</span>').join('')+(c.tags&&c.tags.length>2?'<span style="font-size:11px;color:var(--text3)">+'+( c.tags.length-2)+'</span>':'')+'</td>'+
+  el.innerHTML='<table class="ct"><thead><tr><th>Cliente</th><th>Telefone</th><th>Status</th><th>Origem</th><th>Score</th><th>Tags</th><th></th></tr></thead><tbody>'+
+    clients.map(function(cl){
+      const col=avc(cl.name), sc=calcScore(cl), sl=scoreLabel(sc), tags=(cl.tags||[]).slice(0,2);
+      return '<tr class="cr">'+
+        '<td style="cursor:pointer" onclick="showDetail(\'' +cl.id+ '\')"><div class="nc"><div class="av-sm" style="background:'+col+'18;color:'+col+'">'+ini(cl.name)+'</div><div><div style="font-weight:600">'+cl.name+'</div>'+(cl.city?'<div style="font-size:11px;color:var(--text3)">'+cl.city+'</div>':'')+'</div></div></td>'+
+        '<td style="cursor:pointer;color:var(--text2)" onclick="showDetail(\'' +cl.id+ '\')">'+(cl.phone||'&mdash;')+'</td>'+
+        '<td style="cursor:pointer" onclick="showDetail(\'' +cl.id+ '\')"><span class="badge '+(SB[cl.status]||'bg-gr')+'">'+(SL[cl.status]||'&mdash;')+'</span></td>'+
+        '<td style="cursor:pointer;color:var(--text2);font-size:12px" onclick="showDetail(\'' +cl.id+ '\')">'+(OL[cl.origin]||'&mdash;')+'</td>'+
+        '<td style="cursor:pointer" onclick="showDetail(\'' +cl.id+ '\')"><div class="score-ring '+sl.cls+'" style="width:28px;height:28px;font-size:12px">'+sl.label+'</div></td>'+
+        '<td style="cursor:pointer" onclick="showDetail(\'' +cl.id+ '\')">'+tags.map(function(t){return '<span class="badge bg-g" style="margin-right:3px">'+t+'</span>';}).join('')+(cl.tags&&cl.tags.length>2?'<span style="font-size:11px;color:var(--text3)">+'+(cl.tags.length-2)+'</span>':'')+'</td>'+
+        '<td style="text-align:right;padding-right:8px"><button data-cid="'+cl.id+'" onclick="excluirClienteLista(this.dataset.cid)" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:20px;line-height:1;padding:2px 6px;border-radius:6px;transition:all .15s" title="Excluir" onmouseover="this.style.color=\'var(--red)\';this.style.background=\'var(--red-l)\'" onmouseout="this.style.color=\'var(--text3)\';this.style.background=\'none\'">×</button></td>'+
       '</tr>';
     }).join('')+'</tbody></table>';
+}
+
+async function excluirClienteLista(id) {
+  var cl = gC().find(function(x){ return x.id === id; });
+  var nome = cl ? cl.name : 'este cliente';
+  if (!confirm('Excluir ' + nome + '?\nEsta ação não pode ser desfeita.')) return;
+  try {
+    await _sb.from('purchases').delete().eq('client_id', id);
+    await _sb.from('observations').delete().eq('client_id', id);
+    await _sb.from('contacts').delete().eq('client_id', id);
+    var res = await _sb.from('clients').delete().eq('id', id);
+    if (res.error) { toast('Erro: ' + res.error.message, 'e'); return; }
+    _clients = _clients.filter(function(x){ return x.id !== id; });
+    renderClients();
+    toast(nome + ' excluído com sucesso.');
+  } catch(e) {
+    toast('Erro ao excluir.', 'e');
+  }
 }
 
 // ── OPPORTUNITIES ──
