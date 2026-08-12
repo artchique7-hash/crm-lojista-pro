@@ -2811,6 +2811,37 @@ function renderMsgs() {
 }
 
 
+
+function openSendModal(cid) {
+  var el = document.getElementById('send-modal');
+  if (!el) return;
+  document.getElementById('sm-cid').value = cid || '';
+  var sel = document.getElementById('sm-msg');
+  if (sel) sel.innerHTML = '<option value="">Selecionar modelo...</option>' + gM().map(function(m){ return '<option value="'+m.id+'">'+m.name+'</option>'; }).join('');
+  var selSP = document.getElementById('sm-sp');
+  if (selSP) selSP.innerHTML = '<option value="">Sem vendedora</option>' + gSP().map(function(s){ return '<option value="'+s.id+'">'+s.name+'</option>'; }).join('');
+  var pw = document.getElementById('sm-prev-wrap');
+  if (pw) pw.style.display = 'none';
+  el.classList.add('open');
+}
+function closeSendModal() {
+  var el = document.getElementById('send-modal');
+  if (el) el.classList.remove('open');
+}
+function previewMsg() {
+  var mid = document.getElementById('sm-msg').value;
+  var cid = document.getElementById('sm-cid').value;
+  var wrap = document.getElementById('sm-prev-wrap');
+  var prev = document.getElementById('sm-prev');
+  if (!mid || !wrap || !prev) { if(wrap) wrap.style.display='none'; return; }
+  var m = gM().find(function(x){ return x.id===mid; });
+  var cl = gC().find(function(x){ return x.id===cid; });
+  if (!m) { wrap.style.display='none'; return; }
+  var txt = (m.body||m.text||'').replace(/{nome}/gi, cl?cl.name:'(nome)').replace(/{loja}/gi,'nossa loja');
+  prev.textContent = txt;
+  wrap.style.display = 'block';
+}
+
 async function sendMsg(){
   const mid=document.getElementById('sm-msg').value, cid=document.getElementById('sm-cid').value, spid=document.getElementById('sm-sp').value;
   if(!mid){toast('Selecione um modelo','e');return;}
