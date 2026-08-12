@@ -2216,8 +2216,7 @@ async function showDetail(id) {
           '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
             (c.phone?'<a class="wa" href="https://wa.me/55'+(c.phone||'').replace(/\D/g,'')+'\" target="_blank">WhatsApp</a>':'')+
             '<button class="btn btn-g btn-sm" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff" onclick="openSendModal(\''+c.id+'\')">Mensagem</button>'+
-            '<button class="btn btn-g btn-sm" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff" onclick="openEditClient(\''+c.id+'\')">✏️ Editar</button>'+
-            '<button class="btn btn-d btn-sm" style="background:rgba(220,50,50,.15);border-color:rgba(220,50,50,.4);color:#ff6b6b" onclick="excluirCliente(\\\''+c.id+'\\\')">Excluir</button>'+
+            '<button class="btn btn-d btn-sm" style="background:rgba(220,50,50,.15);border-color:rgba(220,50,50,.4);color:#ff6b6b" onclick="excluirCliente(\''+c.id+'\')">Excluir</button>'+
             ''+
           '</div>'+
         '</div>'+
