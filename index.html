@@ -3182,16 +3182,12 @@ function openNewClient(){
   document.getElementById('client-modal').classList.add('open');
 }
 function openEditClient(id){
-  console.log('[SLP] openEditClient chamado com id:', id);
   let cl = gC().find(function(x){ return x.id===id; }) || (window._detailClient&&window._detailClient.id===id?window._detailClient:null);
-  console.log('[SLP] cliente encontrado em memoria:', cl ? cl.name : 'nao');
   if (cl) {
     _preencherFormEdicao(cl);
   } else {
-    console.log('[SLP] buscando no Supabase...');
     _sb.from('clients').select('*').eq('id',id).single().then(function(res){
-      console.log('[SLP] Supabase retornou:', res.data ? res.data.name : 'null', res.error);
-      if (!res.data) { alert('Cliente nao encontrado. Id: '+id); return; }
+      if (!res.data) { toast('Cliente não encontrado.','e'); return; }
       _preencherFormEdicao(res.data);
     });
   }
@@ -6019,17 +6015,59 @@ function abrirCadastroRapidoPerdaAtend() {
 
 function excluirClienteAtual() {
   var cl = window._detailClient;
-  if (!cl) { toast('Nenhum cliente selecionado.', 'e'); return; }
-  if (!confirm('Excluir ' + cl.name + '? Esta ação não pode ser desfeita.')) return;
+  if (!cl) { toast('Abra o cliente antes de excluir.','e'); return; }
+  if (!confirm('Excluir ' + cl.name + '?\nEsta ação não pode ser desfeita.')) return;
   _sb.from('clients').delete().eq('id', cl.id).then(function(res) {
-    if (res.error) { toast('Erro ao excluir.', 'e'); return; }
+    if (res.error) { toast('Erro ao excluir. Tente novamente.','e'); return; }
     _clients = _clients.filter(function(x){ return x.id !== cl.id; });
     window._detailClient = null;
-    document.getElementById('detail-header-fixed').style.display = 'none';
+    var hf = document.getElementById('detail-header-fixed');
+    if (hf) hf.style.display = 'none';
     showPage('clients');
     renderClients();
-    toast(cl.name + ' excluído(a).');
+    toast(cl.name + ' excluído(a) com sucesso.');
   });
+}
+
+
+// ── SEND MODAL ──
+function openSendModal(cid) {
+  var el = document.getElementById('send-modal');
+  if (!el) return;
+  document.getElementById('sm-cid').value = cid || '';
+  // Preencher select de mensagens
+  var sel = document.getElementById('sm-msg');
+  if (sel) {
+    sel.innerHTML = '<option value="">Selecionar modelo...</option>' +
+      gM().map(function(m){ return '<option value="'+m.id+'">'+m.name+'</option>'; }).join('');
+  }
+  // Preencher select de vendedoras
+  var selSP = document.getElementById('sm-sp');
+  if (selSP) {
+    selSP.innerHTML = '<option value="">Sem vendedora</option>' +
+      gSP().map(function(s){ return '<option value="'+s.id+'">'+s.name+'</option>'; }).join('');
+  }
+  document.getElementById('sm-prev-wrap').style.display = 'none';
+  el.classList.add('open');
+}
+
+function closeSendModal() {
+  var el = document.getElementById('send-modal');
+  if (el) el.classList.remove('open');
+}
+
+function previewMsg() {
+  var mid = document.getElementById('sm-msg').value;
+  var cid = document.getElementById('sm-cid').value;
+  var wrap = document.getElementById('sm-prev-wrap');
+  var prev = document.getElementById('sm-prev');
+  if (!mid || !wrap || !prev) { if(wrap) wrap.style.display='none'; return; }
+  var m = gM().find(function(x){ return x.id===mid; });
+  var cl = gC().find(function(x){ return x.id===cid; });
+  if (!m) { wrap.style.display='none'; return; }
+  var txt = (m.text||'').replace(/{nome}/gi, cl?cl.name:'(nome)').replace(/{loja}/gi, 'nossa loja');
+  prev.textContent = txt;
+  wrap.style.display = 'block';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
