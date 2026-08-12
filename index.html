@@ -2216,7 +2216,8 @@ async function showDetail(id) {
           '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
             (c.phone?'<a class="wa" href="https://wa.me/55'+(c.phone||'').replace(/\D/g,'')+'\" target="_blank">WhatsApp</a>':'')+
             '<button class="btn btn-g btn-sm" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff" onclick="openSendModal(\''+c.id+'\')">Mensagem</button>'+
-            '<button class="btn btn-d btn-sm" style="background:rgba(220,50,50,.15);border-color:rgba(220,50,50,.4);color:#ff6b6b" onclick="excluirClienteAtual()">Excluir</button>'+
+            '<button class="btn btn-g btn-sm" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff" onclick="openEditClient(\''+c.id+'\')">✏️ Editar</button>'+
+            '<button class="btn btn-d btn-sm" style="background:rgba(220,50,50,.15);border-color:rgba(220,50,50,.4);color:#ff6b6b" onclick="excluirCliente(\\\''+c.id+'\\\')">Excluir</button>'+
             ''+
           '</div>'+
         '</div>'+
@@ -5658,22 +5659,6 @@ function salvarProdutoWpp(){
 // ── ATENDIMENTO ONLINE COM ORIGEM ──
 var _onlineResultado = null;
 
-function abrirModalOnline() {
-  _onlineResultado = null;
-  var mo = document.getElementById('mo-online');
-  if (!mo) return;
-  document.getElementById('online-origem').value = 'instagram';
-  document.getElementById('online-origem-outro').style.display = 'none';
-  document.getElementById('online-origem-outro').value = '';
-  document.getElementById('online-perda-wrap').style.display = 'none';
-  document.getElementById('online-perda-produto').value = '';
-  document.getElementById('online-perda-motivo').value = '';
-  setResultadoOnline(null);
-  mo.classList.add('open');
-  document.getElementById('btn-fecha-online').onclick = function(){ mo.classList.remove('open'); };
-  document.getElementById('btn-cancela-online').onclick = function(){ mo.classList.remove('open'); };
-}
-
 function toggleOutroOnline(val) {
   var inp = document.getElementById('online-origem-outro');
   if (inp) inp.style.display = val === 'outro' ? 'block' : 'none';
@@ -5688,60 +5673,6 @@ function setResultadoOnline(val) {
   if (btnN) btnN.style.background = val === 'nao_comprou' ? 'var(--red)' : '';
   if (perdaWrap) perdaWrap.style.display = val === 'nao_comprou' ? 'block' : 'none';
 }
-
-function salvarAtendOnline() {
-  if (!_onlineResultado) { toast('Selecione o resultado.', 'e'); return; }
-  var origemEl = document.getElementById('online-origem');
-  var origem = origemEl ? origemEl.value : 'instagram';
-  if (origem === 'outro') {
-    var outroEl = document.getElementById('online-origem-outro');
-    origem = outroEl && outroEl.value.trim() ? outroEl.value.trim() : 'outro';
-  }
-  var date = getFluxoDate();
-  if (!_fluxo[date]) _fluxo[date] = {fisico:0, online:0, perdas:[], id:null};
-
-  // Incrementar contador online
-  _fluxo[date].online = (_fluxo[date].online || 0) + 1;
-
-  // Registrar origem
-  if (!_fluxo[date].online_origens) _fluxo[date].online_origens = [];
-  _fluxo[date].online_origens.push({
-    origem: origem,
-    resultado: _onlineResultado,
-    ts: new Date().toISOString()
-  });
-
-  // Se comprou, incrementar vendas online
-  if (_onlineResultado === 'comprou') {
-    _fluxo[date].vendas_online = (_fluxo[date].vendas_online || 0) + 1;
-  }
-
-  // Se não comprou, registrar perda
-  if (_onlineResultado === 'nao_comprou') {
-    var produto = document.getElementById('online-perda-produto').value.trim();
-    var motivo = document.getElementById('online-perda-motivo').value.trim();
-    if (!_fluxo[date].perdas) _fluxo[date].perdas = [];
-    _fluxo[date].perdas.push({
-      canal: 'online',
-      origem: origem,
-      produto: produto,
-      motivo: motivo,
-      ts: new Date().toISOString()
-    });
-  }
-
-  saveFluxoToDB(date);
-  renderFluxo();
-  var mo = document.getElementById('mo-online');
-  if (mo) mo.classList.remove('open');
-  toast('Atendimento registrado!');
-}
-
-
-// ── MODAL ATENDIMENTO UNIFICADO ──
-var _atendCanal = 'fisico';
-var _atendResultado = null;
-var _atendClienteId = null;
 
 function abrirModalAtend(canal) {
   _atendCanal = canal;
@@ -6013,69 +5944,28 @@ function abrirCadastroRapidoPerdaAtend() {
   if (wrap) wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
 }
 
-async function excluirClienteAtual() {
-  var cl = window._detailClient;
-  if (!cl) { toast('Abra o cliente antes de excluir.','e'); return; }
-  if (!confirm('Excluir ' + cl.name + '?\nTodo o histórico será apagado. Esta ação não pode ser desfeita.')) return;
+async 
+
+async function excluirCliente(id) {
+  var cl = gC().find(function(x){ return x.id===id; }) || window._detailClient;
+  if (!cl) { toast('Cliente nao encontrado.','e'); return; }
+  if (!confirm('Excluir ' + cl.name + '? Todo o historico sera apagado.')) return;
   try {
-    // Deletar dependências primeiro (FK constraints)
-    await _sb.from('purchases').delete().eq('client_id', cl.id);
-    await _sb.from('observations').delete().eq('client_id', cl.id);
-    await _sb.from('contacts').delete().eq('client_id', cl.id);
-    // Deletar o cliente
-    var res = await _sb.from('clients').delete().eq('id', cl.id);
+    await _sb.from('purchases').delete().eq('client_id', id);
+    await _sb.from('observations').delete().eq('client_id', id);
+    await _sb.from('contacts').delete().eq('client_id', id);
+    var res = await _sb.from('clients').delete().eq('id', id);
     if (res.error) { toast('Erro: ' + res.error.message, 'e'); return; }
-    _clients = _clients.filter(function(x){ return x.id !== cl.id; });
+    _clients = _clients.filter(function(x){ return x.id !== id; });
     window._detailClient = null;
     var hf = document.getElementById('detail-header-fixed');
     if (hf) hf.style.display = 'none';
     showPage('clients');
     renderClients();
-    toast(cl.name + ' excluído(a) com sucesso.');
+    toast(cl.name + ' excluido com sucesso.');
   } catch(e) {
     toast('Erro ao excluir: ' + (e.message||'tente novamente'), 'e');
   }
-}
-
-
-// ── SEND MODAL ──
-function openSendModal(cid) {
-  var el = document.getElementById('send-modal');
-  if (!el) return;
-  document.getElementById('sm-cid').value = cid || '';
-  // Preencher select de mensagens
-  var sel = document.getElementById('sm-msg');
-  if (sel) {
-    sel.innerHTML = '<option value="">Selecionar modelo...</option>' +
-      gM().map(function(m){ return '<option value="'+m.id+'">'+m.name+'</option>'; }).join('');
-  }
-  // Preencher select de vendedoras
-  var selSP = document.getElementById('sm-sp');
-  if (selSP) {
-    selSP.innerHTML = '<option value="">Sem vendedora</option>' +
-      gSP().map(function(s){ return '<option value="'+s.id+'">'+s.name+'</option>'; }).join('');
-  }
-  document.getElementById('sm-prev-wrap').style.display = 'none';
-  el.classList.add('open');
-}
-
-function closeSendModal() {
-  var el = document.getElementById('send-modal');
-  if (el) el.classList.remove('open');
-}
-
-function previewMsg() {
-  var mid = document.getElementById('sm-msg').value;
-  var cid = document.getElementById('sm-cid').value;
-  var wrap = document.getElementById('sm-prev-wrap');
-  var prev = document.getElementById('sm-prev');
-  if (!mid || !wrap || !prev) { if(wrap) wrap.style.display='none'; return; }
-  var m = gM().find(function(x){ return x.id===mid; });
-  var cl = gC().find(function(x){ return x.id===cid; });
-  if (!m) { wrap.style.display='none'; return; }
-  var txt = (m.text||'').replace(/{nome}/gi, cl?cl.name:'(nome)').replace(/{loja}/gi, 'nossa loja');
-  prev.textContent = txt;
-  wrap.style.display = 'block';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
