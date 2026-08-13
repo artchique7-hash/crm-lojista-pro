@@ -295,6 +295,20 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 
 /* MESSAGES */
 .msg-b{font-size:13px;color:var(--text2);line-height:1.6;white-space:pre-wrap;background:var(--bg4);border:1px solid var(--border);border-radius:var(--rs);padding:12px 14px}
+/* IMPORTAR CLIENTES */
+.import-drop{border:2px dashed var(--border2);border-radius:var(--r);padding:40px 20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg3)}
+.import-drop:hover,.import-drop.drag{border-color:var(--green);background:var(--green-l)}
+.import-drop-icon{font-size:36px;margin-bottom:10px}
+.import-preview{margin-top:20px}
+.import-preview-head{display:grid;grid-template-columns:1fr 160px 100px;gap:0;padding:8px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r) var(--r) 0 0;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text3)}
+.import-preview-row{display:grid;grid-template-columns:1fr 160px 100px;gap:0;padding:9px 14px;background:var(--bg2);border:1px solid var(--border);border-top:none;font-size:13px;align-items:center}
+.import-preview-row:last-child{border-radius:0 0 var(--r) var(--r)}
+.import-preview-row.skip{opacity:.4;text-decoration:line-through}
+.import-status-ok{color:var(--green);font-size:11px;font-weight:700}
+.import-status-skip{color:var(--text3);font-size:11px}
+.import-bar{height:6px;background:var(--border);border-radius:20px;overflow:hidden;margin:12px 0}
+.import-bar-fill{height:100%;background:var(--green);border-radius:20px;transition:width .3s}
+
 /* WHATSAPP AUTOMATICO */
 .wpp-divider{margin:28px 0 20px;padding-top:24px;border-top:2px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px}
 .wpp-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;margin-bottom:12px}
@@ -1733,34 +1747,8 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
       <option value="terca">Terca-feira</option>
       <option value="quarta">Quarta-feira</option>
       <option value="quinta">Quinta-feira</option>
-      <option value="sexta">Sexta-feira</option>
-      <option value="sabado">Sabado</option>
-      <option value="domingo">Domingo</option>
-      <option value="diario">Todos os dias</option>
-      <option value="personalizado">Personalizado</option>
-     </select>
-    </div>
-    <div class="fg"><label class="fl">Responsavel</label>
-    <select id="rot-resp" class="fi"><option value="">— Selecionar —</option></select>
-    <input type="text" id="rot-resp-manual" class="fi" style="display:none;margin-top:6px" placeholder="Outro nome">
-   </div>
-   <div class="fg"><label class="fl">Descricao</label><textarea id="rot-desc" class="fi" rows="3" placeholder="Descricao da rotina"></textarea></div>
-   <div class="fg"><label class="fl">Checklist (opcional)</label>
-    <div style="display:flex;gap:6px;margin-bottom:8px">
-     <input type="text" id="rot-check-input" class="fi" placeholder="Ex: Organizar vitrine">
-     <button class="btn btn-g btn-sm" onclick="addCheckRotina()" style="flex-shrink:0">+</button>
-    </div>
-    <div id="rot-check-list"></div>
-   </div>
-   <div class="mf">
-    <button class="btn btn-g btn-sm" onclick="fecharModalRotina()">Cancelar</button>
-    <button class="btn btn-p btn-sm" onclick="salvarRotina()">Salvar</button>
-   </div>
-  </div>
- </div>
-</div>
+      <option 
 
-</div>
 
 <script>
 
@@ -6071,6 +6059,317 @@ async function excluirClienteDoModal() {
   }
 }
 
+
+// ════════════════════════════════
+// IMPORTAR CLIENTES
+// ════════════════════════════════
+var _importClientes = [];
+
+function abrirImportarClientes() {
+  _importClientes = [];
+  document.getElementById('import-preview-wrap').style.display = 'none';
+  document.getElementById('import-loading').style.display = 'none';
+  document.getElementById('import-progress-wrap').style.display = 'none';
+  document.getElementById('import-drop').style.display = 'block';
+  document.getElementById('import-file-input').value = '';
+  document.getElementById('mo-importar').classList.add('open');
+}
+
+function importarArquivo(file) {
+  if (!file) return;
+  var ext = file.name.split('.').pop().toLowerCase();
+  document.getElementById('import-drop').style.display = 'none';
+  document.getElementById('import-loading').style.display = 'block';
+  document.getElementById('import-loading-txt').textContent = 'Lendo ' + file.name + '...';
+
+  if (ext === 'pdf') {
+    lerPDF(file);
+  } else if (ext === 'csv') {
+    lerCSV(file);
+  } else if (ext === 'xlsx' || ext === 'xls') {
+    lerExcel(file);
+  } else {
+    toast('Formato não suportado. Use PDF, Excel ou CSV.', 'e');
+    document.getElementById('import-loading').style.display = 'none';
+    document.getElementById('import-drop').style.display = 'block';
+  }
+}
+
+// ── Leitor de PDF via Claude API ──
+async function lerPDF(file) {
+  try {
+    var reader = new FileReader();
+    reader.onload = async function(e) {
+      var base64 = e.target.result.split(',')[1];
+      document.getElementById('import-loading-txt').textContent = 'Extraindo clientes com IA...';
+      try {
+        var resp = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-6',
+            max_tokens: 4000,
+            messages: [{
+              role: 'user',
+              content: [
+                { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } },
+                { type: 'text', text: 'Extraia todos os clientes deste PDF de cadastro. Retorne APENAS um JSON válido (sem markdown, sem texto extra) no formato: [{"nome":"...","telefone":"...","cidade":"...","email":"..."}]. Para telefone: extraia apenas os dígitos do Celular ou Telefone, removendo 0xx e formatando como (DDD) XXXXX-XXXX. Se não tiver telefone válido, deixe vazio. Nome deve estar com capitalização normal (não CAPS LOCK).' }
+              ]
+            }]
+          })
+        });
+        var data = await resp.json();
+        var texto = data.content && data.content[0] ? data.content[0].text : '';
+        var clean = texto.replace(/```json|```/g, '').trim();
+        var clientes = JSON.parse(clean);
+        _importClientes = clientes.map(function(cl) {
+          return {
+            nome: capitalize(cl.nome||''),
+            telefone: cl.telefone||'',
+            cidade: cl.cidade||'',
+            email: cl.email||''
+          };
+        }).filter(function(cl){ return cl.nome && cl.nome.length > 1; });
+        mostrarPreviewImport();
+      } catch(err) {
+        // Fallback: parser local para PDFs do Gdoor
+        lerPDFLocal(base64);
+      }
+    };
+    reader.readAsDataURL(file);
+  } catch(e) {
+    toast('Erro ao ler PDF: ' + e.message, 'e');
+    document.getElementById('import-loading').style.display = 'none';
+    document.getElementById('import-drop').style.display = 'block';
+  }
+}
+
+// ── Parser local para Gdoor (fallback) ──
+function lerPDFLocal(base64) {
+  document.getElementById('import-loading-txt').textContent = 'Processando formato Gdoor...';
+  // Decodificar base64 para texto
+  try {
+    var texto = atob(base64);
+    // Tentar extrair com regex do padrão Gdoor
+    var clientes = extrairClientesGdoor(texto);
+    if (clientes.length > 0) {
+      _importClientes = clientes;
+      mostrarPreviewImport();
+    } else {
+      toast('Não foi possível extrair clientes. Tente com arquivo Excel ou CSV.', 'e');
+      document.getElementById('import-loading').style.display = 'none';
+      document.getElementById('import-drop').style.display = 'block';
+    }
+  } catch(e) {
+    toast('Erro ao processar PDF. Use Excel ou CSV se possível.', 'e');
+    document.getElementById('import-loading').style.display = 'none';
+    document.getElementById('import-drop').style.display = 'block';
+  }
+}
+
+function extrairClientesGdoor(texto) {
+  var clientes = [];
+  var blocos = texto.split(/(?=Cliente:\s*\d+\s*-)/);
+  blocos.forEach(function(bloco) {
+    if (!bloco || bloco.indexOf('Cliente:') === -1) return;
+    var mNome = bloco.match(/Cliente:\s*\d+\s*-\s*(.+)/);
+    if (!mNome) return;
+    var nome = capitalize(mNome[1].trim());
+    if (!nome || nome.length < 2) return;
+
+    var mCidade = bloco.match(/Municpo\.:\s*([^\n]+?)(?:\s+Estado)/);
+    var cidade = mCidade ? mCidade[1].trim() : '';
+
+    var tel = '';
+    var mCel = bloco.match(/Celular\.:\s*([^\n]+)/);
+    if (mCel) {
+      var digits = mCel[1].replace(/[^\d]/g, '').replace(/^0+/, '');
+      if (digits.length >= 10) tel = formatTel(digits.slice(-11));
+    }
+    if (!tel) {
+      var mFone = bloco.match(/Telefone\.:\s*([^\n]+?)(?:\s+Celular|\n)/);
+      if (mFone) {
+        var digits2 = mFone[1].replace(/[^\d]/g, '').replace(/^0+/, '');
+        if (digits2.length >= 10) tel = formatTel(digits2.slice(-11));
+      }
+    }
+    clientes.push({ nome: nome, telefone: tel, cidade: cidade, email: '' });
+  });
+  return clientes;
+}
+
+// ── Leitor de CSV ──
+function lerCSV(file) {
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var linhas = e.target.result.split('\n');
+    var header = linhas[0].split(/[,;\t]/).map(function(h){ return h.toLowerCase().trim(); });
+    var iNome = encontrarColuna(header, ['nome','name','cliente','razao','razão']);
+    var iTel = encontrarColuna(header, ['telefone','celular','fone','phone','tel','whatsapp']);
+    var iCidade = encontrarColuna(header, ['cidade','municipio','município','city']);
+    var iEmail = encontrarColuna(header, ['email','e-mail']);
+    if (iNome === -1) { toast('Coluna de nome não encontrada no CSV.', 'e'); return; }
+    _importClientes = [];
+    for (var i = 1; i < linhas.length; i++) {
+      var cols = linhas[i].split(/[,;\t]/);
+      if (!cols[iNome] || cols[iNome].trim() === '') continue;
+      _importClientes.push({
+        nome: capitalize(cols[iNome].trim().replace(/^"|"$/g,'')),
+        telefone: iTel !== -1 ? (cols[iTel]||'').trim().replace(/^"|"$/g,'') : '',
+        cidade: iCidade !== -1 ? (cols[iCidade]||'').trim().replace(/^"|"$/g,'') : '',
+        email: iEmail !== -1 ? (cols[iEmail]||'').trim().replace(/^"|"$/g,'') : ''
+      });
+    }
+    mostrarPreviewImport();
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+// ── Leitor de Excel (usando SheetJS se disponível) ──
+function lerExcel(file) {
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      if (typeof XLSX === 'undefined') {
+        // Carregar SheetJS dinamicamente
+        var script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+        script.onload = function() { processarExcel(e.target.result); };
+        document.head.appendChild(script);
+      } else {
+        processarExcel(e.target.result);
+      }
+    } catch(err) {
+      toast('Erro ao ler Excel: ' + err.message, 'e');
+      document.getElementById('import-loading').style.display = 'none';
+      document.getElementById('import-drop').style.display = 'block';
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function processarExcel(buffer) {
+  var wb = XLSX.read(buffer, { type: 'array' });
+  var ws = wb.Sheets[wb.SheetNames[0]];
+  var dados = XLSX.utils.sheet_to_json(ws, { header: 1 });
+  if (!dados.length) { toast('Planilha vazia.', 'e'); return; }
+  var header = dados[0].map(function(h){ return String(h||'').toLowerCase().trim(); });
+  var iNome = encontrarColuna(header, ['nome','name','cliente','razao','razão']);
+  var iTel = encontrarColuna(header, ['telefone','celular','fone','phone','tel','whatsapp']);
+  var iCidade = encontrarColuna(header, ['cidade','municipio','município','city']);
+  var iEmail = encontrarColuna(header, ['email','e-mail']);
+  if (iNome === -1) { toast('Coluna de nome não encontrada na planilha.', 'e'); return; }
+  _importClientes = [];
+  for (var i = 1; i < dados.length; i++) {
+    var row = dados[i];
+    if (!row[iNome]) continue;
+    _importClientes.push({
+      nome: capitalize(String(row[iNome]||'').trim()),
+      telefone: iTel !== -1 ? String(row[iTel]||'').trim() : '',
+      cidade: iCidade !== -1 ? String(row[iCidade]||'').trim() : '',
+      email: iEmail !== -1 ? String(row[iEmail]||'').trim() : ''
+    });
+  }
+  mostrarPreviewImport();
+}
+
+// ── Utilitários ──
+function encontrarColuna(header, opcoes) {
+  for (var j = 0; j < opcoes.length; j++) {
+    var idx = header.findIndex(function(h){ return h.includes(opcoes[j]); });
+    if (idx !== -1) return idx;
+  }
+  return -1;
+}
+
+function capitalize(str) {
+  if (!str) return '';
+  return str.toLowerCase().replace(/(?:^|\s|-)\S/g, function(l){ return l.toUpperCase(); });
+}
+
+function formatTel(digits) {
+  if (!digits) return '';
+  if (digits.length === 11) return '(' + digits.slice(0,2) + ') ' + digits.slice(2,7) + '-' + digits.slice(7);
+  if (digits.length === 10) return '(' + digits.slice(0,2) + ') ' + digits.slice(2,6) + '-' + digits.slice(6);
+  return digits;
+}
+
+// ── Mostrar preview ──
+function mostrarPreviewImport() {
+  document.getElementById('import-loading').style.display = 'none';
+  document.getElementById('import-progress-wrap').style.display = 'none';
+  if (!_importClientes.length) {
+    toast('Nenhum cliente encontrado no arquivo.', 'e');
+    document.getElementById('import-drop').style.display = 'block';
+    return;
+  }
+  document.getElementById('import-count').textContent = _importClientes.length;
+  var lista = document.getElementById('import-preview-list');
+  var clientesExistentes = gC();
+  lista.innerHTML = _importClientes.slice(0, 50).map(function(cl, i) {
+    var dup = clientesExistentes.some(function(ex){
+      return ex.name.toLowerCase() === cl.nome.toLowerCase() ||
+             (cl.telefone && ex.phone && ex.phone.replace(/\D/g,'') === cl.telefone.replace(/\D/g,''));
+    });
+    return '<div class="import-preview-row' + (dup?' skip':'') + '">' +
+      '<span>' + cl.nome + (dup ? ' <span style="color:var(--gold);font-size:10px">duplicado</span>' : '') + '</span>' +
+      '<span style="color:var(--text3);font-size:12px">' + (cl.telefone||'—') + '</span>' +
+      '<span style="color:var(--text3);font-size:12px">' + (cl.cidade||'—') + '</span>' +
+    '</div>';
+  }).join('') + (_importClientes.length > 50 ? '<div style="padding:10px;font-size:12px;color:var(--text3);text-align:center">+ ' + (_importClientes.length - 50) + ' clientes (mostrando prévia de 50)</div>' : '');
+  document.getElementById('import-preview-wrap').style.display = 'block';
+}
+
+// ── Confirmar importação ──
+async function confirmarImportacao() {
+  var skipDup = document.getElementById('import-skip-dup').checked;
+  var clientesExistentes = gC();
+  var paraImportar = skipDup ? _importClientes.filter(function(cl) {
+    return !clientesExistentes.some(function(ex){
+      return ex.name.toLowerCase() === cl.nome.toLowerCase() ||
+             (cl.telefone && ex.phone && ex.phone.replace(/\D/g,'') === cl.telefone.replace(/\D/g,''));
+    });
+  }) : _importClientes;
+
+  if (!paraImportar.length) { toast('Nenhum cliente novo para importar.', 'e'); return; }
+
+  document.getElementById('import-preview-wrap').style.display = 'none';
+  document.getElementById('import-progress-wrap').style.display = 'block';
+  document.getElementById('btn-confirmar-import').disabled = true;
+
+  var total = paraImportar.length;
+  var ok = 0; var erros = 0;
+
+  // Importar em lotes de 20
+  var loteSize = 20;
+  for (var i = 0; i < paraImportar.length; i += loteSize) {
+    var lote = paraImportar.slice(i, i + loteSize);
+    var rows = lote.map(function(cl) {
+      return { store_id: CU.id, name: cl.nome, phone: cl.telefone||null, city: cl.cidade||null, status: 'comprou', origin: 'importacao' };
+    });
+    try {
+      var res = await _sb.from('clients').insert(rows).select();
+      if (res.data) {
+        res.data.forEach(function(r){ _clients.unshift(r); });
+        ok += res.data.length;
+      }
+      if (res.error) erros += lote.length;
+    } catch(e) { erros += lote.length; }
+
+    var pct = Math.round(((i + lote.length) / total) * 100);
+    document.getElementById('import-bar-fill').style.width = pct + '%';
+    document.getElementById('import-progress-txt').textContent = 'Importando ' + Math.min(i+loteSize, total) + ' de ' + total + '...';
+  }
+
+  document.getElementById('import-progress-txt').textContent = '✓ Concluído!';
+  document.getElementById('import-progress-sub').textContent = ok + ' clientes importados' + (erros ? ' · ' + erros + ' erros' : '');
+  renderClients();
+  updateBadges();
+  setTimeout(function(){
+    document.getElementById('mo-importar').classList.remove('open');
+    toast(ok + ' clientes importados com sucesso!');
+  }, 1800);
+}
 document.addEventListener('DOMContentLoaded', () => {
   // Tags input
   const inp=document.getElementById('tag-inp');
@@ -6095,152 +6394,5 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 </script>
-
-<!-- MODAL ATENDIMENTO ONLINE -->
-<div class="mo" id="mo-online">
- <div class="modal" style="max-width:380px">
-  <div class="mh"><h3 class="mt">Atendimento Online</h3><button class="mc" id="btn-fecha-online"></button></div>
-  <div class="mb">
-   <div class="fg">
-    <label class="fl">Origem do atendimento *</label>
-    <select id="online-origem" class="fi" onchange="toggleOutroOnline(this.value)">
-     <option value="instagram">Instagram</option>
-     <option value="whatsapp">WhatsApp</option>
-     <option value="anuncio_instagram">Anúncio → Instagram</option>
-     <option value="anuncio_whatsapp">Anúncio → WhatsApp</option>
-     <option value="outro">Outro</option>
-    </select>
-    <input type="text" id="online-origem-outro" class="fi" style="display:none;margin-top:6px" placeholder="Especifique o canal...">
-   </div>
-   <div class="fg">
-    <label class="fl">Resultado</label>
-    <div style="display:flex;gap:8px">
-     <button class="btn btn-p btn-sm" style="flex:1" id="btn-online-comprou" onclick="setResultadoOnline('comprou')">✓ Comprou</button>
-     <button class="btn btn-g btn-sm" style="flex:1" id="btn-online-nao-comprou" onclick="setResultadoOnline('nao_comprou')">✗ Não comprou</button>
-    </div>
-   </div>
-   <div id="online-perda-wrap" style="display:none">
-    <div class="fg">
-     <label class="fl">O que buscava</label>
-     <input type="text" id="online-perda-produto" class="fi" placeholder="Ex: vestido social, calça preta G...">
-    </div>
-    <div class="fg">
-     <label class="fl">Motivo da perda</label>
-     <input type="text" id="online-perda-motivo" class="fi" placeholder="Ex: não tinha o tamanho, achou caro...">
-    </div>
-   </div>
-   <div style="display:flex;gap:10px;justify-content:flex-end;padding-top:14px;border-top:1px solid var(--border)">
-    <button class="btn btn-g btn-sm" id="btn-cancela-online">Cancelar</button>
-    <button class="btn btn-p btn-sm" onclick="salvarAtendOnline()">Registrar</button>
-   </div>
-  </div>
- </div>
-</div>
-
-
-<!-- MODAL ATENDIMENTO UNIFICADO -->
-<div class="mo" id="mo-atend">
- <div class="modal" style="max-width:420px;max-height:90vh;overflow-y:auto">
-  <div class="mh"><h3 class="mt" id="mo-atend-title">Atendimento</h3><button class="mc" id="btn-fecha-atend"></button></div>
-  <div class="mb">
-
-   <!-- ORIGEM (só para online) -->
-   <div id="atend-origem-wrap" style="display:none">
-    <div class="fg">
-     <label class="fl">Origem do atendimento</label>
-     <select id="atend-origem" class="fi" onchange="toggleAtendOutro(this.value)">
-      <option value="instagram">Instagram</option>
-      <option value="whatsapp">WhatsApp</option>
-      <option value="anuncio_instagram">Anúncio → Instagram</option>
-      <option value="anuncio_whatsapp">Anúncio → WhatsApp</option>
-      <option value="outro">Outro</option>
-     </select>
-     <input type="text" id="atend-origem-outro" class="fi" style="display:none;margin-top:6px" placeholder="Especifique o canal...">
-    </div>
-   </div>
-
-   <!-- RESULTADO -->
-   <div class="fg">
-    <label class="fl">Resultado</label>
-    <div style="display:flex;gap:8px">
-     <button class="btn btn-sm" id="btn-atend-comprou" style="flex:1;border:2px solid var(--border)" onclick="setAtendResultado('comprou')">✓ Comprou</button>
-     <button class="btn btn-sm" id="btn-atend-nao" style="flex:1;border:2px solid var(--border)" onclick="setAtendResultado('nao_comprou')">✗ Não comprou</button>
-    </div>
-   </div>
-
-   <!-- SE COMPROU: vincular/cadastrar cliente -->
-   <div id="atend-comprou-wrap" style="display:none">
-    <div class="fg">
-     <label class="fl">Cliente (opcional)</label>
-     <div style="position:relative">
-      <input type="text" id="atend-cliente-busca" class="fi" placeholder="Buscar por nome ou telefone..." autocomplete="off" oninput="buscarClienteAtend(this.value)">
-      <div id="atend-cliente-lista" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rs);z-index:100;max-height:160px;overflow-y:auto;box-shadow:var(--sh-md)"></div>
-     </div>
-     <div id="atend-cliente-sel" style="display:none;background:var(--green-l);border:1px solid var(--green);border-radius:var(--rs);padding:8px 12px;margin-top:6px;display:flex;align-items:center;justify-content:space-between">
-      <span id="atend-cliente-nome" style="font-size:13px;font-weight:600;color:var(--green)"></span>
-      <button onclick="limparClienteAtend()" style="background:none;border:none;cursor:pointer;color:var(--green);font-size:16px">×</button>
-     </div>
-     <input type="hidden" id="atend-cliente-id">
-    </div>
-    <div style="text-align:center;margin:8px 0;font-size:12px;color:var(--text3)">— ou —</div>
-    <button class="btn btn-g btn-sm" style="width:100%" onclick="abrirCadastroRapidoAtend()">+ Cadastrar novo cliente</button>
-
-    <!-- Cadastro rápido inline -->
-    <div id="atend-novo-cliente" style="display:none;background:var(--bg3);border-radius:var(--rs);padding:12px;margin-top:8px">
-     <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px">Cadastro rápido</div>
-     <div class="fg"><input type="text" id="atend-novo-nome" class="fi" placeholder="Nome *"></div>
-     <div class="fg"><input type="text" id="atend-novo-tel" class="fi" placeholder="Telefone (com DDD)"></div>
-    </div>
-
-    <!-- Valor da compra -->
-    <div class="fg" style="margin-top:8px">
-     <label class="fl">Valor da compra (opcional)</label>
-     <input type="number" id="atend-valor" class="fi" placeholder="0,00" step="0.01">
-    </div>
-    <div class="fg">
-     <label class="fl">Produto(s) comprado(s)</label>
-     <input type="text" id="atend-produto-compra" class="fi" placeholder="Ex: vestido floral + calça preta">
-    </div>
-   </div>
-
-   <!-- SE NÃO COMPROU: perda -->
-   <div id="atend-perda-wrap" style="display:none">
-    <div class="fg">
-     <label class="fl">O que buscava</label>
-     <input type="text" id="atend-perda-produto" class="fi" placeholder="Ex: calça preta G, vestido social...">
-    </div>
-    <div class="fg">
-     <label class="fl">Motivo da perda</label>
-     <input type="text" id="atend-perda-motivo" class="fi" placeholder="Ex: não tinha o tamanho, achou caro...">
-    </div>
-    <!-- Cliente (opcional) para não comprou -->
-    <div class="fg">
-     <label class="fl">Cliente (opcional)</label>
-     <div style="position:relative">
-      <input type="text" id="atend-perda-cliente-busca" class="fi" placeholder="Buscar por nome ou telefone..." autocomplete="off" oninput="buscarClientePerdaAtend(this.value)">
-      <div id="atend-perda-cliente-lista" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rs);z-index:100;max-height:140px;overflow-y:auto;box-shadow:var(--sh-md)"></div>
-     </div>
-     <div id="atend-perda-cliente-sel" style="display:none;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:8px 12px;margin-top:6px;display:flex;align-items:center;justify-content:space-between">
-      <span id="atend-perda-cliente-nome" style="font-size:13px;font-weight:600"></span>
-      <button onclick="limparClientePerdaAtend()" style="background:none;border:none;cursor:pointer;font-size:16px">×</button>
-     </div>
-     <input type="hidden" id="atend-perda-cliente-id">
-    </div>
-    <button class="btn btn-g btn-sm" style="width:100%;margin-top:4px" onclick="abrirCadastroRapidoPerdaAtend()">+ Cadastrar novo cliente</button>
-    <div id="atend-perda-novo-cliente" style="display:none;background:var(--bg3);border-radius:var(--rs);padding:12px;margin-top:8px">
-     <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px">Cadastro rápido</div>
-     <div class="fg"><input type="text" id="atend-perda-novo-nome" class="fi" placeholder="Nome *"></div>
-     <div class="fg"><input type="text" id="atend-perda-novo-tel" class="fi" placeholder="Telefone (com DDD)"></div>
-    </div>
-   </div>
-
-   <div style="display:flex;gap:10px;justify-content:flex-end;padding-top:14px;border-top:1px solid var(--border);margin-top:8px">
-    <button class="btn btn-g btn-sm" id="btn-cancela-atend">Cancelar</button>
-    <button class="btn btn-p btn-sm" onclick="salvarAtendUnificado()">Registrar</button>
-   </div>
-  </div>
- </div>
-</div>
-
 </body>
 </html>
