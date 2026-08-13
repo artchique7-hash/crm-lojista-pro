@@ -6145,42 +6145,32 @@ function importarArquivo(file) {
 // ── Leitor de PDF via Claude API ──
 async function lerPDF(file) {
   try {
+    document.getElementById('import-loading-txt').textContent = 'Lendo PDF...';
     var reader = new FileReader();
-    reader.onload = async function(e) {
-      var base64 = e.target.result.split(',')[1];
-      document.getElementById('import-loading-txt').textContent = 'Extraindo clientes com IA...';
+    reader.onload = function(e) {
       try {
-        var resp = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: 'claude-sonnet-4-6',
-            max_tokens: 4000,
-            messages: [{
-              role: 'user',
-              content: [
-                { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } },
-                { type: 'text', text: 'Extraia todos os clientes deste PDF de cadastro. Retorne APENAS um JSON válido (sem markdown, sem texto extra) no formato: [{"nome":"...","telefone":"...","cidade":"...","email":"..."}]. Para telefone: extraia apenas os dígitos do Celular ou Telefone, removendo 0xx e formatando como (DDD) XXXXX-XXXX. Se não tiver telefone válido, deixe vazio. Nome deve estar com capitalização normal (não CAPS LOCK).' }
-              ]
-            }]
-          })
-        });
-        var data = await resp.json();
-        var texto = data.content && data.content[0] ? data.content[0].text : '';
-        var clean = texto.replace(/```json|```/g, '').trim();
-        var clientes = JSON.parse(clean);
-        _importClientes = clientes.map(function(cl) {
-          return {
-            nome: capitalize(cl.nome||''),
-            telefone: cl.telefone||'',
-            cidade: cl.cidade||'',
-            email: cl.email||''
+        // Tentar extrair texto do PDF usando PDF.js se disponível
+        if (typeof pdfjsLib !== 'undefined') {
+          lerPDFcomPDFJS(e.target.result);
+        } else {
+          // Carregar PDF.js dinamicamente
+          var script = document.createElement('script');
+          script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+          script.onload = function() {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+            lerPDFcomPDFJS(e.target.result);
           };
-        }).filter(function(cl){ return cl.nome && cl.nome.length > 1; });
-        mostrarPreviewImport();
+          script.onerror = function() {
+            // Se não carregar PDF.js, tentar extração direta
+            var base64 = e.target.result.split(',')[1];
+            lerPDFLocal(atob(base64));
+          };
+          document.head.appendChild(script);
+        }
       } catch(err) {
-        // Fallback: parser local para PDFs do Gdoor
-        lerPDFLocal(base64);
+        toast('Erro ao processar PDF. Tente converter para CSV ou Excel.', 'e');
+        document.getElementById('import-loading').style.display = 'none';
+        document.getElementById('import-drop').style.display = 'block';
       }
     };
     reader.readAsDataURL(file);
@@ -6191,19 +6181,41 @@ async function lerPDF(file) {
   }
 }
 
-// ── Parser local para Gdoor (fallback) ──
-function lerPDFLocal(base64) {
-  document.getElementById('import-loading-txt').textContent = 'Processando formato Gdoor...';
-  // Decodificar base64 para texto
+async function lerPDFcomPDFJS(dataUrl) {
   try {
-    var texto = atob(base64);
-    // Tentar extrair com regex do padrão Gdoor
+    document.getElementById('import-loading-txt').textContent = 'Extraindo texto do PDF...';
+    var base64 = dataUrl.split(',')[1];
+    var binary = atob(base64);
+    var bytes = new Uint8Array(binary.length);
+    for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+
+    var pdf = await pdfjsLib.getDocument({data: bytes}).promise;
+    var textoTotal = '';
+    for (var p = 1; p <= pdf.numPages; p++) {
+      var page = await pdf.getPage(p);
+      var content = await page.getTextContent();
+      textoTotal += content.items.map(function(s){ return s.str; }).join(' ') + '\n';
+    }
+    document.getElementById('import-loading-txt').textContent = 'Identificando clientes...';
+    lerPDFLocal(textoTotal);
+  } catch(err) {
+    toast('Não foi possível ler o PDF. Tente converter para CSV ou Excel.', 'e');
+    document.getElementById('import-loading').style.display = 'none';
+    document.getElementById('import-drop').style.display = 'block';
+  }
+}
+
+
+// ── Parser local — recebe texto já extraído ──
+function lerPDFLocal(texto) {
+  document.getElementById('import-loading-txt').textContent = 'Identificando clientes...';
+  try {
     var clientes = extrairClientesGdoor(texto);
     if (clientes.length > 0) {
       _importClientes = clientes;
       mostrarPreviewImport();
     } else {
-      toast('Não foi possível extrair clientes. Tente com arquivo Excel ou CSV.', 'e');
+      toast('Nenhum cliente identificado no PDF. Tente converter para CSV ou Excel.', 'e');
       document.getElementById('import-loading').style.display = 'none';
       document.getElementById('import-drop').style.display = 'block';
     }
@@ -6216,33 +6228,88 @@ function lerPDFLocal(base64) {
 
 function extrairClientesGdoor(texto) {
   var clientes = [];
-  var blocos = texto.split(/(?=Cliente:\s*\d+\s*-)/);
-  blocos.forEach(function(bloco) {
-    if (!bloco || bloco.indexOf('Cliente:') === -1) return;
-    var mNome = bloco.match(/Cliente:\s*\d+\s*-\s*(.+)/);
-    if (!mNome) return;
-    var nome = capitalize(mNome[1].trim());
-    if (!nome || nome.length < 2) return;
 
-    var mCidade = bloco.match(/Municpo\.:\s*([^\n]+?)(?:\s+Estado)/);
-    var cidade = mCidade ? mCidade[1].trim() : '';
+  // ── Formato 1: Gdoor (Cliente: 000001 - Nome) ──
+  if (texto.indexOf('Cliente:') !== -1) {
+    var blocos = texto.split(/(?=Cliente:\s*\d+\s*-)/);
+    blocos.forEach(function(bloco) {
+      if (!bloco || bloco.indexOf('Cliente:') === -1) return;
+      var mNome = bloco.match(/Cliente:\s*\d+\s*-\s*(.+)/);
+      if (!mNome) return;
+      var nome = capitalize(mNome[1].trim());
+      if (!nome || nome.length < 2) return;
+      var mCidade = bloco.match(/Munic[^.]*\.:\s*([^\n]+?)(?:\s+Estado)/);
+      var cidade = mCidade ? mCidade[1].trim() : '';
+      var tel = extrairTelefoneTexto(bloco, 'Celular') || extrairTelefoneTexto(bloco, 'Telefone');
+      clientes.push({ nome: nome, telefone: tel, cidade: cidade, email: '' });
+    });
+    if (clientes.length > 0) return clientes;
+  }
 
-    var tel = '';
-    var mCel = bloco.match(/Celular\.:\s*([^\n]+)/);
-    if (mCel) {
-      var digits = mCel[1].replace(/[^\d]/g, '').replace(/^0+/, '');
-      if (digits.length >= 10) tel = formatTel(digits.slice(-11));
-    }
-    if (!tel) {
-      var mFone = bloco.match(/Telefone\.:\s*([^\n]+?)(?:\s+Celular|\n)/);
-      if (mFone) {
-        var digits2 = mFone[1].replace(/[^\d]/g, '').replace(/^0+/, '');
-        if (digits2.length >= 10) tel = formatTel(digits2.slice(-11));
+  // ── Formato 2: Linhas com Nome e Telefone (genérico) ──
+  // Detectar padrão: linha com nome + linha com telefone, ou coluna separada
+  var linhas = texto.split(/\n|\r/).map(function(l){ return l.trim(); }).filter(Boolean);
+
+  // Tentar encontrar padrão tabular — primeira linha com cabeçalho
+  var cabecalho = linhas[0] ? linhas[0].toLowerCase() : '';
+  var temCabecalho = ['nome','telefone','celular','cliente','fone','name'].some(function(p){ return cabecalho.indexOf(p) !== -1; });
+
+  if (temCabecalho) {
+    // Detectar separador
+    var sep = linhas[0].indexOf(';') !== -1 ? ';' : linhas[0].indexOf('\t') !== -1 ? '\t' : ',';
+    var cols = linhas[0].split(sep).map(function(h){ return h.toLowerCase().trim(); });
+    var iNome = encontrarColuna(cols, ['nome','name','cliente','razao']);
+    var iTel  = encontrarColuna(cols, ['telefone','celular','fone','phone','tel','whatsapp']);
+    var iCidade = encontrarColuna(cols, ['cidade','municipio','município']);
+    if (iNome !== -1) {
+      for (var i = 1; i < linhas.length; i++) {
+        var parts = linhas[i].split(sep);
+        if (!parts[iNome] || parts[iNome].trim() === '') continue;
+        clientes.push({
+          nome: capitalize(parts[iNome].trim()),
+          telefone: iTel !== -1 ? limparTel(parts[iTel]||'') : '',
+          cidade: iCidade !== -1 ? (parts[iCidade]||'').trim() : '',
+          email: ''
+        });
       }
+      if (clientes.length > 0) return clientes;
     }
-    clientes.push({ nome: nome, telefone: tel, cidade: cidade, email: '' });
-  });
+  }
+
+  // ── Formato 3: Extrair nomes e telefones por heurística ──
+  // Procurar linhas que parecem ser nomes (2+ palavras, sem números)
+  // e linhas seguintes com telefone
+  var telRegex = /(\(?\d{2}\)?\s?\d{4,5}[-\s]?\d{4}|\d{10,11})/g;
+  for (var j = 0; j < linhas.length; j++) {
+    var linha = linhas[j];
+    // Verificar se parece um nome (só letras, espaços, acentos)
+    if (/^[A-ZÀ-Ú][a-zA-ZÀ-ú\s]{3,50}$/.test(linha) && linha.split(' ').length >= 1) {
+      var tel = '';
+      // Procurar telefone nas próximas 3 linhas
+      for (var k = j+1; k < Math.min(j+4, linhas.length); k++) {
+        var mTel = linhas[k].match(telRegex);
+        if (mTel) { tel = limparTel(mTel[0]); break; }
+      }
+      clientes.push({ nome: capitalize(linha), telefone: tel, cidade: '', email: '' });
+    }
+  }
+
   return clientes;
+}
+
+function extrairTelefoneTexto(texto, campo) {
+  var regex = new RegExp(campo + '\\.:\\s*([^\\n]+)');
+  var m = texto.match(regex);
+  if (!m) return '';
+  var digits = m[1].replace(/[^\d]/g, '').replace(/^0+/, '');
+  if (digits.length >= 10) return formatTel(digits.slice(-11));
+  return '';
+}
+
+function limparTel(str) {
+  var digits = (str||'').replace(/[^\d]/g, '').replace(/^0+/, '');
+  if (digits.length >= 10) return formatTel(digits.slice(-11));
+  return str;
 }
 
 // ── Leitor de CSV ──
