@@ -2816,8 +2816,17 @@ function openSendModal(cid) {
   var el = document.getElementById('send-modal');
   if (!el) return;
   document.getElementById('sm-cid').value = cid || '';
+  // Usar mensagens da Central de Atendimento (_caMsgs)
+  var msgs = _caMsgs || [];
   var sel = document.getElementById('sm-msg');
-  if (sel) sel.innerHTML = '<option value="">Selecionar modelo...</option>' + gM().map(function(m){ return '<option value="'+m.id+'">'+m.name+'</option>'; }).join('');
+  if (sel) {
+    if (!msgs.length) {
+      sel.innerHTML = '<option value="">Nenhum modelo cadastrado</option>';
+    } else {
+      sel.innerHTML = '<option value="">Selecionar modelo...</option>' +
+        msgs.map(function(m){ return '<option value="'+m.id+'">['+((m.cat||'geral').toUpperCase())+'] '+m.titulo+'</option>'; }).join('');
+    }
+  }
   var selSP = document.getElementById('sm-sp');
   if (selSP) selSP.innerHTML = '<option value="">Sem vendedora</option>' + gSP().map(function(s){ return '<option value="'+s.id+'">'+s.name+'</option>'; }).join('');
   var pw = document.getElementById('sm-prev-wrap');
@@ -2834,24 +2843,41 @@ function previewMsg() {
   var wrap = document.getElementById('sm-prev-wrap');
   var prev = document.getElementById('sm-prev');
   if (!mid || !wrap || !prev) { if(wrap) wrap.style.display='none'; return; }
-  var m = gM().find(function(x){ return x.id===mid; });
+  var m = (_caMsgs||[]).find(function(x){ return x.id===mid; });
   var cl = gC().find(function(x){ return x.id===cid; });
   if (!m) { wrap.style.display='none'; return; }
-  var txt = (m.body||m.text||'').replace(/{nome}/gi, cl?cl.name:'(nome)').replace(/{loja}/gi,'nossa loja');
+  var nome = cl ? cl.name.split(' ')[0] : '{nome}';
+  var txt = (m.corpo||'').replace(/{nome}/gi, nome).replace(/{loja}/gi, (CU&&CU.store)||'nossa loja');
   prev.textContent = txt;
   wrap.style.display = 'block';
 }
 
 async function sendMsg(){
-  const mid=document.getElementById('sm-msg').value, cid=document.getElementById('sm-cid').value, spid=document.getElementById('sm-sp').value;
-  if(!mid){toast('Selecione um modelo','e');return;}
-  const m=gM().find(x=>x.id===mid), c=gC().find(x=>x.id===cid); if(!m||!c)return;
-  const text=m.body.replace(/\{nome\}/g,c.name.split(' ')[0]).replace(/\{loja\}/g,CU.store);
-  const sp=gSP().find(s=>s.id===spid);
-  await _sb.from('sent_log').insert({store_id:CU.id,client_id:cid,client_name:c.name,message_id:mid||null,message_title:m.title,message_type:m.type,salesperson:sp?.name||null});
+  var mid=document.getElementById('sm-msg').value;
+  var cid=document.getElementById('sm-cid').value;
+  var spid=document.getElementById('sm-sp').value;
+  if(!mid){ toast('Selecione um modelo.','e'); return; }
+  var m = (_caMsgs||[]).find(function(x){ return x.id===mid; });
+  var cl = gC().find(function(x){ return x.id===cid; });
+  if(!m){ toast('Modelo não encontrado.','e'); return; }
+  if(!cl){ toast('Cliente não encontrado.','e'); return; }
+  var nome = cl.name.split(' ')[0];
+  var loja = (CU&&CU.store)||'nossa loja';
+  var text = (m.corpo||'').replace(/{nome}/gi, nome).replace(/{loja}/gi, loja);
+  var sp = gSP().find(function(s){ return s.id===spid; });
+  try {
+    await _sb.from('sent_log').insert({
+      store_id: CU.id, client_id: cid, client_name: cl.name,
+      message_id: mid||null, message_title: m.titulo||'',
+      message_type: m.cat||'outro', salesperson: sp?sp.name:null
+    });
+  } catch(e) {}
   closeSendModal();
-  if(c.phone) window.open('https://wa.me/55'+(c.phone||'').replace(/\D/g,'')+'?text='+encodeURIComponent(text),'_blank');
-  else toast('Cliente sem telefone','e');
+  if(cl.phone) {
+    window.open('https://wa.me/55'+(cl.phone||'').replace(/\D/g,'')+'?text='+encodeURIComponent(text),'_blank');
+  } else {
+    toast('Cliente sem telefone cadastrado.','e');
+  }
 }
 
 // ── SALESPEOPLE ──
