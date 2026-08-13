@@ -1747,8 +1747,34 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
       <option value="terca">Terca-feira</option>
       <option value="quarta">Quarta-feira</option>
       <option value="quinta">Quinta-feira</option>
-      <option 
-
+      <option value="sexta">Sexta-feira</option>
+      <option value="sabado">Sabado</option>
+      <option value="domingo">Domingo</option>
+      <option value="diario">Todos os dias</option>
+      <option value="personalizado">Personalizado</option>
+     </select>
+    </div>
+    <div class="fg"><label class="fl">Horario</label><input type="time" id="rot-hora" class="fi"></div>
+   </div>
+   <div class="fg"><label class="fl">Responsavel</label>
+    <select id="rot-resp" class="fi"><option value="">— Selecionar —</option></select>
+    <input type="text" id="rot-resp-manual" class="fi" style="display:none;margin-top:6px" placeholder="Outro nome">
+   </div>
+   <div class="fg"><label class="fl">Descricao</label><textarea id="rot-desc" class="fi" rows="3"></textarea></div>
+   <div class="fg"><label class="fl">Checklist (opcional)</label>
+    <div style="display:flex;gap:6px;margin-bottom:8px">
+     <input type="text" id="rot-check-input" class="fi" placeholder="Item do checklist">
+     <button class="btn btn-g btn-sm" onclick="addCheckRotina()" style="flex-shrink:0">+</button>
+    </div>
+    <div id="rot-check-list"></div>
+   </div>
+   <div class="mf">
+    <button class="btn btn-g btn-sm" onclick="fecharModalRotina()">Cancelar</button>
+    <button class="btn btn-p btn-sm" onclick="salvarRotina()">Salvar</button>
+   </div>
+  </div>
+ </div>
+</div>
 
 <script>
 
