@@ -6441,5 +6441,60 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 </script>
+
+<!-- MODAL IMPORTAR CLIENTES -->
+<div class="mo" id="mo-importar">
+ <div class="modal" style="max-width:640px;max-height:90vh;overflow-y:auto">
+  <div class="mh">
+   <h3 class="mt">Importar Clientes</h3>
+   <button class="mc" onclick="document.getElementById('mo-importar').classList.remove('open')"></button>
+  </div>
+  <div class="mb">
+   <div style="background:var(--bg3);border-radius:var(--rs);padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--text2)">
+    Aceita <strong>PDF</strong> do Gdoor e outros sistemas · <strong>Excel (.xlsx)</strong> · <strong>CSV (.csv)</strong>
+   </div>
+   <div class="import-drop" id="import-drop" onclick="document.getElementById('import-file-input').click()"
+        ondragover="event.preventDefault();this.classList.add('drag')"
+        ondragleave="this.classList.remove('drag')"
+        ondrop="event.preventDefault();this.classList.remove('drag');importarArquivo(event.dataTransfer.files[0])">
+    <div class="import-drop-icon">📂</div>
+    <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px">Clique ou arraste o arquivo aqui</div>
+    <div style="font-size:12px;color:var(--text3)">PDF, Excel ou CSV</div>
+    <input type="file" id="import-file-input" accept=".pdf,.xlsx,.xls,.csv" style="display:none" onchange="importarArquivo(this.files[0])">
+   </div>
+   <div id="import-loading" style="display:none;text-align:center;padding:24px 0">
+    <div style="font-size:24px;margin-bottom:8px">⏳</div>
+    <div style="font-size:13px;color:var(--text2)" id="import-loading-txt">Lendo arquivo...</div>
+   </div>
+   <div id="import-preview-wrap" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin:16px 0 10px">
+     <div>
+      <span id="import-count" style="font-size:15px;font-weight:700;color:var(--green)"></span>
+      <span style="font-size:13px;color:var(--text3);margin-left:6px">clientes encontrados</span>
+     </div>
+     <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text3);cursor:pointer">
+      <input type="checkbox" id="import-skip-dup" checked> Ignorar duplicados
+     </label>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 160px 100px;padding:8px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r) var(--r) 0 0;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text3)">
+     <span>Nome</span><span>Telefone</span><span>Cidade</span>
+    </div>
+    <div id="import-preview-list" style="max-height:280px;overflow-y:auto;border:1px solid var(--border);border-top:none;border-radius:0 0 var(--r) var(--r)"></div>
+    <div style="padding-top:16px;border-top:1px solid var(--border);margin-top:12px;display:flex;justify-content:space-between;align-items:center">
+     <button class="btn btn-g btn-sm" onclick="document.getElementById('import-file-input').click()">Trocar arquivo</button>
+     <button class="btn btn-p btn-sm" onclick="confirmarImportacao()">Importar clientes</button>
+    </div>
+   </div>
+   <div id="import-progress-wrap" style="display:none;padding:16px 0">
+    <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px" id="import-progress-txt">Importando...</div>
+    <div style="height:6px;background:var(--border);border-radius:20px;overflow:hidden;margin-bottom:5px">
+     <div style="height:100%;background:var(--green);border-radius:20px;transition:width .3s" id="import-bar-fill" style="width:0%"></div>
+    </div>
+    <div style="font-size:12px;color:var(--text3)" id="import-progress-sub"></div>
+   </div>
+  </div>
+ </div>
+</div>
+
 </body>
 </html>
