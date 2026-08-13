@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Sistema Loja Previsivel — SLP v3.0</title>
+<title>Sistema Loja Previsivel — SLP v3.1</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
@@ -1768,12 +1768,15 @@ const gLog= () => _log;
 async function loadAll() {
   if (!CU) return;
   const [c, s, m, l] = await Promise.all([
-    _sb.from('clients').select('*').eq('store_id', CU.id).order('created_at', {ascending:false}),
+    _sb.from('clients').select('*, purchases(*)').eq('store_id', CU.id).order('created_at', {ascending:false}),
     _sb.from('salespeople').select('*').eq('store_id', CU.id).order('name'),
     _sb.from('messages').select('*').eq('store_id', CU.id).order('created_at'),
     _sb.from('sent_log').select('*').eq('store_id', CU.id).order('sent_at', {ascending:false}),
   ]);
-  _clients = c.data || [];
+  _clients = (c.data || []).map(function(cl) {
+    cl.purchases = cl.purchases || [];
+    return cl;
+  });
   _sp = s.data || [];
   _msgs = m.data || [];
   _log = l.data || [];
@@ -3347,10 +3350,12 @@ function updateBadges(){
   const c=gC();
   var sbc=document.getElementById('sb-c'); if(sbc){sbc.textContent=c.length;sbc.style.display=c.length?'inline':'none';}
   var sb2=document.getElementById('sb-c2'); if(sb2){sb2.textContent=c.length;sb2.style.display=c.length?'inline':'none';}
-  var sb2=document.getElementById('sb-c2'); if(sb2){sb2.textContent=c.length;sb2.style.display=c.length?'inline':'none';}
   const bd=getBD(c); document.getElementById('sb-bd').textContent=bd.length; document.getElementById('sb-bd').style.display=bd.length?'inline':'none';
   const ia=getIA(c); document.getElementById('sb-in').textContent=ia.length; document.getElementById('sb-in').style.display=ia.length?'inline':'none';
   const rem=getReminders(c); document.getElementById('sb-rem').textContent=rem.length; document.getElementById('sb-rem').style.display=rem.length?'inline':'none';
+  // Pós-venda badge
+  const pv=getPS(c);
+  var sbpv=document.getElementById('sb-pv'); if(sbpv){sbpv.textContent=pv.length;sbpv.style.display=pv.length?'inline':'none';}
 }
 
 // ── INIT ──
@@ -5891,21 +5896,31 @@ async function salvarAtendUnificado() {
     var clienteId = _atendClienteId;
 
     if (novoNome && !clienteId) {
-      // Cadastrar novo cliente rapidamente
-      try {
-        var resCliente = await _sb.from('clients').insert({
-          store_id: CU.id,
-          name: novoNome,
-          phone: novoTel || null,
-          status: 'comprou',
-          origin: _atendCanal === 'online' ? origem : 'loja_fisica'
-        }).select().single();
-        if (resCliente.data) {
-          clienteId = resCliente.data.id;
-          _clients.unshift(resCliente.data);
-          toast('Cliente cadastrado!');
-        }
-      } catch(e) {}
+      // Verificar se já existe cliente com mesmo nome ou telefone
+      var existente = gC().find(function(x) {
+        var mesmoNome = x.name.toLowerCase().trim() === novoNome.toLowerCase().trim();
+        var mesmoTel = novoTel && x.phone && x.phone.replace(/\D/g,'') === novoTel.replace(/\D/g,'');
+        return mesmoNome || mesmoTel;
+      });
+      if (existente) {
+        clienteId = existente.id;
+        toast('Cliente já cadastrado — vínculo automático!');
+      } else {
+        try {
+          var resCliente = await _sb.from('clients').insert({
+            store_id: CU.id,
+            name: novoNome,
+            phone: novoTel || null,
+            status: 'comprou',
+            origin: _atendCanal === 'online' ? origem : 'loja_fisica'
+          }).select().single();
+          if (resCliente.data) {
+            clienteId = resCliente.data.id;
+            _clients.unshift(resCliente.data);
+            toast('Cliente cadastrado!');
+          }
+        } catch(e) {}
+      }
     }
 
     // Registrar compra no cliente
@@ -5957,6 +5972,12 @@ async function salvarAtendUnificado() {
 
   saveFluxoToDB(date);
   renderFluxo();
+
+  // Recarregar clientes para atualizar histórico e oportunidades
+  if (_atendResultado === 'comprou') {
+    await loadAll();
+    updateBadges();
+  }
 
   var mo = document.getElementById('mo-atend');
   if (mo) mo.classList.remove('open');
