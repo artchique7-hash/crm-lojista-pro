@@ -6,6 +6,7 @@
 <title>Sistema Loja Previsivel — SLP v3.1</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root{
   --bg:#f4f6f4;
@@ -6316,8 +6317,13 @@ function limparTel(str) {
 function lerCSV(file) {
   var reader = new FileReader();
   reader.onload = function(e) {
-    var linhas = e.target.result.split('\n');
-    var header = linhas[0].split(/[,;\t]/).map(function(h){ return h.toLowerCase().trim(); });
+    // Remover BOM se existir
+    var texto = e.target.result.replace(/^\uFEFF/, '');
+    var linhas = texto.split(/\r?\n/);
+    // Pular linhas vazias no início
+    while (linhas.length && !linhas[0].trim()) linhas.shift();
+    if (!linhas.length) { toast('Arquivo CSV vazio.','e'); return; }
+    var header = linhas[0].split(/[,;\t]/).map(function(h){ return h.toLowerCase().trim().replace(/^"|"$/g,''); });
     var iNome = encontrarColuna(header, ['nome','name','cliente','razao','razão']);
     var iTel = encontrarColuna(header, ['telefone','celular','fone','phone','tel','whatsapp']);
     var iCidade = encontrarColuna(header, ['cidade','municipio','município','city']);
@@ -6345,46 +6351,79 @@ function lerExcel(file) {
   reader.onload = function(e) {
     try {
       if (typeof XLSX === 'undefined') {
-        // Carregar SheetJS dinamicamente
-        var script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
-        script.onload = function() { processarExcel(e.target.result); };
-        document.head.appendChild(script);
-      } else {
-        processarExcel(e.target.result);
+        toast('Biblioteca Excel não carregada. Verifique sua conexão e tente novamente.', 'e');
+        document.getElementById('import-loading').style.display = 'none';
+        document.getElementById('import-drop').style.display = 'block';
+        return;
       }
+      processarExcel(e.target.result);
     } catch(err) {
       toast('Erro ao ler Excel: ' + err.message, 'e');
       document.getElementById('import-loading').style.display = 'none';
       document.getElementById('import-drop').style.display = 'block';
     }
   };
+  reader.onerror = function() {
+    toast('Erro ao ler o arquivo.', 'e');
+    document.getElementById('import-loading').style.display = 'none';
+    document.getElementById('import-drop').style.display = 'block';
+  };
   reader.readAsArrayBuffer(file);
 }
 
 function processarExcel(buffer) {
-  var wb = XLSX.read(buffer, { type: 'array' });
-  var ws = wb.Sheets[wb.SheetNames[0]];
-  var dados = XLSX.utils.sheet_to_json(ws, { header: 1 });
-  if (!dados.length) { toast('Planilha vazia.', 'e'); return; }
-  var header = dados[0].map(function(h){ return String(h||'').toLowerCase().trim(); });
-  var iNome = encontrarColuna(header, ['nome','name','cliente','razao','razão']);
-  var iTel = encontrarColuna(header, ['telefone','celular','fone','phone','tel','whatsapp']);
-  var iCidade = encontrarColuna(header, ['cidade','municipio','município','city']);
-  var iEmail = encontrarColuna(header, ['email','e-mail']);
-  if (iNome === -1) { toast('Coluna de nome não encontrada na planilha.', 'e'); return; }
-  _importClientes = [];
-  for (var i = 1; i < dados.length; i++) {
-    var row = dados[i];
-    if (!row[iNome]) continue;
-    _importClientes.push({
-      nome: capitalize(String(row[iNome]||'').trim()),
-      telefone: iTel !== -1 ? String(row[iTel]||'').trim() : '',
-      cidade: iCidade !== -1 ? String(row[iCidade]||'').trim() : '',
-      email: iEmail !== -1 ? String(row[iEmail]||'').trim() : ''
-    });
+  try {
+    var wb = XLSX.read(buffer, { type: 'array' });
+    if (!wb.SheetNames.length) { toast('Planilha sem abas.', 'e'); return; }
+    var ws = wb.Sheets[wb.SheetNames[0]];
+    var dados = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+    // Remover linhas completamente vazias
+    dados = dados.filter(function(row){ return row.some(function(cell){ return String(cell||'').trim() !== ''; }); });
+    if (dados.length < 2) { toast('Planilha sem dados suficientes.', 'e'); return; }
+    var header = dados[0].map(function(h){ return String(h||'').toLowerCase().trim(); });
+    var iNome   = encontrarColuna(header, ['nome','name','cliente','razao','razão','denominação','denominacao']);
+    var iTel    = encontrarColuna(header, ['telefone','celular','fone','phone','tel','whatsapp','contato']);
+    var iCidade = encontrarColuna(header, ['cidade','municipio','município','city','localidade']);
+    var iEmail  = encontrarColuna(header, ['email','e-mail','mail']);
+    var iNasc   = encontrarColuna(header, ['nascimento','aniversario','aniversário','data nasc','birth']);
+
+    // Se não achou coluna de nome, tentar primeira coluna com texto
+    if (iNome === -1) {
+      for (var ci = 0; ci < header.length; ci++) {
+        var sample = String(dados[1][ci]||'').trim();
+        if (sample && /[a-zA-ZÀ-ú]/.test(sample) && sample.length > 2) {
+          iNome = ci;
+          break;
+        }
+      }
+    }
+    if (iNome === -1) {
+      toast('Não encontrei coluna de nome. Colunas disponíveis: ' + header.slice(0,5).join(', '), 'e');
+      document.getElementById('import-loading').style.display = 'none';
+      document.getElementById('import-drop').style.display = 'block';
+      return;
+    }
+
+    _importClientes = [];
+    for (var i = 1; i < dados.length; i++) {
+      var row = dados[i];
+      var nome = String(row[iNome]||'').trim();
+      if (!nome || nome.length < 2) continue;
+      var tel = iTel !== -1 ? limparTel(String(row[iTel]||'').trim()) : '';
+      _importClientes.push({
+        nome: capitalize(nome),
+        telefone: tel,
+        cidade: iCidade !== -1 ? String(row[iCidade]||'').trim() : '',
+        email:  iEmail  !== -1 ? String(row[iEmail]||'').trim()  : '',
+        nasc:   iNasc   !== -1 ? String(row[iNasc]||'').trim()   : ''
+      });
+    }
+    mostrarPreviewImport();
+  } catch(err) {
+    toast('Erro ao processar planilha: ' + err.message, 'e');
+    document.getElementById('import-loading').style.display = 'none';
+    document.getElementById('import-drop').style.display = 'block';
   }
-  mostrarPreviewImport();
 }
 
 // ── Utilitários ──
@@ -6413,7 +6452,8 @@ function mostrarPreviewImport() {
   document.getElementById('import-loading').style.display = 'none';
   document.getElementById('import-progress-wrap').style.display = 'none';
   if (!_importClientes.length) {
-    toast('Nenhum cliente encontrado no arquivo.', 'e');
+    toast('Nenhum cliente identificado. Verifique se o arquivo tem coluna "Nome".', 'e');
+    document.getElementById('import-loading').style.display = 'none';
     document.getElementById('import-drop').style.display = 'block';
     return;
   }
@@ -6449,7 +6489,6 @@ async function confirmarImportacao() {
 
   document.getElementById('import-preview-wrap').style.display = 'none';
   document.getElementById('import-progress-wrap').style.display = 'block';
-  document.getElementById('btn-confirmar-import').disabled = true;
 
   var total = paraImportar.length;
   var ok = 0; var erros = 0;
@@ -6459,7 +6498,7 @@ async function confirmarImportacao() {
   for (var i = 0; i < paraImportar.length; i += loteSize) {
     var lote = paraImportar.slice(i, i + loteSize);
     var rows = lote.map(function(cl) {
-      return { store_id: CU.id, name: cl.nome, phone: cl.telefone||null, city: cl.cidade||null, status: 'comprou', origin: 'importacao' };
+      return { store_id: CU.id, name: cl.nome, phone: cl.telefone||null, city: cl.cidade||null, birth_date: cl.nasc||null, status: 'comprou', origin: 'importacao' };
     });
     try {
       var res = await _sb.from('clients').insert(rows).select();
@@ -6558,6 +6597,97 @@ document.addEventListener('DOMContentLoaded', () => {
      <div style="height:100%;background:var(--green);border-radius:20px;transition:width .3s" id="import-bar-fill" style="width:0%"></div>
     </div>
     <div style="font-size:12px;color:var(--text3)" id="import-progress-sub"></div>
+   </div>
+  </div>
+ </div>
+</div>
+
+
+<!-- MODAL ATENDIMENTO UNIFICADO -->
+<div class="mo" id="mo-atend">
+ <div class="modal" style="max-width:420px;max-height:90vh;overflow-y:auto">
+  <div class="mh"><h3 class="mt" id="mo-atend-title">Atendimento</h3><button class="mc" id="btn-fecha-atend"></button></div>
+  <div class="mb">
+   <div id="atend-origem-wrap" style="display:none">
+    <div class="fg">
+     <label class="fl">Origem do atendimento</label>
+     <select id="atend-origem" class="fi" onchange="toggleAtendOutro(this.value)">
+      <option value="instagram">Instagram</option>
+      <option value="whatsapp">WhatsApp</option>
+      <option value="anuncio_instagram">Anúncio → Instagram</option>
+      <option value="anuncio_whatsapp">Anúncio → WhatsApp</option>
+      <option value="outro">Outro</option>
+     </select>
+     <input type="text" id="atend-origem-outro" class="fi" style="display:none;margin-top:6px" placeholder="Especifique o canal...">
+    </div>
+   </div>
+   <div class="fg">
+    <label class="fl">Resultado</label>
+    <div style="display:flex;gap:8px">
+     <button class="btn btn-sm" id="btn-atend-comprou" style="flex:1;border:2px solid var(--border)" onclick="setAtendResultado('comprou')">✓ Comprou</button>
+     <button class="btn btn-sm" id="btn-atend-nao" style="flex:1;border:2px solid var(--border)" onclick="setAtendResultado('nao_comprou')">✗ Não comprou</button>
+    </div>
+   </div>
+   <div id="atend-comprou-wrap" style="display:none">
+    <div class="fg">
+     <label class="fl">Cliente (opcional)</label>
+     <div style="position:relative">
+      <input type="text" id="atend-cliente-busca" class="fi" placeholder="Buscar por nome ou telefone..." autocomplete="off" oninput="buscarClienteAtend(this.value)">
+      <div id="atend-cliente-lista" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rs);z-index:100;max-height:160px;overflow-y:auto;box-shadow:var(--sh-md)"></div>
+     </div>
+     <div id="atend-cliente-sel" style="display:none;background:var(--green-l);border:1px solid var(--green);border-radius:var(--rs);padding:8px 12px;margin-top:6px;align-items:center;justify-content:space-between">
+      <span id="atend-cliente-nome" style="font-size:13px;font-weight:600;color:var(--green)"></span>
+      <button onclick="limparClienteAtend()" style="background:none;border:none;cursor:pointer;color:var(--green);font-size:16px">×</button>
+     </div>
+     <input type="hidden" id="atend-cliente-id">
+    </div>
+    <div style="text-align:center;margin:8px 0;font-size:12px;color:var(--text3)">— ou —</div>
+    <button class="btn btn-g btn-sm" style="width:100%" onclick="abrirCadastroRapidoAtend()">+ Cadastrar novo cliente</button>
+    <div id="atend-novo-cliente" style="display:none;background:var(--bg3);border-radius:var(--rs);padding:12px;margin-top:8px">
+     <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px">Cadastro rápido</div>
+     <div class="fg"><input type="text" id="atend-novo-nome" class="fi" placeholder="Nome *"></div>
+     <div class="fg"><input type="text" id="atend-novo-tel" class="fi" placeholder="Telefone (com DDD)"></div>
+    </div>
+    <div class="fg" style="margin-top:8px">
+     <label class="fl">Valor da compra (opcional)</label>
+     <input type="number" id="atend-valor" class="fi" placeholder="0,00" step="0.01">
+    </div>
+    <div class="fg">
+     <label class="fl">Produto(s) comprado(s)</label>
+     <input type="text" id="atend-produto-compra" class="fi" placeholder="Ex: vestido floral + calça preta">
+    </div>
+   </div>
+   <div id="atend-perda-wrap" style="display:none">
+    <div class="fg">
+     <label class="fl">O que buscava</label>
+     <input type="text" id="atend-perda-produto" class="fi" placeholder="Ex: calça preta G, vestido social...">
+    </div>
+    <div class="fg">
+     <label class="fl">Motivo da perda</label>
+     <input type="text" id="atend-perda-motivo" class="fi" placeholder="Ex: não tinha o tamanho, achou caro...">
+    </div>
+    <div class="fg">
+     <label class="fl">Cliente (opcional)</label>
+     <div style="position:relative">
+      <input type="text" id="atend-perda-cliente-busca" class="fi" placeholder="Buscar por nome ou telefone..." autocomplete="off" oninput="buscarClientePerdaAtend(this.value)">
+      <div id="atend-perda-cliente-lista" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rs);z-index:100;max-height:140px;overflow-y:auto;box-shadow:var(--sh-md)"></div>
+     </div>
+     <div id="atend-perda-cliente-sel" style="display:none;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:8px 12px;margin-top:6px;align-items:center;justify-content:space-between">
+      <span id="atend-perda-cliente-nome" style="font-size:13px;font-weight:600"></span>
+      <button onclick="limparClientePerdaAtend()" style="background:none;border:none;cursor:pointer;font-size:16px">×</button>
+     </div>
+     <input type="hidden" id="atend-perda-cliente-id">
+    </div>
+    <button class="btn btn-g btn-sm" style="width:100%;margin-top:4px" onclick="abrirCadastroRapidoPerdaAtend()">+ Cadastrar novo cliente</button>
+    <div id="atend-perda-novo-cliente" style="display:none;background:var(--bg3);border-radius:var(--rs);padding:12px;margin-top:8px">
+     <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px">Cadastro rápido</div>
+     <div class="fg"><input type="text" id="atend-perda-novo-nome" class="fi" placeholder="Nome *"></div>
+     <div class="fg"><input type="text" id="atend-perda-novo-tel" class="fi" placeholder="Telefone (com DDD)"></div>
+    </div>
+   </div>
+   <div style="display:flex;gap:10px;justify-content:flex-end;padding-top:14px;border-top:1px solid var(--border);margin-top:8px">
+    <button class="btn btn-g btn-sm" id="btn-cancela-atend">Cancelar</button>
+    <button class="btn btn-p btn-sm" onclick="salvarAtendUnificado()">Registrar</button>
    </div>
   </div>
  </div>
