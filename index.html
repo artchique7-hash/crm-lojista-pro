@@ -1289,6 +1289,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
    <button class="escrit-tab" onclick="switchEscrit('calendario',this)">Calendario</button>
    <button class="escrit-tab" onclick="switchEscrit('rotina',this)">Rotina Comercial</button>
    <button class="escrit-tab" onclick="switchEscrit('funis',this)">Funis</button>
+   <button class="escrit-tab" onclick="switchEscrit('cashback',this)">💰 Cashback</button>
   </div>
 
   <!-- OBJETIVOS -->
@@ -1460,6 +1461,71 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
    </div>
    <button class="btn btn-p btn-sm" onclick="abrirEscolhaTipoFunil()">+ Novo Funil</button>
   </div>
+ <div id="escrit-cashback" class="escrit-section">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+   <div><div style="font-family:Syne,sans-serif;font-size:17px;font-weight:700;margin-bottom:2px">💰 Cashback</div>
+   <div style="font-size:12px;color:var(--text3)">Configure e gerencie o programa de cashback da loja</div></div>
+   <button class="btn btn-p btn-sm" onclick="salvarConfigCashback()">Salvar configurações</button>
+  </div>
+  <div class="cb-config-card">
+   <div style="font-size:13px;font-weight:700;margin-bottom:14px">⚙️ Regra padrão</div>
+   <div class="fgrid">
+    <div class="fg">
+     <label class="fl">Percentual de cashback (%)</label>
+     <input type="number" id="cb-percentual" class="fi" placeholder="Ex: 5" min="0" max="100" step="0.5">
+     <div style="font-size:11px;color:var(--text3);margin-top:4px">💡 Sugestão para moda: 5% a 10%. Defina conforme sua margem e estratégia.</div>
+    </div>
+    <div class="fg">
+     <label class="fl">Validade (dias)</label>
+     <div style="display:flex;gap:6px;margin-bottom:6px">
+      <button class="btn btn-g btn-xs cb-dias-btn" onclick="setCbDias(30,this)">30d</button>
+      <button class="btn btn-g btn-xs cb-dias-btn" onclick="setCbDias(60,this)">60d</button>
+      <button class="btn btn-g btn-xs cb-dias-btn" onclick="setCbDias(90,this)">90d</button>
+     </div>
+     <input type="number" id="cb-validade" class="fi" placeholder="Dias de validade (ex: 60)" min="1">
+    </div>
+   </div>
+   <div class="fg" style="margin-top:8px">
+    <label class="fl">Valor mínimo de compra para gerar cashback (opcional)</label>
+    <input type="number" id="cb-minimo" class="fi" placeholder="Deixe vazio para qualquer valor" min="0" step="0.01">
+   </div>
+  </div>
+  <div class="cb-config-card">
+   <div style="font-size:13px;font-weight:700;margin-bottom:14px">💬 Mensagens de lembrete automático</div>
+   <div class="fg">
+    <label class="fl">30 dias antes do vencimento</label>
+    <textarea id="cb-msg-30" class="fi" rows="2" placeholder="Oi {nome}! Você tem R$ {valor} de cashback disponível até {data}."></textarea>
+   </div>
+   <div class="fg">
+    <label class="fl">15 dias antes</label>
+    <textarea id="cb-msg-15" class="fi" rows="2" placeholder="{nome}, você ainda tem R$ {valor} de cashback. Faltam 15 dias para usar!"></textarea>
+   </div>
+   <div class="fg">
+    <label class="fl">5 dias antes (urgência)</label>
+    <textarea id="cb-msg-5" class="fi" rows="2" placeholder="Últimos dias! Seu cashback de R$ {valor} expira em {data}, {nome}."></textarea>
+   </div>
+  </div>
+  <div class="cb-config-card">
+   <div style="font-size:13px;font-weight:700;margin-bottom:14px">🔍 Pesquisa de clientes com cashback</div>
+   <div class="fgrid">
+    <div class="fg">
+     <label class="fl">Filtrar</label>
+     <select id="cb-filtro" class="fi" onchange="renderCbPesquisa()">
+      <option value="">Todas com saldo disponível</option>
+      <option value="vencendo30">Vencendo em 30 dias</option>
+      <option value="vencendo15">Vencendo em 15 dias</option>
+      <option value="vencendo5">Vencendo em 5 dias</option>
+      <option value="alto">Saldo acima de R$ 50</option>
+     </select>
+    </div>
+    <div class="fg">
+     <label class="fl">Buscar por tag/interesse</label>
+     <input type="text" id="cb-tag-busca" class="fi" placeholder="Ex: tênis, vestido..." oninput="renderCbPesquisa()">
+    </div>
+   </div>
+   <div id="cb-pesquisa-list" style="margin-top:12px"></div>
+  </div>
+ </div>
   <div id="funis-list" class="funil-list"></div>
   <div class="wpp-divider">
    <div style="display:flex;align-items:center;gap:10px">
@@ -1475,7 +1541,8 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
  </div>
  <!-- FIM ESCRITORIO -->
 
- <div id="page-client-detail" class="page"><div id="detail-header-fixed" style="display:none;margin-bottom:0"><button class="btn btn-p btn-sm" onclick="editarClienteAtual()" style="position:fixed;bottom:24px;right:24px;z-index:200;box-shadow:0 4px 16px rgba(0,0,0,.2);border-radius:50px;padding:12px 24px;font-size:14px">✏️ Editar Cliente</button></div><div id="detail-content"></div></div>
+ <div id="page-client-detail" class="page">
+<div id="cb-cliente-section" style="display:none;margin:0 0 20px"></div><div id="detail-header-fixed" style="display:none;margin-bottom:0"><button class="btn btn-p btn-sm" onclick="editarClienteAtual()" style="position:fixed;bottom:24px;right:24px;z-index:200;box-shadow:0 4px 16px rgba(0,0,0,.2);border-radius:50px;padding:12px 24px;font-size:14px">✏️ Editar Cliente</button></div><div id="detail-content"></div></div>
  </main>
 </div>
 
@@ -1808,6 +1875,7 @@ async function loadAll() {
   _msgs = m.data || [];
   _log = l.data || [];
   await loadFluxoFromDB();
+  await loadCashback();
   updateBadges();
 }
 
@@ -2299,6 +2367,7 @@ async function showDetail(id) {
   if (hf) hf.style.display = 'block';
   document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
   document.getElementById('page-client-detail').classList.add('active');
+  renderCashbackCliente(c.id);
 }
 function goBack(){
   var hf=document.getElementById('detail-header-fixed'); if(hf) hf.style.display='none';showPage('clients');}
@@ -3350,7 +3419,9 @@ async function savePurch(){
   const amt=document.getElementById('p-amt').value;
   await _sb.from('purchases').insert({store_id:CU.id,client_id:cid,date,description:document.getElementById('p-desc').value.trim()||null,amount:amt?parseFloat(amt):null,observations:document.getElementById('p-obs').value.trim()||null,salesperson:sp?.name||null});
   await _sb.from('clients').update({status:'comprou'}).eq('id',cid).eq('status','ainda_nao_comprou');
-  closePurchModal(); toast('Compra registrada!'); await loadAll(); showDetail(cid);
+  closePurchModal(); toast('Compra registrada!'); await loadAll();
+  if (amt) { await gerarCashbackVenda(cid, parseFloat(amt), null); }
+  showDetail(cid);
 }
 
 // ── CONTACTS ──
@@ -3930,6 +4001,7 @@ var _funis = JSON.parse(localStorage.getItem('slp_funis') || '[]');
 function switchEscrit(section, btn) {
   document.querySelectorAll('.escrit-section').forEach(function(el){ el.classList.remove('active'); });
   document.querySelectorAll('.escrit-tab').forEach(function(el){ el.classList.remove('active'); });
+  if (section === 'cashback') { setTimeout(function(){ carregarConfigCashback(); renderCbPesquisa(); }, 50); }
   var el = document.getElementById('escrit-' + section);
   if (el) el.classList.add('active');
   if (btn) btn.classList.add('active');
@@ -6523,6 +6595,208 @@ async function confirmarImportacao() {
     toast(ok + ' clientes importados com sucesso!');
   }, 1800);
 }
+
+// MÓDULO CASHBACK
+var _cbConfig=JSON.parse(localStorage.getItem('slp_cb_config')||'{"percentual":5,"validade":60,"minimo":0,"msg30":"Oi {nome}! Você tem R$ {valor} de cashback até {data}.","msg15":"{nome}, seu cashback de R$ {valor} vence em 15 dias!","msg5":"Últimos dias! Cashback de R$ {valor} expira em {data}, {nome}."}');
+function saveCbConfig(){localStorage.setItem('slp_cb_config',JSON.stringify(_cbConfig));}
+var _cashback=[];
+async function loadCashback(){
+  if(!CU)return;
+  var r=await _sb.from('cashback').select('*').eq('store_id',CU.id).order('created_at',{ascending:false});
+  _cashback=r.data||[];
+  var h=new Date().toISOString().slice(0,10);
+  for(var i=0;i<_cashback.length;i++){
+    var cb=_cashback[i];
+    if(cb.status==='disponivel'&&cb.validade&&cb.validade<h){
+      await _sb.from('cashback').update({status:'expirado'}).eq('id',cb.id);
+      _cashback[i].status='expirado';
+    }
+  }
+}
+function getCbSaldo(cid){return _cashback.filter(function(cb){return cb.client_id===cid&&cb.status==='disponivel';}).reduce(function(s,cb){return s+parseFloat(cb.valor||0);},0);}
+function getCbUtilizado(cid){return _cashback.filter(function(cb){return cb.client_id===cid&&cb.status==='utilizado';}).reduce(function(s,cb){return s+parseFloat(cb.utilizado_valor||cb.valor||0);},0);}
+async function gerarCashbackVenda(clientId,valorVenda,purchaseId){
+  if(!CU||!clientId||!valorVenda||parseFloat(valorVenda)<=0)return;
+  var perc=_cbConfig.percentual||5;
+  var minimo=_cbConfig.minimo||0;
+  if(minimo>0&&parseFloat(valorVenda)<minimo)return;
+  var valorCb=Math.round(parseFloat(valorVenda)*perc/100*100)/100;
+  if(valorCb<=0)return;
+  var val=new Date();val.setDate(val.getDate()+(_cbConfig.validade||60));
+  var res=await _sb.from('cashback').insert({store_id:CU.id,client_id:clientId,valor:valorCb,percentual:perc,origem:'compra',purchase_id:purchaseId||null,status:'disponivel',validade:val.toISOString().slice(0,10)}).select().single();
+  if(res.data){_cashback.unshift(res.data);toast('💰 Cashback de R$ '+valorCb.toFixed(2).replace('.',',')+' gerado!');}
+}
+function abrirModalCashbackManual(cid){
+  var mo=document.getElementById('mo-cb-manual');
+  if(!mo){mo=document.createElement('div');mo.id='mo-cb-manual';mo.className='mo';mo.addEventListener('click',function(e){if(e.target===this)mo.classList.remove('open');});document.body.appendChild(mo);}
+  mo.innerHTML='<div class="modal" style="max-width:400px"><div class="mh"><h3 class="mt">Adicionar Cashback Manual</h3><button class="mc" id="cbm-f"></button></div><div class="mb"><input type="hidden" id="cbm-cid" value="'+cid+'"><div class="fg"><label class="fl">Valor (R$) *</label><input type="number" id="cbm-val" class="fi" min="0.01" step="0.01"></div><div class="fg"><label class="fl">Motivo *</label><input type="text" id="cbm-mot" class="fi" placeholder="Ex: Compensação de atendimento"></div><div class="fg"><label class="fl">Validade (dias)</label><input type="number" id="cbm-dias" class="fi" value="'+(_cbConfig.validade||60)+'"></div><div style="display:flex;gap:10px;justify-content:flex-end;padding-top:14px;border-top:1px solid var(--border)"><button class="btn btn-g btn-sm" id="cbm-c">Cancelar</button><button class="btn btn-p btn-sm" onclick="salvarCbManual()">Adicionar</button></div></div></div>';
+  mo.classList.add('open');
+  document.getElementById('cbm-f').onclick=function(){mo.classList.remove('open');};
+  document.getElementById('cbm-c').onclick=function(){mo.classList.remove('open');};
+}
+async function salvarCbManual(){
+  var cid=document.getElementById('cbm-cid').value;
+  var valor=parseFloat(document.getElementById('cbm-val').value);
+  var motivo=(document.getElementById('cbm-mot').value||'').trim();
+  var dias=parseInt(document.getElementById('cbm-dias').value)||60;
+  if(!valor||valor<=0){toast('Informe o valor.','e');return;}
+  if(!motivo){toast('Informe o motivo.','e');return;}
+  var val=new Date();val.setDate(val.getDate()+dias);
+  var res=await _sb.from('cashback').insert({store_id:CU.id,client_id:cid,valor:valor,origem:'manual',status:'disponivel',motivo:motivo,validade:val.toISOString().slice(0,10)}).select().single();
+  if(res.error){toast('Erro ao adicionar.','e');return;}
+  _cashback.unshift(res.data);
+  document.getElementById('mo-cb-manual').classList.remove('open');
+  toast('💰 Cashback de R$ '+valor.toFixed(2).replace('.',',')+' adicionado!');
+  renderCashbackCliente(cid);
+}
+function abrirModalUsarCashback(cid){
+  var saldo=getCbSaldo(cid);
+  if(saldo<=0){toast('Cliente sem cashback disponível.','e');return;}
+  var mo=document.getElementById('mo-cb-usar');
+  if(!mo){mo=document.createElement('div');mo.id='mo-cb-usar';mo.className='mo';mo.addEventListener('click',function(e){if(e.target===this)mo.classList.remove('open');});document.body.appendChild(mo);}
+  mo.innerHTML='<div class="modal" style="max-width:360px"><div class="mh"><h3 class="mt">Utilizar Cashback</h3><button class="mc" id="cbu-f"></button></div><div class="mb"><input type="hidden" id="cbu-cid" value="'+cid+'"><div style="background:var(--green-l);border:1px solid var(--green);border-radius:var(--rs);padding:12px;margin-bottom:14px;text-align:center"><div style="font-size:11px;color:var(--green);font-weight:700">SALDO DISPONÍVEL</div><div style="font-size:22px;font-weight:700;color:var(--green);font-family:Syne,sans-serif">R$ '+saldo.toFixed(2).replace('.',',')+'</div></div><div class="fg"><label class="fl">Valor a utilizar (R$) *</label><input type="number" id="cbu-val" class="fi" max="'+saldo+'" min="0.01" step="0.01"></div><div style="display:flex;gap:10px;justify-content:flex-end;padding-top:14px;border-top:1px solid var(--border)"><button class="btn btn-g btn-sm" id="cbu-c">Cancelar</button><button class="btn btn-p btn-sm" onclick="confirmarUsarCashback()">Confirmar</button></div></div></div>';
+  mo.classList.add('open');
+  document.getElementById('cbu-f').onclick=function(){mo.classList.remove('open');};
+  document.getElementById('cbu-c').onclick=function(){mo.classList.remove('open');};
+}
+async function confirmarUsarCashback(){
+  var cid=document.getElementById('cbu-cid').value;
+  var valorUsar=parseFloat(document.getElementById('cbu-val').value);
+  var saldo=getCbSaldo(cid);
+  if(!valorUsar||valorUsar<=0){toast('Informe o valor.','e');return;}
+  if(valorUsar>saldo+0.01){toast('Valor maior que o saldo.','e');return;}
+  var h=new Date().toISOString().slice(0,10);
+  var disp=_cashback.filter(function(cb){return cb.client_id===cid&&cb.status==='disponivel';}).sort(function(a,b){return a.validade>b.validade?1:-1;});
+  var restante=valorUsar;
+  for(var i=0;i<disp.length&&restante>0.005;i++){
+    var cb=disp[i];
+    if(parseFloat(cb.valor)<=restante+0.005){
+      await _sb.from('cashback').update({status:'utilizado',utilizado_em:h,utilizado_valor:cb.valor}).eq('id',cb.id);
+      cb.status='utilizado';cb.utilizado_em=h;cb.utilizado_valor=cb.valor;
+      restante-=parseFloat(cb.valor);
+    }else{
+      var novo=Math.round((parseFloat(cb.valor)-restante)*100)/100;
+      await _sb.from('cashback').update({valor:novo}).eq('id',cb.id);
+      cb.valor=novo;restante=0;
+    }
+  }
+  document.getElementById('mo-cb-usar').classList.remove('open');
+  toast('✅ R$ '+valorUsar.toFixed(2).replace('.',',')+' de cashback utilizado!');
+  renderCashbackCliente(cid);
+}
+function renderCashbackCliente(cid){
+  var el=document.getElementById('cb-cliente-section');if(!el)return;
+  var saldo=getCbSaldo(cid);
+  var util=getCbUtilizado(cid);
+  var exp=_cashback.filter(function(cb){return cb.client_id===cid&&cb.status==='expirado';}).reduce(function(s,cb){return s+parseFloat(cb.valor||0);},0);
+  var movs=_cashback.filter(function(cb){return cb.client_id===cid;}).slice(0,10);
+  var hoje=new Date();
+  var venc=_cashback.filter(function(cb){return cb.client_id===cid&&cb.status==='disponivel'&&cb.validade&&Math.ceil((new Date(cb.validade)-hoje)/86400000)<=30;});
+  el.style.display='block';
+  el.innerHTML='<div class="card" style="padding:18px">'+
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'+
+    '<div style="font-weight:700;font-size:15px;font-family:Syne,sans-serif">💰 Cashback</div>'+
+    '<div style="display:flex;gap:6px">'+
+    '<button class="btn btn-g btn-xs" data-cid="'+cid+'" onclick="abrirModalCashbackManual(this.dataset.cid)">+ Manual</button>'+
+    (saldo>0?'<button class="btn btn-p btn-xs" data-cid="'+cid+'" onclick="abrirModalUsarCashback(this.dataset.cid)">Utilizar</button>':'')+
+    '</div></div>'+
+    '<div class="cb-saldo-box">'+
+    '<div class="cb-saldo-label">Saldo disponível</div>'+
+    '<div class="cb-saldo-valor">R$ '+saldo.toFixed(2).replace('.',',')+'</div>'+
+    (venc.length?'<div class="cb-saldo-sub">⚠ '+venc.length+' lançamento(s) vencem em 30 dias</div>':'')+
+    '</div>'+
+    '<div class="cb-stats">'+
+    '<div class="cb-stat"><div class="cb-stat-val" style="color:var(--green)">R$ '+saldo.toFixed(2).replace('.',',')+'</div><div class="cb-stat-lbl">Disponível</div></div>'+
+    '<div class="cb-stat"><div class="cb-stat-val" style="color:var(--blue)">R$ '+util.toFixed(2).replace('.',',')+'</div><div class="cb-stat-lbl">Utilizado</div></div>'+
+    '<div class="cb-stat"><div class="cb-stat-val" style="color:var(--text3)">R$ '+exp.toFixed(2).replace('.',',')+'</div><div class="cb-stat-lbl">Expirado</div></div>'+
+    '</div>'+
+    (movs.length?
+      '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text3);margin-bottom:8px">Movimentações</div>'+
+      '<div class="cb-mov">'+movs.map(function(cb){
+        var isP=cb.status!=='utilizado';
+        var icon=cb.status==='disponivel'?'💰':cb.status==='utilizado'?'✓':'⏰';
+        var cls=isP?'cb-mov-plus':'cb-mov-minus';
+        var val=(isP?'+ R$ ':'- R$ ')+parseFloat(cb.valor||0).toFixed(2).replace('.',',');
+        var desc=cb.origem==='compra'?'Cashback de compra':cb.motivo||'Adição manual';
+        if(cb.status==='utilizado')desc='Utilizado'+(cb.utilizado_em?' em '+cb.utilizado_em.split('-').reverse().join('/'):'');
+        if(cb.status==='expirado')desc='Expirado';
+        var dias=cb.validade&&cb.status==='disponivel'?Math.ceil((new Date(cb.validade)-hoje)/86400000):null;
+        return '<div class="cb-mov-item"><div class="cb-mov-icon '+cls+'">'+icon+'</div>'+
+          '<div style="flex:1"><div class="cb-mov-val" style="color:'+(isP?'var(--green)':'var(--text3)')+'">'+val+'</div>'+
+          '<div class="cb-mov-desc">'+desc+(cb.created_at?' · '+cb.created_at.slice(0,10).split('-').reverse().join('/'):'')+'</div>'+
+          (cb.percentual?'<div class="cb-mov-desc">Regra: '+cb.percentual+'%</div>':'')+
+          (dias!==null&&dias<=15?'<div class="cb-venc-alert">⚠ Expira em '+dias+' dias</div>':'')+
+          (cb.validade&&cb.status==='disponivel'?'<div class="cb-mov-desc">Válido até '+cb.validade.split('-').reverse().join('/')+'</div>':'')+
+          '</div></div>';
+      }).join('')+'</div>'
+      :'<div style="font-size:12px;color:var(--text3);text-align:center;padding:16px">Nenhum cashback registrado</div>'
+    )+'</div>';
+}
+function carregarConfigCashback(){
+  var p=document.getElementById('cb-percentual');if(p)p.value=_cbConfig.percentual||5;
+  var v=document.getElementById('cb-validade');if(v)v.value=_cbConfig.validade||60;
+  var m=document.getElementById('cb-minimo');if(m)m.value=_cbConfig.minimo||'';
+  var m30=document.getElementById('cb-msg-30');if(m30)m30.value=_cbConfig.msg30||'';
+  var m15=document.getElementById('cb-msg-15');if(m15)m15.value=_cbConfig.msg15||'';
+  var m5=document.getElementById('cb-msg-5');if(m5)m5.value=_cbConfig.msg5||'';
+}
+function salvarConfigCashback(){
+  var p=document.getElementById('cb-percentual');
+  var v=document.getElementById('cb-validade');
+  var m=document.getElementById('cb-minimo');
+  _cbConfig.percentual=parseFloat((p&&p.value)||5);
+  _cbConfig.validade=parseInt((v&&v.value)||60);
+  _cbConfig.minimo=parseFloat((m&&m.value)||0);
+  var m30=document.getElementById('cb-msg-30');if(m30)_cbConfig.msg30=m30.value;
+  var m15=document.getElementById('cb-msg-15');if(m15)_cbConfig.msg15=m15.value;
+  var m5=document.getElementById('cb-msg-5');if(m5)_cbConfig.msg5=m5.value;
+  saveCbConfig();
+  toast('Configurações de cashback salvas!');
+}
+function setCbDias(dias,el){
+  var v=document.getElementById('cb-validade');if(v)v.value=dias;
+  document.querySelectorAll('.cb-dias-btn').forEach(function(b){b.classList.remove('btn-p');b.classList.add('btn-g');});
+  el.classList.remove('btn-g');el.classList.add('btn-p');
+}
+function renderCbPesquisa(){
+  var el=document.getElementById('cb-pesquisa-list');if(!el)return;
+  var filtro=(document.getElementById('cb-filtro')||{}).value||'';
+  var tag=((document.getElementById('cb-tag-busca')||{}).value||'').toLowerCase().trim();
+  var hoje=new Date();
+  var lista=gC().filter(function(cl){
+    if(getCbSaldo(cl.id)<=0)return false;
+    if(tag&&!(cl.tags||[]).some(function(t){return t.toLowerCase().includes(tag);}))return false;
+    if(filtro==='vencendo30'||filtro==='vencendo15'||filtro==='vencendo5'){
+      var d=filtro==='vencendo30'?30:filtro==='vencendo15'?15:5;
+      return _cashback.some(function(cb){if(cb.client_id!==cl.id||cb.status!=='disponivel'||!cb.validade)return false;var diff=Math.ceil((new Date(cb.validade)-hoje)/86400000);return diff<=d&&diff>=0;});
+    }
+    if(filtro==='alto')return getCbSaldo(cl.id)>=50;
+    return true;
+  });
+  if(!lista.length){el.innerHTML='<div style="text-align:center;padding:24px;font-size:13px;color:var(--text3)">Nenhuma cliente com cashback nos filtros.</div>';return;}
+  el.innerHTML=lista.slice(0,30).map(function(cl){
+    var saldo=getCbSaldo(cl.id);
+    var prox=_cashback.filter(function(cb){return cb.client_id===cl.id&&cb.status==='disponivel'&&cb.validade;}).map(function(cb){return cb.validade;}).sort()[0];
+    var diasV=prox?Math.ceil((new Date(prox)-hoje)/86400000):null;
+    var bdg=diasV!==null&&diasV<=15?'cb-badge-venc':'cb-badge-disp';
+    return '<div class="cb-search-card" data-cid="'+cl.id+'" onclick="showDetail(this.dataset.cid)">'+
+      '<div class="av-sm" style="background:'+avc(cl.name)+'18;color:'+avc(cl.name)+'">'+ini(cl.name)+'</div>'+
+      '<div style="flex:1"><div style="font-weight:600;font-size:13px">'+cl.name+'</div>'+
+      '<div style="font-size:11px;color:var(--text3)">'+(cl.phone||'Sem telefone')+(cl.tags&&cl.tags.length?' · '+cl.tags.slice(0,2).join(', '):'')+'</div></div>'+
+      '<div style="text-align:right"><div class="'+bdg+'">R$ '+saldo.toFixed(2).replace('.',',')+'</div>'+
+      (diasV!==null?'<div style="font-size:10px;color:var(--text3);margin-top:2px">Vence em '+diasV+'d</div>':'')+'</div>'+
+    '</div>';
+  }).join('');
+}
+function getCbDashboard(){
+  var disp=_cashback.filter(function(cb){return cb.status==='disponivel';}).reduce(function(s,cb){return s+parseFloat(cb.valor||0);},0);
+  var util=_cashback.filter(function(cb){return cb.status==='utilizado';}).reduce(function(s,cb){return s+parseFloat(cb.utilizado_valor||cb.valor||0);},0);
+  var clientes=new Set(_cashback.filter(function(cb){return cb.status==='disponivel';}).map(function(cb){return cb.client_id;})).size;
+  var hoje=new Date();
+  var venc30=_cashback.filter(function(cb){if(cb.status!=='disponivel'||!cb.validade)return false;var d=Math.ceil((new Date(cb.validade)-hoje)/86400000);return d<=30&&d>=0;}).length;
+  return {disp:disp,util:util,clientes:clientes,venc30:venc30};
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   // Tags input
   const inp=document.getElementById('tag-inp');
