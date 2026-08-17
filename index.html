@@ -2345,7 +2345,7 @@ async function showDetail(id) {
           '<div style="font-weight:700;font-family:\'Syne\',sans-serif">Historico de Compras</div>'+
           '<button class="btn btn-o btn-sm" onclick="openPurchModal(\''+c.id+'\')">+ Registrar</button></div>'+
           (!sortPurch.length?'<div class="empty" style="padding:18px"><div class="empty-d">Nenhuma compra registrada</div></div>':
-            sortPurch.map(p=>'<div class="pi"><div style="display:flex;align-items:center;justify-content:space-between;gap:9px"><div style="display:flex;align-items:center;gap:9px"><div class="pi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/></svg></div><div><div style="font-size:13px;font-weight:500">'+(p.description||'Compra')+'</div><div style="font-size:11px;color:var(--text3)">'+fD(p.date)+(p.salesperson?' - '+p.salesperson:'')+'</div></div></div>'+(p.amount?'<div class="pa">R$ '+parseFloat(p.amount).toFixed(2).replace('.',',')+'</div>':'')+'<div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;text-align:right"><button data-pid="'+p.id+'" data-cid="'+c.id+'" onclick="excluirCompra(this.dataset.pid,this.dataset.cid)" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:11px;padding:2px 8px;border-radius:4px" onmouseover="this.style.color=\'var(--red)\';this.style.background=\'var(--red-l)\'" onmouseout="this.style.color=\'var(--text3)\';this.style.background=\'none\'">🗑 Excluir compra</button></div></div>').join(''))+
+            sortPurch.map(p=>'<div class="pi"><div class="pi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/></svg></div><div style="flex:1"><div style="font-size:13px;font-weight:500">'+(p.description||'Compra')+'</div><div style="font-size:11px;color:var(--text3)">'+fD(p.date)+(p.salesperson?' - '+p.salesperson:'')+'</div></div>'+(p.amount?'<div class="pa">R$ '+parseFloat(p.amount).toFixed(2).replace('.',',')+"</div>":'')+'<button data-pid="'+p.id+'" data-cid="'+c.id+'" onclick="excluirCompra(this.dataset.pid,this.dataset.cid)" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:11px;padding:2px 4px;border-radius:4px;margin-left:4px" title="Excluir" onmouseover="this.style.color=\'var(--red)\';this.style.background=\'var(--red-l)\'" onmouseout="this.style.color=\'var(--text3)\';this.style.background=\'none\'">×</button></div>').join(''))
         '</div>'+
         '<div class="card card-sm">'+
           '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">'+
@@ -6698,15 +6698,24 @@ async function confirmarUsarCashback(){
   renderCashbackCliente(cid);
 }
 function renderCashbackCliente(cid){
-  // Criar/reutilizar seção dentro do detail-content
-  var container = document.getElementById('detail-content');
-  if (!container) return;
+  // Criar dentro da coluna lateral do detalhe (dc)
   var el = document.getElementById('cb-cliente-section');
   if (!el) {
-    el = document.createElement('div');
-    el.id = 'cb-cliente-section';
-    el.style.marginTop = '20px';
-    container.appendChild(el);
+    // Tentar colocar na coluna lateral dc
+    var dc = document.querySelector('#detail-content .dc');
+    if (dc) {
+      el = document.createElement('div');
+      el.id = 'cb-cliente-section';
+      dc.appendChild(el);
+    } else {
+      // Fallback: no final do detail-content
+      var container = document.getElementById('detail-content');
+      if (!container) return;
+      el = document.createElement('div');
+      el.id = 'cb-cliente-section';
+      el.style.marginTop = '16px';
+      container.appendChild(el);
+    }
   }
   var saldo=getCbSaldo(cid);
   var util=getCbUtilizado(cid);
@@ -6715,7 +6724,7 @@ function renderCashbackCliente(cid){
   var hoje=new Date();
   var venc=_cashback.filter(function(cb){return cb.client_id===cid&&cb.status==='disponivel'&&cb.validade&&Math.ceil((new Date(cb.validade)-hoje)/86400000)<=30;});
   el.style.display='block';
-  el.innerHTML='<div class="card" style="padding:18px">'+
+  el.innerHTML='<div class="card card-sm">'+
     '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'+
     '<div style="font-weight:700;font-size:15px;font-family:Syne,sans-serif">💰 Cashback</div>'+
     '<div style="display:flex;gap:6px">'+
