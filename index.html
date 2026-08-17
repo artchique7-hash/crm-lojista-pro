@@ -1275,7 +1275,13 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 
 
  <!-- ESCRITORIO DA LOJA -->
- <div id="page-escritorio" class="page">
+ 
+<div id="page-cashback-opp" class="page">
+ <div class="ph"><div><h1 class="pt">💰 Cashback</h1><p class="ps">Clientes com cashback disponível</p></div></div>
+ <div id="cashback-opp-list"></div>
+</div>
+
+<div id="page-escritorio" class="page">
   <div class="ph">
    <div>
     <h1 class="pt">Escritorio da Loja</h1>
@@ -1541,8 +1547,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
  </div>
  <!-- FIM ESCRITORIO -->
 
- <div id="page-client-detail" class="page">
-<div id="cb-cliente-section" style="display:none;margin:0 0 20px"></div><div id="detail-header-fixed" style="display:none;margin-bottom:0"><button class="btn btn-p btn-sm" onclick="editarClienteAtual()" style="position:fixed;bottom:24px;right:24px;z-index:200;box-shadow:0 4px 16px rgba(0,0,0,.2);border-radius:50px;padding:12px 24px;font-size:14px">✏️ Editar Cliente</button></div><div id="detail-content"></div></div>
+ <div id="page-client-detail" class="page"><div id="detail-header-fixed" style="display:none;margin-bottom:0"><button class="btn btn-p btn-sm" onclick="editarClienteAtual()" style="position:fixed;bottom:24px;right:24px;z-index:200;box-shadow:0 4px 16px rgba(0,0,0,.2);border-radius:50px;padding:12px 24px;font-size:14px">✏️ Editar Cliente</button></div><div id="detail-content"></div></div>
  </main>
 </div>
 
@@ -2340,7 +2345,7 @@ async function showDetail(id) {
           '<div style="font-weight:700;font-family:\'Syne\',sans-serif">Historico de Compras</div>'+
           '<button class="btn btn-o btn-sm" onclick="openPurchModal(\''+c.id+'\')">+ Registrar</button></div>'+
           (!sortPurch.length?'<div class="empty" style="padding:18px"><div class="empty-d">Nenhuma compra registrada</div></div>':
-            sortPurch.map(p=>'<div class="pi"><div style="display:flex;align-items:center;gap:9px"><div class="pi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/></svg></div><div><div style="font-size:13px;font-weight:500">'+(p.description||'Compra')+'</div><div style="font-size:11px;color:var(--text3)">'+fD(p.date)+(p.salesperson?' - '+p.salesperson:'')+'</div></div></div>'+(p.amount?'<div class="pa">R$ '+parseFloat(p.amount).toFixed(2).replace('.',',')+'</div>':'')+'</div>').join(''))+
+            sortPurch.map(p=>'<div class="pi"><div style="display:flex;align-items:center;justify-content:space-between;gap:9px"><div style="display:flex;align-items:center;gap:9px"><div class="pi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/></svg></div><div><div style="font-size:13px;font-weight:500">'+(p.description||'Compra')+'</div><div style="font-size:11px;color:var(--text3)">'+fD(p.date)+(p.salesperson?' - '+p.salesperson:'')+'</div></div></div>'+(p.amount?'<div class="pa">R$ '+parseFloat(p.amount).toFixed(2).replace('.',',')+'</div>':'')+'<div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;text-align:right"><button data-pid="'+p.id+'" data-cid="'+c.id+'" onclick="excluirCompra(this.dataset.pid,this.dataset.cid)" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:11px;padding:2px 8px;border-radius:4px" onmouseover="this.style.color=\'var(--red)\';this.style.background=\'var(--red-l)\'" onmouseout="this.style.color=\'var(--text3)\';this.style.background=\'none\'">🗑 Excluir compra</button></div></div>').join(''))+
         '</div>'+
         '<div class="card card-sm">'+
           '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">'+
@@ -3419,9 +3424,14 @@ async function savePurch(){
   const amt=document.getElementById('p-amt').value;
   await _sb.from('purchases').insert({store_id:CU.id,client_id:cid,date,description:document.getElementById('p-desc').value.trim()||null,amount:amt?parseFloat(amt):null,observations:document.getElementById('p-obs').value.trim()||null,salesperson:sp?.name||null});
   await _sb.from('clients').update({status:'comprou'}).eq('id',cid).eq('status','ainda_nao_comprou');
-  closePurchModal(); toast('Compra registrada!'); await loadAll();
+  // Atualizar memória local sem recarregar tudo
+  var resP = await _sb.from('purchases').select('*').eq('client_id', cid).order('date', {ascending:false});
+  var cl = _clients.find(function(x){ return x.id===cid; });
+  if (cl) { cl.purchases = resP.data || []; cl.status = 'comprou'; }
+  closePurchModal(); toast('Compra registrada!');
   if (amt) { await gerarCashbackVenda(cid, parseFloat(amt), null); }
   showDetail(cid);
+  updateBadges();
 }
 
 // ── CONTACTS ──
@@ -3454,6 +3464,9 @@ function updateBadges(){
   // Pós-venda badge
   const pv=getPS(c);
   var sbpv=document.getElementById('sb-pv'); if(sbpv){sbpv.textContent=pv.length;sbpv.style.display=pv.length?'inline':'none';}
+  // Badge cashback
+  var cbCount = gC().filter(function(cl){ return getCbSaldo(cl.id) > 0; }).length;
+  var sbcb=document.getElementById('sb-cb'); if(sbcb){sbcb.textContent=cbCount;sbcb.style.display=cbCount?'inline':'none';}
 }
 
 // ── INIT ──
@@ -6685,7 +6698,16 @@ async function confirmarUsarCashback(){
   renderCashbackCliente(cid);
 }
 function renderCashbackCliente(cid){
-  var el=document.getElementById('cb-cliente-section');if(!el)return;
+  // Criar/reutilizar seção dentro do detail-content
+  var container = document.getElementById('detail-content');
+  if (!container) return;
+  var el = document.getElementById('cb-cliente-section');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'cb-cliente-section';
+    el.style.marginTop = '20px';
+    container.appendChild(el);
+  }
   var saldo=getCbSaldo(cid);
   var util=getCbUtilizado(cid);
   var exp=_cashback.filter(function(cb){return cb.client_id===cid&&cb.status==='expirado';}).reduce(function(s,cb){return s+parseFloat(cb.valor||0);},0);
@@ -6795,6 +6817,59 @@ function getCbDashboard(){
   var hoje=new Date();
   var venc30=_cashback.filter(function(cb){if(cb.status!=='disponivel'||!cb.validade)return false;var d=Math.ceil((new Date(cb.validade)-hoje)/86400000);return d<=30&&d>=0;}).length;
   return {disp:disp,util:util,clientes:clientes,venc30:venc30};
+}
+
+
+async function excluirCompra(purchaseId, clientId) {
+  if (!confirm('Excluir esta compra? Esta ação não pode ser desfeita.')) return;
+  try {
+    var res = await _sb.from('purchases').delete().eq('id', purchaseId);
+    if (res.error) { toast('Erro ao excluir compra.', 'e'); return; }
+    // Atualizar _clients em memória
+    var cl = _clients.find(function(x){ return x.id === clientId; });
+    if (cl && cl.purchases) {
+      cl.purchases = cl.purchases.filter(function(p){ return p.id !== purchaseId; });
+    }
+    toast('Compra excluída.');
+    showDetail(clientId);
+  } catch(e) {
+    toast('Erro ao excluir.', 'e');
+  }
+}
+
+
+function renderCashbackOpp() {
+  var el = document.getElementById('cashback-opp-list');
+  if (!el) return;
+  var hoje = new Date();
+  var lista = gC().filter(function(cl){ return getCbSaldo(cl.id) > 0; });
+  lista.sort(function(a, b){
+    var da = _cashback.filter(function(cb){return cb.client_id===a.id&&cb.status==='disponivel'&&cb.validade;}).map(function(cb){return cb.validade;}).sort()[0] || '9999';
+    var db = _cashback.filter(function(cb){return cb.client_id===b.id&&cb.status==='disponivel'&&cb.validade;}).map(function(cb){return cb.validade;}).sort()[0] || '9999';
+    return da < db ? -1 : 1;
+  });
+  if (!lista.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-t">Nenhum cashback disponível</div><div class="empty-d">As oportunidades de cashback aparecerão aqui quando houver saldo ativo</div></div>';
+    return;
+  }
+  el.innerHTML = '<div class="ol">' + lista.map(function(cl) {
+    var saldo = getCbSaldo(cl.id);
+    var prox = _cashback.filter(function(cb){return cb.client_id===cl.id&&cb.status==='disponivel'&&cb.validade;}).map(function(cb){return cb.validade;}).sort()[0];
+    var dias = prox ? Math.ceil((new Date(prox) - hoje) / 86400000) : null;
+    var urgente = dias !== null && dias <= 15;
+    var col = avc(cl.name);
+    return '<div class="ol-i" data-cid="'+cl.id+'" onclick="showDetail(this.dataset.cid)">'+
+      '<div class="av-sm" style="background:'+col+'18;color:'+col+'">'+ini(cl.name)+'</div>'+
+      '<div style="flex:1">'+
+        '<div style="font-weight:600;font-size:13px">'+cl.name+'</div>'+
+        '<div style="font-size:11px;color:var(--text3)">'+
+          'R$ '+saldo.toFixed(2).replace('.',',')+' disponível'+
+          (dias !== null ? ' · Vence em '+dias+' dia'+(dias!==1?'s':'') : '')+
+        '</div>'+
+      '</div>'+
+      (urgente ? '<span style="background:var(--red-l);color:var(--red);font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px">Urgente</span>' : '<span style="background:var(--green-l);color:var(--green);font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px">Ativo</span>')+
+    '</div>';
+  }).join('') + '</div>';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
