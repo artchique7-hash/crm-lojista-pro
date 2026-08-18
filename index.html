@@ -930,6 +930,20 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   <div id="dash-prioridades"></div>
  </div>
 
+ <!-- META DO MES -->
+ <div style="margin-bottom:20px">
+  <div id="dash-meta"></div>
+ </div>
+
+ <!-- ROTINA DO DIA -->
+ <div style="margin-bottom:26px">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+   <div style="width:3px;height:18px;background:var(--green);border-radius:2px"></div>
+   <h2 style="font-size:13px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px">Rotina do Dia</h2>
+  </div>
+  <div id="dash-rotinas-dia" class="card" style="padding:12px"></div>
+ </div>
+
  <!-- 2. RESUMO DO DIA -->
  <div style="margin-bottom:26px">
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
@@ -1291,10 +1305,10 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 
   <!-- TABS -->
   <div class="escrit-tabs">
-   <button class="escrit-tab active" onclick="switchEscrit('objetivos',this)">Objetivos</button>
-   <button class="escrit-tab" onclick="switchEscrit('calendario',this)">Calendario</button>
-   <button class="escrit-tab" onclick="switchEscrit('rotina',this)">Rotina Comercial</button>
-   <button class="escrit-tab" onclick="switchEscrit('funis',this)">Funis</button>
+   <button class="escrit-tab active" onclick="switchEscrit('objetivos',this)">🎯 Objetivos</button>
+   <button class="escrit-tab" onclick="switchEscrit('funis',this)">🔀 Funis</button>
+   <button class="escrit-tab" onclick="switchEscrit('rotina',this)">📋 Rotina Comercial</button>
+   <button class="escrit-tab" onclick="switchEscrit('calendario',this)">📅 Conteúdo</button>
    <button class="escrit-tab" onclick="switchEscrit('cashback',this)">💰 Cashback</button>
   </div>
 
