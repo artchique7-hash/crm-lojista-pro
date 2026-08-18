@@ -450,6 +450,39 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 .escrit-tab.active{background:var(--bg2);color:var(--text);box-shadow:var(--sh)}
 .escrit-section{display:none}.escrit-section.active{display:block;animation:fadeUp .22s ease}
 
+/* FICHA DO CLIENTE */
+.cf-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.cf-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--text)}
+.cf-sub{font-size:13px;color:var(--text3);margin-top:4px}
+.cf-actions{display:flex;gap:8px;flex-wrap:wrap}
+.cf-layout{display:grid;grid-template-columns:1fr 300px;gap:18px;align-items:start;margin-bottom:20px}
+@media (max-width:900px){.cf-layout{grid-template-columns:1fr}}
+.cf-maincard{display:grid;grid-template-columns:1.3fr 1fr;gap:24px;align-items:start}
+@media (max-width:640px){.cf-maincard{grid-template-columns:1fr}}
+.cf-id{display:flex;align-items:flex-start;gap:14px}
+.cf-name{font-size:18px;font-weight:700;font-family:'Syne',sans-serif;margin-bottom:8px}
+.cf-info-grid{display:grid;grid-template-columns:repeat(2,minmax(110px,1fr));gap:8px 18px;font-size:13px;color:var(--text2)}
+.cf-info-grid b{display:block;color:var(--text3);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px}
+.cf-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.cf-indicators{display:grid;grid-template-columns:repeat(2,1fr);gap:14px 20px;align-content:start}
+.cf-ind-lbl{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px}
+.cf-ind-val{font-size:16px;font-weight:700;font-family:'Syne',sans-serif}
+.cf-cashback{background:var(--gold-grad);border-radius:var(--rs);padding:12px 14px;color:#fff;grid-column:1/-1}
+.cf-cashback-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;opacity:.9}
+.cf-cashback-val{font-size:18px;font-weight:700;font-family:'Syne',sans-serif;margin:3px 0}
+.cf-cashback-sub{font-size:11px;opacity:.9}
+.cf-side-card{margin-bottom:16px}
+.cf-opp-item{display:flex;align-items:center;gap:10px;padding:9px 4px;border-bottom:1px solid var(--border);font-size:12.5px;font-weight:600;cursor:pointer}
+.cf-opp-item:last-child{border-bottom:none}
+.cf-opp-i{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;background:var(--bg4)}
+.cf-tabs{display:flex;gap:0;background:var(--bg4);border-radius:var(--r);padding:4px;margin-bottom:18px;overflow-x:auto}
+.cf-tab{flex:1;padding:10px 14px;border-radius:var(--rs);cursor:pointer;font-size:13px;font-weight:600;color:var(--text3);transition:all .2s;text-align:center;white-space:nowrap;border:none;background:none;font-family:"DM Sans",sans-serif}
+.cf-tab.active{background:var(--bg2);color:var(--text);box-shadow:var(--sh)}
+.cf-panel{display:none}
+.cf-panel.active{display:block;animation:fadeUp .22s ease}
+.cf-cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media (max-width:900px){.cf-cols3{grid-template-columns:1fr}}
+
 /* OBJETIVOS */
 /* METAS v3 — layout lista compacta */
 .meta-resumo-v2{display:flex;align-items:center;gap:16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 18px;margin-bottom:14px;box-shadow:var(--sh);flex-wrap:wrap}
@@ -2352,106 +2385,223 @@ async function showDetail(id) {
 
   if(!cr.data)return;
   const c={...cr.data, observations:obsr.data||[], purchases:pur.data||[], contacts:contr.data||[]};
-  const col=avc(c.name), sps=gSP();
-  const spName=sps.find(s=>s.id===c.salesperson_id)?.name||'';
-  const sortObs=[...c.observations].sort((a,b)=>b.created_at.localeCompare(a.created_at));
-  const sortPurch=[...c.purchases].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-  const sortCont=[...c.contacts].sort((a,b)=>b.created_at.localeCompare(a.created_at));
-  const totalSpent=sortPurch.reduce((a,p)=>a+(parseFloat(p.amount)||0),0);
-  const sc=calcScore(c), sl=scoreLabel(sc);
-  const today=new Date().toISOString().split('T')[0];
-  const remVal=(c.reminder||'').substring(0,10);
-  const remDue=remVal&&remVal<=today;
-
-  document.getElementById('detail-content').innerHTML=
-    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">'+
-    '<button class="btn btn-g btn-sm" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff" onclick="editarClienteAtual()">Editar</button>'+
-    '<span style="color:var(--text3);font-size:13px">/ '+c.name+'</span></div>'+
-    '<div class="dh">'+
-      '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">'+
-        '<div style="display:flex;align-items:center;gap:14px">'+
-          '<div class="av-lg" style="background:'+col+'30;color:'+col+';border:2px solid '+col+'40">'+ini(c.name)+'</div>'+
-          '<div>'+
-            '<div style="font-size:19px;font-weight:700;margin-bottom:6px">'+c.name+'</div>'+
-            '<div style="display:flex;flex-wrap:wrap;gap:9px;margin-bottom:8px">'+
-              (c.phone?'<span class="mp">'+c.phone+'</span>':'')+
-              (c.birth_date?'<span class="mp">Nasc. '+fD(c.birth_date)+'</span>':'')+
-              (c.city?'<span class="mp">'+c.city+(c.region?', '+c.region:'')+'</span>':'')+
-              (c.address?'<span class="mp">'+c.address+'</span>':'')+
-              (spName?'<span class="mp">'+spName+'</span>':'')+
-            '</div>'+
-            '<div style="display:flex;flex-wrap:wrap;gap:5px">'+
-              (c.status?'<span class="badge '+(SB[c.status]||'bg-gr')+'">'+(SL[c.status]||'')+'</span>':'')+
-              (c.loyalty==='vip'?'<span class="badge bg-go">VIP</span>':'')+
-              (c.loyalty==='clube'?'<span class="badge bg-dk">Clube</span>':'')+
-              (remDue?'<span class="reminder-badge">Lembrete: '+fD(remVal)+'</span>':'')+
-            '</div>'+
-          '</div>'+
-        '</div>'+
-        '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">'+
-          '<div style="display:flex;align-items:center;gap:10px">'+
-            '<div class="score-ring '+sl.cls+'">'+sl.label+'</div>'+
-            '<div><div style="font-size:10px;color:rgba(255,255,255,.5);margin-bottom:3px">Score</div><div style="font-size:11px;color:rgba(255,255,255,.7)">'+sc+'/100</div></div>'+
-          '</div>'+
-          '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
-            (c.phone?'<a class="wa" href="https://wa.me/55'+(c.phone||'').replace(/\D/g,'')+'\" target="_blank">WhatsApp</a>':'')+
-            '<button class="btn btn-g btn-sm" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff" onclick="openSendModal(\''+c.id+'\')">Mensagem</button>'+
-            ''+
-          '</div>'+
-        '</div>'+
-      '</div>'+
-    '</div>'+
-    '<div class="dgrid">'+
-      '<div class="dc">'+
-        ((c.payment_methods||[]).length?'<div class="card card-sm"><div class="fsec-t" style="margin-bottom:7px">Formas de Pagamento</div><div style="display:flex;flex-wrap:wrap;gap:5px">'+c.payment_methods.map(p=>'<span class="badge bg-g">'+p+'</span>').join('')+'</div></div>':'')+
-        ((c.channels||[]).length?'<div class="card card-sm"><div class="fsec-t" style="margin-bottom:7px">Canal de Compra</div><div style="display:flex;flex-wrap:wrap;gap:5px">'+c.channels.map(x=>'<span class="badge bg-b">'+x+'</span>').join('')+'</div></div>':'')+
-        ((c.tags||[]).length?'<div class="card card-sm"><div class="fsec-t" style="margin-bottom:7px">Tags de Produto</div><div style="display:flex;flex-wrap:wrap;gap:5px">'+c.tags.map(t=>'<span class="badge bg-g">'+t+'</span>').join('')+'</div></div>':'')+
-        (totalSpent>0?'<div class="card card-sm" style="border-color:rgba(45,106,79,.2);background:var(--green-l)"><div class="fsec-t" style="margin-bottom:5px">Total Gasto</div><div style="font-family:\'Syne\',sans-serif;font-size:20px;font-weight:700;color:var(--green)">R$ '+totalSpent.toFixed(2).replace('.',',')+'</div><div style="font-size:11px;color:var(--text2)">'+sortPurch.length+' compra'+(sortPurch.length!==1?'s':'')+'</div></div>':'')+
-        (remVal?'<div class="card card-sm" style="'+(remDue?'border-color:rgba(165,90,245,.3);background:var(--purple-l)':'')+'"><div class="fsec-t" style="margin-bottom:5px">Lembrete</div><div style="font-size:13px;font-weight:600">'+fD(remVal)+'</div></div>':'')+
-      '</div>'+
-      '<div class="dc">'+
-        '<div class="card card-sm">'+
-          '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">'+
-          '<div style="font-weight:700;font-family:\'Syne\',sans-serif">Historico de Compras</div>'+
-          '<button class="btn btn-o btn-sm" onclick="openPurchModal(\''+c.id+'\')">+ Registrar</button></div>'+
-          (!sortPurch.length?'<div class="empty" style="padding:18px"><div class="empty-d">Nenhuma compra registrada</div></div>':
-            sortPurch.map(p=>'<div class="pi"><div class="pi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/></svg></div><div style="flex:1"><div style="font-size:13px;font-weight:500">'+(p.description||'Compra')+'</div><div style="font-size:11px;color:var(--text3)">'+fD(p.date)+(p.salesperson?' - '+p.salesperson:'')+'</div></div>'+(p.amount?'<div class="pa">R$ '+parseFloat(p.amount).toFixed(2).replace('.',',')+"</div>":'')+'<button data-pid="'+p.id+'" data-cid="'+c.id+'" onclick="excluirCompra(this.dataset.pid,this.dataset.cid)" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:11px;padding:2px 4px;border-radius:4px;margin-left:4px" title="Excluir" onmouseover="this.style.color=\'var(--red)\';this.style.background=\'var(--red-l)\'" onmouseout="this.style.color=\'var(--text3)\';this.style.background=\'none\'">×</button></div>').join(''))
-        '</div>'+
-        '<div class="card card-sm">'+
-          '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">'+
-          '<div style="font-weight:700;font-family:\'Syne\',sans-serif">Historico de Contatos</div>'+
-          '<button class="btn btn-o btn-sm" onclick="openContactModal(\''+c.id+'\')">+ Registrar</button></div>'+
-          (!sortCont.length?'<div class="empty" style="padding:18px"><div class="empty-d">Nenhum contato registrado</div></div>':
-            '<div class="tl">'+sortCont.map(ct=>'<div class="tl-i"><div class="tl-dot" style="background:var(--blue)"></div><div><div class="tl-text"><strong>'+(CTL[ct.type]||ct.type)+'</strong> - '+(CRL[ct.result]||ct.result)+'</div>'+(ct.observations?'<div style="font-size:12px;color:var(--text2);margin-top:2px">'+ct.observations+'</div>':'')+(ct.next_contact?'<div style="font-size:11px;color:var(--purple);margin-top:2px">Proximo: '+fD(ct.next_contact)+'</div>':'')+'<div class="tl-date">'+fDT(ct.created_at)+(ct.salesperson?' - '+ct.salesperson:'')+'</div></div></div>').join('')+'</div>')+
-        '</div>'+
-        '<div class="card card-sm">'+
-          '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">'+
-          '<div style="font-weight:700;font-family:\'Syne\',sans-serif">Observacoes</div>'+
-          '<button class="btn btn-o btn-sm" onclick="showObsForm(\''+c.id+'\')">+ Adicionar</button></div>'+
-          '<div id="obs-f-'+c.id+'" style="display:none;margin-bottom:11px">'+
-          '<textarea id="obs-t-'+c.id+'" class="fta" placeholder="Anotacao sobre esta cliente..."></textarea>'+
-          '<div style="display:flex;gap:7px;margin-top:7px"><button class="btn btn-p btn-sm" onclick="saveObs(\''+c.id+'\')">Salvar</button><button class="btn btn-g btn-sm" onclick="hideObsForm(\''+c.id+'\')">Cancelar</button></div></div>'+
-          (!sortObs.length?'<div class="empty" style="padding:18px"><div class="empty-d">Nenhuma observacao ainda</div></div>':
-            '<div class="tl">'+sortObs.map(o=>'<div class="tl-i"><div class="tl-dot"></div><div><div class="tl-text">'+o.text+'</div><div class="tl-date">'+fDT(o.created_at)+'</div></div></div>').join('')+'</div>')+
-        '</div>'+
-      '</div>'+
-    '</div>';
 
   window._detailClient = c;
+  document.getElementById('detail-content').innerHTML = montarFichaCliente(c);
   var hf = document.getElementById('detail-header-fixed');
-  if (hf) hf.style.display = 'block';
+  if (hf) hf.style.display = 'none';
   document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
   document.getElementById('page-client-detail').classList.add('active');
   renderCashbackCliente(c.id);
 }
+
+// Reconstrói a ficha inteira a partir do que já está em memória (window._detailClient),
+// sem nenhuma consulta ao Supabase — usado depois de salvar compra/contato/observação
+// para a informação aparecer na hora, sem trocar de tela e sem refresh.
+function atualizarFichaComMemoria() {
+  var c = window._detailClient;
+  if (!c) return;
+  document.getElementById('detail-content').innerHTML = montarFichaCliente(c);
+  renderCashbackCliente(c.id);
+}
+
+// Atendimentos do Fluxo do Dia (não comprou) vinculados a este cliente.
+// Duas gerações do Fluxo do Dia gravaram o vínculo com nomes de campo
+// diferentes (clienteId e client_id) — checamos os dois por segurança.
+function getAtendimentosCliente(cid) {
+  var lista = [];
+  Object.keys(_fluxo || {}).forEach(function(date) {
+    var dia = _fluxo[date];
+    if (!dia || !dia.perdas) return;
+    dia.perdas.forEach(function(p) {
+      var pid = p.clienteId || p.client_id || null;
+      if (pid === cid) {
+        lista.push({
+          date: date,
+          canal: p.canal || '',
+          origem: p.origem || '',
+          produto: p.produto || '',
+          motivo: p.motivo || '',
+          ts: p.hora || p.ts || ''
+        });
+      }
+    });
+  });
+  lista.sort(function(a,b){ return (b.date+(b.ts||'')).localeCompare(a.date+(a.ts||'')); });
+  return lista;
+}
+
+function switchClienteTab(tab, btn) {
+  document.querySelectorAll('.cf-tab').forEach(function(el){ el.classList.remove('active'); });
+  document.querySelectorAll('.cf-panel').forEach(function(el){ el.classList.remove('active'); });
+  var targetBtn = btn || document.querySelector('.cf-tab[data-tab="'+tab+'"]');
+  if (targetBtn) targetBtn.classList.add('active');
+  var panel = document.querySelector('.cf-panel[data-panel="'+tab+'"]');
+  if (panel) panel.classList.add('active');
+}
+
+function montarFichaCliente(c) {
+  var col=avc(c.name), sps=gSP();
+  var spName=sps.find(s=>s.id===c.salesperson_id)?.name||'';
+  var sortObs=[...(c.observations||[])].sort((a,b)=>(b.created_at||'').localeCompare(a.created_at||''));
+  var sortPurch=[...(c.purchases||[])].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  var sortCont=[...(c.contacts||[])].sort((a,b)=>(b.created_at||'').localeCompare(a.created_at||''));
+  var atend=getAtendimentosCliente(c.id);
+  var totalSpent=sortPurch.reduce((a,p)=>a+(parseFloat(p.amount)||0),0);
+  var ticketMedio=sortPurch.length?totalSpent/sortPurch.length:0;
+  var ultimaCompra=sortPurch.length?sortPurch[0].date:null;
+  var saldoCb=getCbSaldo(c.id);
+  var today=new Date().toISOString().split('T')[0];
+  var remVal=(c.reminder||'').substring(0,10);
+  var remDue=remVal&&remVal<=today;
+
+  // Oportunidades reais desta cliente (mesma lógica de negócio das listas gerais,
+  // aplicada a uma única cliente — nada inventado)
+  var opps=[];
+  if (saldoCb>0) opps.push({icon:'💰',label:'Cashback disponível',sub:'R$ '+saldoCb.toFixed(2).replace('.',','),tab:'cashback'});
+  if (remVal) opps.push({icon:'⏰',label:remDue?'Lembrete vencido':'Lembrete agendado',sub:fD(remVal),tab:'lembretes'});
+  if (ultimaCompra) {
+    var diasUlt=Math.floor((new Date()-new Date(ultimaCompra))/86400000);
+    if (diasUlt>=7&&diasUlt<=60) opps.push({icon:'📞',label:'Pós-venda pendente',sub:diasUlt+' dias sem contato',tab:'compras'});
+    else if (diasUlt>60) opps.push({icon:'⚠️',label:'Cliente inativa',sub:diasUlt+' dias sem comprar',tab:'compras'});
+  }
+
+  var html='';
+  html+='<div class="cf-top">'
+    +'<div><div class="cf-title">Perfil da cliente</div><div class="cf-sub">Cliente desde '+(c.created_at?fD(c.created_at.substring(0,10)):'—')+'</div></div>'
+    +'<div class="cf-actions">'
+    +'<button class="btn btn-g btn-sm" onclick="editarClienteAtual()">Editar cliente</button>'
+    +'<button class="btn btn-p btn-sm" onclick="openPurchModal(\''+c.id+'\')">+ Nova compra</button>'
+    +'</div></div>';
+
+  html+='<div class="cf-layout">'
+    +'<div class="card cf-maincard">'
+      +'<div class="cf-id">'
+        +'<div class="av-lg" style="background:'+col+'30;color:'+col+';border:2px solid '+col+'40">'+ini(c.name)+'</div>'
+        +'<div>'
+          +'<div class="cf-name">'+c.name+'</div>'
+          +'<div class="cf-info-grid">'
+            +'<div><b>Telefone</b>'+(c.phone?c.phone+' <a class="wa" href="https://wa.me/55'+(c.phone||'').replace(/\D/g,'')+'" target="_blank" style="margin-left:4px">WhatsApp</a>':'—')+'</div>'
+            +'<div><b>Cidade</b>'+(c.city||'—')+'</div>'
+            +'<div><b>Origem</b>'+(OL[c.origin]||'—')+'</div>'
+            +'<div><b>Vendedora</b>'+(spName||'—')+'</div>'
+          +'</div>'
+          +((c.tags||[]).length?'<div class="cf-tags">'+c.tags.map(t=>'<span class="badge bg-g">'+t+'</span>').join('')+'</div>':'')
+        +'</div>'
+      +'</div>'
+      +'<div class="cf-indicators">'
+        +'<div><div class="cf-ind-lbl">Total comprado</div><div class="cf-ind-val">R$ '+totalSpent.toFixed(2).replace('.',',')+'</div></div>'
+        +'<div><div class="cf-ind-lbl">Compras</div><div class="cf-ind-val">'+sortPurch.length+'</div></div>'
+        +'<div><div class="cf-ind-lbl">Última compra</div><div class="cf-ind-val" style="font-size:14px">'+(ultimaCompra?fD(ultimaCompra):'—')+'</div></div>'
+        +'<div><div class="cf-ind-lbl">Ticket médio</div><div class="cf-ind-val">R$ '+ticketMedio.toFixed(2).replace('.',',')+'</div></div>'
+        +(saldoCb>0?'<div class="cf-cashback"><div class="cf-cashback-lbl">Cashback</div><div class="cf-cashback-val">R$ '+saldoCb.toFixed(2).replace('.',',')+'</div><div class="cf-cashback-sub">Saldo disponível</div></div>':'')
+      +'</div>'
+    +'</div>'
+    +'<div class="cf-sidebar">'
+      +(opps.length?'<div class="card card-sm cf-side-card"><div class="fsec-t">Oportunidades</div>'+opps.map(o=>'<div class="cf-opp-item" onclick="switchClienteTab(\''+o.tab+'\')"><div class="cf-opp-i">'+o.icon+'</div><div><div>'+o.label+'</div><div style="font-size:11px;color:var(--text3);font-weight:400">'+o.sub+'</div></div></div>').join('')+'</div>':'')
+      +(sortPurch.length?'<div class="card card-sm cf-side-card"><div class="fsec-t">Última compra</div><div style="font-size:13px;font-weight:600;margin-bottom:4px">'+(sortPurch[0].description||'Compra')+'</div><div style="font-size:12px;color:var(--text3)">'+(sortPurch[0].amount?'R$ '+parseFloat(sortPurch[0].amount).toFixed(2).replace('.',','):'')+' · '+fD(sortPurch[0].date)+'</div></div>':'')
+    +'</div>'
+  +'</div>';
+
+  html+='<div class="cf-tabs">'
+    +['visao:Visão geral','compras:Compras','atendimentos:Atendimentos','contatos:Contatos','lembretes:Lembretes','cashback:Cashback'].map(function(t,i){
+      var p=t.split(':');
+      return '<button class="cf-tab'+(i===0?' active':'')+'" data-tab="'+p[0]+'" onclick="switchClienteTab(\''+p[0]+'\',this)">'+p[1]+'</button>';
+    }).join('')
+  +'</div>';
+
+  html+='<div class="cf-panel active" data-panel="visao">'+buildCfVisaoGeral(c,sortPurch,sortCont,sortObs,atend)+'</div>';
+  html+='<div class="cf-panel" data-panel="compras">'+buildCfCompras(c,sortPurch)+'</div>';
+  html+='<div class="cf-panel" data-panel="atendimentos">'+buildCfAtendimentos(c,atend)+'</div>';
+  html+='<div class="cf-panel" data-panel="contatos">'+buildCfContatos(c,sortCont)+'</div>';
+  html+='<div class="cf-panel" data-panel="lembretes">'+buildCfLembretes(c)+'</div>';
+  html+='<div class="cf-panel" data-panel="cashback"><div id="cb-cliente-section"></div></div>';
+
+  return html;
+}
+
+function buildCfVisaoGeral(c,sortPurch,sortCont,sortObs,atend) {
+  var eventos=[];
+  sortPurch.forEach(function(p){ eventos.push({date:p.date||'',tipo:'compra',cor:'var(--green)',label:'Compra realizada'+(p.amount?' — R$ '+parseFloat(p.amount).toFixed(2).replace('.',','):''),sub:p.description||''}); });
+  atend.forEach(function(a){ eventos.push({date:a.date||'',tipo:'atendimento',cor:'var(--blue)',label:'Não comprou'+(a.canal?' — '+(a.canal==='online'?'Online':'Físico'):''),sub:a.motivo||a.produto||''}); });
+  sortCont.forEach(function(ct){ eventos.push({date:(ct.created_at||'').substring(0,10),tipo:'contato',cor:'var(--purple)',label:(CTL[ct.type]||ct.type)+' — '+(CRL[ct.result]||ct.result),sub:ct.observations||''}); });
+  eventos.sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); });
+  eventos=eventos.slice(0,8);
+
+  var interesses=(c.tags||[]);
+  var html='<div class="cf-cols3">';
+  html+='<div class="card card-sm"><div class="fsec-t">Resumo comercial</div>'
+    +(!eventos.length?'<div class="empty" style="padding:14px"><div class="empty-d">Sem movimentação ainda</div></div>':
+      '<div class="tl">'+eventos.map(function(e){ return '<div class="tl-i"><div class="tl-dot" style="background:'+e.cor+'"></div><div><div class="tl-text"><strong>'+fD(e.date)+'</strong> — '+e.label+'</div>'+(e.sub?'<div style="font-size:12px;color:var(--text2);margin-top:2px">'+e.sub+'</div>':'')+'</div></div>'; }).join('')+'</div>')
+    +'</div>';
+  html+='<div class="card card-sm"><div class="fsec-t">Interesses e observações</div>'
+    +(interesses.length?'<div class="cf-tags" style="margin-bottom:12px">'+interesses.map(t=>'<span class="badge bg-g">'+t+'</span>').join('')+'</div>':'<div style="font-size:12px;color:var(--text3);margin-bottom:10px">Nenhuma tag de interesse cadastrada</div>')
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px">Observações</div><button class="btn btn-o btn-sm" onclick="showObsForm(\''+c.id+'\')">+ Adicionar</button></div>'
+    +'<div id="obs-f-'+c.id+'" style="display:none;margin-bottom:11px"><textarea id="obs-t-'+c.id+'" class="fta" placeholder="Anotação sobre esta cliente..."></textarea><div style="display:flex;gap:7px;margin-top:7px"><button class="btn btn-p btn-sm" onclick="saveObs(\''+c.id+'\')">Salvar</button><button class="btn btn-g btn-sm" onclick="hideObsForm(\''+c.id+'\')">Cancelar</button></div></div>'
+    +(!sortObs.length?'<div class="empty" style="padding:14px"><div class="empty-d">Nenhuma observação ainda</div></div>':
+      '<div class="tl">'+sortObs.slice(0,5).map(o=>'<div class="tl-i"><div class="tl-dot"></div><div><div class="tl-text">'+o.text+'</div><div class="tl-date">'+fDT(o.created_at)+'</div></div></div>').join('')+'</div>')
+    +'</div>';
+  html+='<div class="card card-sm"><div class="fsec-t">Próximas ações</div>'+buildCfLembretes(c,true)+'</div>';
+  html+='</div>';
+  return html;
+}
+
+function buildCfCompras(c,sortPurch) {
+  return '<div class="card card-sm">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div class="fsec-t" style="margin-bottom:0;border-bottom:none;padding-bottom:0">Histórico de Compras</div><button class="btn btn-o btn-sm" onclick="openPurchModal(\''+c.id+'\')">+ Registrar</button></div>'
+    +(!sortPurch.length?'<div class="empty" style="padding:18px"><div class="empty-d">Nenhuma compra registrada</div></div>':
+      sortPurch.map(p=>'<div class="pi"><div class="pi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/></svg></div><div style="flex:1"><div style="font-size:13px;font-weight:500">'+(p.description||'Compra')+'</div><div style="font-size:11px;color:var(--text3)">'+fD(p.date)+(p.salesperson?' - '+p.salesperson:'')+'</div></div>'+(p.amount?'<div class="pa">R$ '+parseFloat(p.amount).toFixed(2).replace('.',',')+'</div>':'')+'<button data-pid="'+p.id+'" data-cid="'+c.id+'" onclick="excluirCompra(this.dataset.pid,this.dataset.cid)" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:11px;padding:2px 4px;border-radius:4px;margin-left:4px" title="Excluir">×</button></div>').join(''))
+    +'</div>';
+}
+
+function buildCfAtendimentos(c,atend) {
+  var CANAL_LBL={fisico:'Loja Física',online:'Online'};
+  return '<div class="card card-sm">'
+    +'<div class="fsec-t">Atendimentos registrados no Fluxo do Dia</div>'
+    +(!atend.length?'<div class="empty" style="padding:18px"><div class="empty-d">Nenhum atendimento sem compra registrado</div></div>':
+      '<div class="tl">'+atend.map(function(a){ return '<div class="tl-i"><div class="tl-dot" style="background:var(--blue)"></div><div><div class="tl-text"><strong>'+(CANAL_LBL[a.canal]||a.canal||'Atendimento')+'</strong>'+(a.origem?' — '+a.origem:'')+'</div>'+(a.produto?'<div style="font-size:12px;color:var(--text2);margin-top:2px">Procurava: '+a.produto+'</div>':'')+(a.motivo?'<div style="font-size:12px;color:var(--text2);margin-top:2px">Motivo: '+a.motivo+'</div>':'')+'<div class="tl-date">'+fD(a.date)+'</div></div></div>'; }).join('')+'</div>')
+    +'</div>';
+}
+
+function buildCfContatos(c,sortCont) {
+  return '<div class="card card-sm">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div class="fsec-t" style="margin-bottom:0;border-bottom:none;padding-bottom:0">Histórico de Contatos</div><button class="btn btn-o btn-sm" onclick="openContactModal(\''+c.id+'\')">+ Registrar</button></div>'
+    +(!sortCont.length?'<div class="empty" style="padding:18px"><div class="empty-d">Nenhum contato registrado</div></div>':
+      '<div class="tl">'+sortCont.map(ct=>'<div class="tl-i"><div class="tl-dot" style="background:var(--blue)"></div><div><div class="tl-text"><strong>'+(CTL[ct.type]||ct.type)+'</strong> - '+(CRL[ct.result]||ct.result)+'</div>'+(ct.observations?'<div style="font-size:12px;color:var(--text2);margin-top:2px">'+ct.observations+'</div>':'')+(ct.next_contact?'<div style="font-size:11px;color:var(--purple);margin-top:2px">Proximo: '+fD(ct.next_contact)+'</div>':'')+'<div class="tl-date">'+fDT(ct.created_at)+(ct.salesperson?' - '+ct.salesperson:'')+'</div></div></div>').join('')+'</div>')
+    +'</div>';
+}
+
+// compacto=true → usado dentro do card "Próximas ações" da Visão Geral
+function buildCfLembretes(c, compacto) {
+  var remVal=(c.reminder||'').substring(0,10);
+  var today=new Date().toISOString().split('T')[0];
+  var remDue=remVal&&remVal<=today;
+  var corpo=(!remVal)
+    ? '<div class="empty" style="padding:'+(compacto?'10px':'18px')+'"><div class="empty-d">Nenhum lembrete agendado</div></div>'
+    : '<div class="tl"><div class="tl-i"><div class="tl-dot" style="background:'+(remDue?'var(--red)':'var(--purple)')+'"></div><div><div class="tl-text"><strong>'+(remDue?'Lembrete vencido':'Entrar em contato')+'</strong></div><div class="tl-date">'+fD(remVal)+'</div></div></div></div>';
+  if (compacto) {
+    return corpo+'<div style="font-size:11px;color:var(--text3);margin-top:10px">O lembrete é criado a partir do Fluxo do Dia ou de um contato com "próximo contato".</div>';
+  }
+  return '<div class="card card-sm"><div class="fsec-t">Lembretes</div>'+corpo
+    +'<div style="font-size:11px;color:var(--text3);margin-top:12px">Novos lembretes são criados no Fluxo do Dia (atendimento) ou ao registrar um contato com data de "próximo contato". Aqui você só acompanha.</div>'
+    +'</div>';
+}
+
 function goBack(){
   var hf=document.getElementById('detail-header-fixed'); if(hf) hf.style.display='none';showPage('clients');}
 function showObsForm(id){document.getElementById('obs-f-'+id).style.display='block';document.getElementById('obs-t-'+id).focus();}
 function hideObsForm(id){document.getElementById('obs-f-'+id).style.display='none';}
 async function saveObs(cid){
   const t=document.getElementById('obs-t-'+cid).value.trim(); if(!t)return;
-  await _sb.from('observations').insert({store_id:CU.id, client_id:cid, text:t});
-  toast('Observacao salva!'); await loadAll(); showDetail(cid);
+  const res=await _sb.from('observations').insert({store_id:CU.id, client_id:cid, text:t}).select().single();
+  toast('Observacao salva!');
+  if (window._detailClient && window._detailClient.id===cid && res.data) {
+    window._detailClient.observations = window._detailClient.observations||[];
+    window._detailClient.observations.unshift(res.data);
+    atualizarFichaComMemoria();
+  } else {
+    await loadAll(); showDetail(cid);
+  }
 }
 
 // ── MESSAGES ──
@@ -3506,8 +3656,14 @@ async function savePurch(){
   if (cl) { cl.purchases = resP.data || []; cl.status = 'comprou'; }
   closePurchModal(); toast('Compra registrada!');
   if (amt) { await gerarCashbackVenda(cid, parseFloat(amt), null); }
-  showDetail(cid);
   updateBadges();
+  if (window._detailClient && window._detailClient.id===cid) {
+    window._detailClient.purchases = resP.data || [];
+    window._detailClient.status = 'comprou';
+    atualizarFichaComMemoria();
+  } else {
+    showDetail(cid);
+  }
 }
 
 // ── CONTACTS ──
@@ -3524,9 +3680,21 @@ async function saveContact(){
   const spid=document.getElementById('ct-sp').value||null;
   const sp=gSP().find(s=>s.id===spid);
   const nextDate=document.getElementById('ct-next').value||null;
-  await _sb.from('contacts').insert({store_id:CU.id,client_id:cid,type:document.getElementById('ct-type').value,result:document.getElementById('ct-result').value,observations:document.getElementById('ct-obs').value.trim()||null,next_contact:nextDate,salesperson:sp?.name||null});
-  if(nextDate) await _sb.from('clients').update({reminder:nextDate}).eq('id',cid);
-  closeContactModal(); toast('Contato registrado!'); await loadAll(); showDetail(cid);
+  const res=await _sb.from('contacts').insert({store_id:CU.id,client_id:cid,type:document.getElementById('ct-type').value,result:document.getElementById('ct-result').value,observations:document.getElementById('ct-obs').value.trim()||null,next_contact:nextDate,salesperson:sp?.name||null}).select().single();
+  if (nextDate) {
+    await _sb.from('clients').update({reminder:nextDate}).eq('id',cid);
+    var clG=_clients.find(function(x){ return x.id===cid; });
+    if (clG) clG.reminder = nextDate;
+  }
+  closeContactModal(); toast('Contato registrado!');
+  if (window._detailClient && window._detailClient.id===cid && res.data) {
+    window._detailClient.contacts = window._detailClient.contacts||[];
+    window._detailClient.contacts.unshift(res.data);
+    if (nextDate) window._detailClient.reminder = nextDate;
+    atualizarFichaComMemoria();
+  } else {
+    await loadAll(); showDetail(cid);
+  }
 }
 
 // ── BADGES ──
