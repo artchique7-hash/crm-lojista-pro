@@ -1901,7 +1901,18 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
    <div class="fg"><label class="fl">Checklist (opcional)</label>
     <div style="display:flex;gap:6px;margin-bottom:8px">
      <input type="text" id="rot-check-input" class="fi" placeholder="Item do checklist">
-     <button class="btn btn-g btn-sm" onclick="addCheckRotina()
+     <button class="btn btn-g btn-sm" onclick="addCheckRotina()" style="flex-shrink:0">+</button>
+    </div>
+    <div id="rot-check-list"></div>
+   </div>
+   <div class="mf">
+    <button class="btn btn-g btn-sm" onclick="fecharModalRotina()">Cancelar</button>
+    <button class="btn btn-p btn-sm" onclick="salvarRotina()">Salvar</button>
+   </div>
+  </div>
+ </div>
+</div>
+
 <script>
 // ── CONFIG SUPABASE ──
 const _sb = supabase.createClient('https://ihpfexmourrvixtsxhrt.supabase.co', 'sb_publishable_M7vZQ1VPi_7BP3HQAp-ngA_cMB22bEG');
