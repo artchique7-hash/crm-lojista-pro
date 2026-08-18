@@ -1355,7 +1355,6 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
    <button class="escrit-tab" onclick="switchEscrit('funis',this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg> Funis</button>
    <button class="escrit-tab" onclick="switchEscrit('rotina',this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> Rotina Comercial</button>
    <button class="escrit-tab" onclick="switchEscrit('calendario',this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Conteúdo</button>
-   
   </div>
 
   <!-- OBJETIVOS -->
@@ -1527,71 +1526,6 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
    </div>
    <button class="btn btn-p btn-sm" onclick="abrirEscolhaTipoFunil()">+ Novo Funil</button>
   </div>
- <div id="escrit-cashback" class="escrit-section">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
-   <div><div style="font-family:Syne,sans-serif;font-size:17px;font-weight:700;margin-bottom:2px">💰 Cashback</div>
-   <div style="font-size:12px;color:var(--text3)">Configure e gerencie o programa de cashback da loja</div></div>
-   <button class="btn btn-p btn-sm" onclick="salvarConfigCashback()">Salvar configurações</button>
-  </div>
-  <div class="cb-config-card">
-   <div style="font-size:13px;font-weight:700;margin-bottom:14px">⚙️ Regra padrão</div>
-   <div class="fgrid">
-    <div class="fg">
-     <label class="fl">Percentual de cashback (%)</label>
-     <input type="number" id="cb-percentual" class="fi" placeholder="Ex: 5" min="0" max="100" step="0.5">
-     <div style="font-size:11px;color:var(--text3);margin-top:4px">💡 Sugestão para moda: 5% a 10%. Defina conforme sua margem e estratégia.</div>
-    </div>
-    <div class="fg">
-     <label class="fl">Validade (dias)</label>
-     <div style="display:flex;gap:6px;margin-bottom:6px">
-      <button class="btn btn-g btn-xs cb-dias-btn" onclick="setCbDias(30,this)">30d</button>
-      <button class="btn btn-g btn-xs cb-dias-btn" onclick="setCbDias(60,this)">60d</button>
-      <button class="btn btn-g btn-xs cb-dias-btn" onclick="setCbDias(90,this)">90d</button>
-     </div>
-     <input type="number" id="cb-validade" class="fi" placeholder="Dias de validade (ex: 60)" min="1">
-    </div>
-   </div>
-   <div class="fg" style="margin-top:8px">
-    <label class="fl">Valor mínimo de compra para gerar cashback (opcional)</label>
-    <input type="number" id="cb-minimo" class="fi" placeholder="Deixe vazio para qualquer valor" min="0" step="0.01">
-   </div>
-  </div>
-  <div class="cb-config-card">
-   <div style="font-size:13px;font-weight:700;margin-bottom:14px">💬 Mensagens de lembrete automático</div>
-   <div class="fg">
-    <label class="fl">30 dias antes do vencimento</label>
-    <textarea id="cb-msg-30" class="fi" rows="2" placeholder="Oi {nome}! Você tem R$ {valor} de cashback disponível até {data}."></textarea>
-   </div>
-   <div class="fg">
-    <label class="fl">15 dias antes</label>
-    <textarea id="cb-msg-15" class="fi" rows="2" placeholder="{nome}, você ainda tem R$ {valor} de cashback. Faltam 15 dias para usar!"></textarea>
-   </div>
-   <div class="fg">
-    <label class="fl">5 dias antes (urgência)</label>
-    <textarea id="cb-msg-5" class="fi" rows="2" placeholder="Últimos dias! Seu cashback de R$ {valor} expira em {data}, {nome}."></textarea>
-   </div>
-  </div>
-  <div class="cb-config-card">
-   <div style="font-size:13px;font-weight:700;margin-bottom:14px">🔍 Pesquisa de clientes com cashback</div>
-   <div class="fgrid">
-    <div class="fg">
-     <label class="fl">Filtrar</label>
-     <select id="cb-filtro" class="fi" onchange="renderCbPesquisa()">
-      <option value="">Todas com saldo disponível</option>
-      <option value="vencendo30">Vencendo em 30 dias</option>
-      <option value="vencendo15">Vencendo em 15 dias</option>
-      <option value="vencendo5">Vencendo em 5 dias</option>
-      <option value="alto">Saldo acima de R$ 50</option>
-     </select>
-    </div>
-    <div class="fg">
-     <label class="fl">Buscar por tag/interesse</label>
-     <input type="text" id="cb-tag-busca" class="fi" placeholder="Ex: tênis, vestido..." oninput="renderCbPesquisa()">
-    </div>
-   </div>
-   <div id="cb-pesquisa-list" style="margin-top:12px"></div>
-  </div>
- </div>
   <div id="funis-list" class="funil-list"></div>
   <div class="wpp-divider">
    <div style="display:flex;align-items:center;gap:10px">
@@ -1914,11 +1848,43 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 </div>
 
 <script>
+
+// 
 // ── CONFIG SUPABASE ──
 const _sb = supabase.createClient('https://ihpfexmourrvixtsxhrt.supabase.co', 'sb_publishable_M7vZQ1VPi_7BP3HQAp-ngA_cMB22bEG');
 
 // ── STATE ──
 let CU=null, TAGS=[], editCID=null, editSPID=null, editMSGID=null;
+
+// ── Armazenamento local isolado por loja ──
+// Todo dado que hoje só existe no navegador (nao no Supabase) precisa ser
+// gravado com uma chave unica por loja, senao dados de lojas diferentes que
+// passaram pelo mesmo navegador podem se misturar.
+function slpKey(base) {
+  return (CU && CU.id) ? (base + '_' + CU.id) : base;
+}
+function slpGet(base, fallback) {
+  var scopedRaw = localStorage.getItem(slpKey(base));
+  if (scopedRaw) {
+    try { return JSON.parse(scopedRaw); } catch (e) { return fallback; }
+  }
+  // Migração automática: dados salvos antes do isolamento por loja ficavam
+  // numa chave sem o id da loja. Se a chave nova ainda não tem nada, busca
+  // na chave antiga, usa esse valor e já grava na chave nova — sem apagar
+  // a antiga e sem a aluna precisar fazer nada.
+  var legacyRaw = localStorage.getItem(base);
+  if (legacyRaw) {
+    try {
+      var val = JSON.parse(legacyRaw);
+      localStorage.setItem(slpKey(base), JSON.stringify(val));
+      return val;
+    } catch (e) { return fallback; }
+  }
+  return fallback;
+}
+function slpSet(base, value) {
+  localStorage.setItem(slpKey(base), JSON.stringify(value));
+}
 let _clients=[], _sp=[], _msgs=[], _log=[];
 
 const uid = () => Date.now().toString(36) + Math.random().toString(36).substr(2,5);
@@ -1990,6 +1956,9 @@ async function register() {
 async function logout() {
   await _sb.auth.signOut();
   CU=null; _clients=[]; _sp=[]; _msgs=[]; _log=[];
+  _caMsgs=[]; _caRoteiros=[]; _caObjecoes=[]; _caCom={}; _caFavs=[];
+  _eventos=[]; _metas=[]; _tarefas=[]; _funis=[]; _planMes={};
+  _rotinas=[]; _atividades=[]; _wppAuto=[]; _cbConfig=Object.assign({}, _CB_CONFIG_PADRAO);
   document.getElementById('app').style.display='none';
   document.getElementById('auth-screen').style.display='flex';
   showLogin();
@@ -2013,7 +1982,28 @@ async function initDefaultMsgs() {
   ]);
 }
 
+// Carrega tudo que hoje mora no localStorage, já usando a chave da loja logada.
+// Precisa rodar depois que CU existe (por isso é chamada dentro de enterApp,
+// nunca antes do login).
+function carregarDadosLocaisDaLoja() {
+  _caMsgs = slpGet('slp_ca_msgs', []);
+  _caRoteiros = slpGet('slp_ca_roteiros', []);
+  _caObjecoes = slpGet('slp_ca_objecoes', []);
+  _caCom = slpGet('slp_ca_com', {});
+  _caFavs = slpGet('slp_ca_favs', []);
+  _eventos = slpGet('slp_eventos', []);
+  _metas = slpGet('slp_metas', []);
+  _tarefas = slpGet('slp_tarefas', []);
+  _funis = slpGet('slp_funis', []);
+  _planMes = slpGet('slp_plan', {});
+  _rotinas = slpGet('slp_rotinas', []);
+  _atividades = slpGet('slp_atividades', []);
+  _wppAuto = slpGet('slp_wpp_auto', []);
+  _cbConfig = Object.assign({}, _CB_CONFIG_PADRAO, slpGet('slp_cb_config', {}));
+}
+
 function enterApp() {
+  carregarDadosLocaisDaLoja();
   document.getElementById('auth-screen').style.display='none';
   document.getElementById('app').style.display='block';
   document.getElementById('sb-store').textContent = CU.store||'Minha Loja';
@@ -2204,9 +2194,8 @@ function renderDash() {
   // ── 4. PROXIMAS ACOES ──
   var proxEl = document.getElementById('dash-proximas');
   if (proxEl) {
-    var eventos = JSON.parse(localStorage.getItem('slp_eventos') || '[]');
     var hoje2 = new Date().toISOString().split('T')[0];
-    var proximos = eventos.filter(function(e){ return e.data >= hoje2; })
+    var proximos = (_eventos||[]).filter(function(e){ return e.data >= hoje2; })
       .sort(function(a,b){ return a.data.localeCompare(b.data); }).slice(0,5);
 
     var TIPO_COR_P = {stories:'#e07020', reels:'#7d3c98', live:'#b83232', campanha:'#1f5c3a', data:'#a07830', outro:'#8a9e90'};
@@ -2452,11 +2441,11 @@ async function saveObs(cid){
 // ════════════════════════════════════════════════
 // CENTRAL DE ATENDIMENTO
 // ════════════════════════════════════════════════
-var _caMsgs = JSON.parse(localStorage.getItem('slp_ca_msgs') || '[]');
-var _caRoteiros = JSON.parse(localStorage.getItem('slp_ca_roteiros') || '[]');
-var _caObjecoes = JSON.parse(localStorage.getItem('slp_ca_objecoes') || '[]');
-var _caCom = JSON.parse(localStorage.getItem('slp_ca_com') || '{}');
-var _caFavs = JSON.parse(localStorage.getItem('slp_ca_favs') || '[]');
+var _caMsgs = [];
+var _caRoteiros = [];
+var _caObjecoes = [];
+var _caCom = {};
+var _caFavs = [];
 
 var CA_CATS = {
   primeiro_atendimento: {label:'Primeiro atendimento', cor:'var(--blue)', bg:'var(--blue-l)'},
@@ -2479,7 +2468,7 @@ var CA_VINC = {
 };
 
 function saveCA(key, data) {
-  localStorage.setItem('slp_ca_' + key, JSON.stringify(data));
+  slpSet('slp_ca_' + key, data);
 }
 
 function isFav(tipo, id) {
@@ -2590,7 +2579,7 @@ function renderCAMsgs() {
   // Combinar mensagens locais + Supabase (antigas)
   var todos = _caMsgs.slice();
   // Migrar mensagens do Supabase para o novo sistema se ainda não migradas
-  var migradas = JSON.parse(localStorage.getItem('slp_ca_migrated') || 'false');
+  var migradas = slpGet('slp_ca_migrated', false);
   if (!migradas && (_msgs||[]).length) {
     (_msgs||[]).forEach(function(m){
       var catMap = {aniversario:'aniversario', pos_venda:'pos_venda', inativos:'reativacao', outro:'outro'};
@@ -2599,7 +2588,7 @@ function renderCAMsgs() {
       }
     });
     saveCA('msgs', _caMsgs);
-    localStorage.setItem('slp_ca_migrated', 'true');
+    slpSet('slp_ca_migrated', true);
     todos = _caMsgs.slice();
   }
   
@@ -3462,11 +3451,17 @@ async function saveClient(){
   if(editCID){
     await _sb.from('clients').update(row).eq('id',editCID);
     if(obs) await _sb.from('observations').insert({store_id:CU.id,client_id:editCID,text:obs});
-    toast('Cliente atualizada!'); closeClientModal(); await loadAll(); showDetail(editCID);
+    // atualizar em memória imediatamente
+    var existing = _clients.find(function(x){ return x.id===editCID; });
+    if (existing) { Object.assign(existing, row); }
+    toast('Cliente atualizada!'); closeClientModal(); showDetail(editCID);
+    loadAll(); // sincronizar em background
   } else {
     const {data}=await _sb.from('clients').insert(row).select().single();
     if(obs&&data) await _sb.from('observations').insert({store_id:CU.id,client_id:data.id,text:obs});
-    toast('Cliente cadastrada!'); closeClientModal(); await loadAll(); renderClients();
+    if(data) { data.purchases=[]; _clients.unshift(data); }
+    toast('Cliente cadastrada!'); closeClientModal(); renderClients(); updateBadges();
+    loadAll(); // atualizar em background
   }
 }
 
@@ -3548,41 +3543,6 @@ function getFluxoDate() {
 
 function getFluxoDay(date) {
   return _fluxo[date] || {fisico:0, online:0, perdas:[], id:null};
-}
-
-function loadFluxoFromDB() {
-  if (!CU) return Promise.resolve();
-  return _sb.from('daily_flow').select('*').eq('store_id', CU.id).then(function(res) {
-    _fluxo = {};
-    (res.data || []).forEach(function(row) {
-      _fluxo[row.date] = {fisico:row.fisico||0, online:row.online||0, perdas:row.perdas||[], id:row.id};
-    });
-  }).catch(function(e) { console.log('fluxo load err', e); });
-}
-
-function saveFluxoToDB(date) {
-  var day = getFluxoDay(date);
-  var row = {store_id:CU.id, date:date, fisico:day.fisico, online:day.online, perdas:day.perdas};
-  if (day.id) {
-    _sb.from('daily_flow').update(row).eq('id', day.id).then(function(){});
-  } else {
-    _sb.from('daily_flow').insert(row).select().single().then(function(res) {
-      if (res.data) {
-        if (!_fluxo[date]) _fluxo[date] = {fisico:0, online:0, perdas:[]};
-        _fluxo[date].id = res.data.id;
-      }
-    });
-  }
-}
-
-
-
-function changeCount(tipo, delta) {
-  var date = getFluxoDate();
-  if (!_fluxo[date]) _fluxo[date] = {fisico:0, online:0, perdas:[], id:null};
-  _fluxo[date][tipo] = Math.max(0, (_fluxo[date][tipo] || 0) + delta);
-  renderFluxo();
-  saveFluxoToDB(date);
 }
 
 function openPerdaForm() {
@@ -3964,8 +3924,6 @@ function changeCount(tipo, delta) {
   saveFluxoToDB(date);
 }
 
-// Estender saveFluxoToDB para incluir vendas
-var _origSaveFluxo = saveFluxoToDB;
 function saveFluxoToDB(date) {
   var day = getFluxoDay(date);
   var row = {
@@ -4051,9 +4009,9 @@ function salvarClienteRapido() {
 // ── ESCRITORIO DA LOJA ──
 var _calAno = new Date().getFullYear();
 var _calMes = new Date().getMonth();
-var _eventos = JSON.parse(localStorage.getItem('slp_eventos') || '[]');
-var _metas = JSON.parse(localStorage.getItem('slp_metas') || '[]');
-var _tarefas = JSON.parse(localStorage.getItem('slp_tarefas') || '[]');
+var _eventos = [];
+var _metas = [];
+var _tarefas = [];
 // HELPER vendedoras
 function spSelectHtml(valorAtual) {
   return '<option value="">— Selecionar —</option>' +
@@ -4073,7 +4031,7 @@ function onRespChange(selEl, manualId) {
   if (m) m.style.display = selEl.value === '__manual__' ? 'block' : 'none';
 }
 
-var _funis = JSON.parse(localStorage.getItem('slp_funis') || '[]');
+var _funis = [];
 
 function switchEscrit(section, btn) {
   document.querySelectorAll('.escrit-section').forEach(function(el){ el.classList.remove('active'); });
@@ -4108,7 +4066,7 @@ var KAN_COLS = [
 ];
 
 var _calView = 'resumo';
-var _planMes = JSON.parse(localStorage.getItem('slp_plan') || '{}');
+var _planMes = {};
 
 function calNav(delta) {
   _calMes += delta;
@@ -4228,7 +4186,7 @@ function salvarPlanMes() {
     narrativa: document.getElementById('plan-narrativa').value.trim(),
     obs: document.getElementById('plan-obs').value.trim()
   };
-  localStorage.setItem('slp_plan', JSON.stringify(_planMes));
+  slpSet('slp_plan', _planMes);
   cancelarPlanEdit();
   renderResumoMes();
   toast('Planejamento salvo!');
@@ -4304,7 +4262,7 @@ function moverKan(id, novoStatus) {
   var idx = _eventos.findIndex(function(e){ return e.id===id; });
   if (idx === -1) return;
   _eventos[idx].status = novoStatus;
-  localStorage.setItem('slp_eventos', JSON.stringify(_eventos));
+  slpSet('slp_eventos', _eventos);
   renderKanban();
   toast('Movido para ' + (KAN_COLS.find(function(c){ return c.id===novoStatus; })||{}).label);
 }
@@ -4357,7 +4315,6 @@ function abrirModalConteudo(id, statusDefault, dataDefault) {
   document.getElementById('ev-tipo').value = ev ? (ev.tipo||'stories') : 'stories';
   document.getElementById('ev-status').value = ev ? (ev.status||'ideias') : (statusDefault||'ideias');
   document.getElementById('ev-data').value = ev ? (ev.data||'') : (dataDefault||new Date().toISOString().split('T')[0]);
-  getResponsavelValue('ev-resp','ev-resp-manual') = ev ? (ev.resp||'') : '';
   document.getElementById('ev-objetivo').value = ev ? (ev.objetivo||'') : '';
   document.getElementById('ev-campanha').value = ev ? (ev.campanha||'') : '';
   document.getElementById('ev-obs').value = ev ? (ev.obs||'') : '';
@@ -4400,7 +4357,7 @@ function salvarEvento() {
   } else {
     _eventos.push(ev);
   }
-  localStorage.setItem('slp_eventos', JSON.stringify(_eventos));
+  slpSet('slp_eventos', _eventos);
   fecharModalConteudo();
   renderPlanMes();
   toast(editId ? 'Conteudo atualizado!' : 'Conteudo adicionado!');
@@ -4512,7 +4469,7 @@ function salvarMeta() {
   } else {
     _metas.push(meta);
   }
-  localStorage.setItem('slp_metas', JSON.stringify(_metas));
+  slpSet('slp_metas', _metas);
   fecharModalMeta();
   renderMetas();
   toast(editId ? 'Meta atualizada!' : 'Meta criada!');
@@ -4521,7 +4478,7 @@ function salvarMeta() {
 function excluirMeta(id) {
   if (!confirm('Excluir esta meta?')) return;
   _metas = _metas.filter(function(m){ return m.id !== id; });
-  localStorage.setItem('slp_metas', JSON.stringify(_metas));
+  slpSet('slp_metas', _metas);
   renderMetas();
   toast('Meta excluida.');
 }
@@ -4549,7 +4506,7 @@ function confirmarResultado() {
   var idx = _metas.findIndex(function(x){ return x.id === id; });
   if (idx === -1) return;
   _metas[idx].atual = valor;
-  localStorage.setItem('slp_metas', JSON.stringify(_metas));
+  slpSet('slp_metas', _metas);
   fecharModalResultado();
   renderMetas();
   var pct = _metas[idx].alvo > 0 ? Math.round((valor/_metas[idx].alvo)*100) : 0;
@@ -4687,8 +4644,8 @@ function filtrarMetas(btn) {
 
 
 // ── ROTINA COMERCIAL ──
-var _rotinas = JSON.parse(localStorage.getItem('slp_rotinas') || '[]');
-var _atividades = JSON.parse(localStorage.getItem('slp_atividades') || '[]');
+var _rotinas = [];
+var _atividades = [];
 var _rotCheckTemp = [];
 var _ativCheckTemp = [];
 var _ativFiltro = 'todas';
@@ -4792,7 +4749,7 @@ function salvarRotina() {
   } else {
     _rotinas.push(rot);
   }
-  localStorage.setItem('slp_rotinas', JSON.stringify(_rotinas));
+  slpSet('slp_rotinas', _rotinas);
   fecharModalRotina();
   renderRotinas();
   toast(editId ? 'Rotina atualizada!' : 'Rotina criada!');
@@ -4801,7 +4758,7 @@ function salvarRotina() {
 function excluirRotina(id) {
   if (!confirm('Excluir esta rotina?')) return;
   _rotinas = _rotinas.filter(function(r){ return r.id!==id; });
-  localStorage.setItem('slp_rotinas', JSON.stringify(_rotinas));
+  slpSet('slp_rotinas', _rotinas);
   renderRotinas();
   toast('Rotina excluida.');
 }
@@ -4811,7 +4768,7 @@ function toggleCheckRotina(rotId, idx) {
   if (!rot) return;
   if (!rot.checkDone) rot.checkDone = {};
   rot.checkDone[idx] = !rot.checkDone[idx];
-  localStorage.setItem('slp_rotinas', JSON.stringify(_rotinas));
+  slpSet('slp_rotinas', _rotinas);
   var box = document.getElementById('rc-' + rotId + '-' + idx);
   var txt = document.getElementById('rt-' + rotId + '-' + idx);
   if (box) box.classList.toggle('done', rot.checkDone[idx]);
@@ -4954,7 +4911,7 @@ function salvarAtividade() {
   } else {
     _atividades.push(at);
   }
-  localStorage.setItem('slp_atividades', JSON.stringify(_atividades));
+  slpSet('slp_atividades', _atividades);
   fecharModalAtividade();
   renderAtividades();
   toast(editId ? 'Atividade atualizada!' : 'Atividade criada!');
@@ -4963,7 +4920,7 @@ function salvarAtividade() {
 function excluirAtividade(id) {
   if (!confirm('Excluir esta atividade?')) return;
   _atividades = _atividades.filter(function(a){ return a.id!==id; });
-  localStorage.setItem('slp_atividades', JSON.stringify(_atividades));
+  slpSet('slp_atividades', _atividades);
   renderAtividades();
   toast('Atividade excluida.');
 }
@@ -4975,7 +4932,7 @@ function toggleCheckAtiv(ativId, idx) {
   // Auto status se tudo concluido
   var allDone = at.checklist.every(function(item){ return item.done; });
   if (allDone && at.checklist.length > 0) at.status = 'concluida';
-  localStorage.setItem('slp_atividades', JSON.stringify(_atividades));
+  slpSet('slp_atividades', _atividades);
   renderAtividades();
 }
 
@@ -4983,7 +4940,7 @@ function mudarStatusAtiv(id, status) {
   var at = _atividades.find(function(a){ return a.id===id; });
   if (!at) return;
   at.status = status;
-  localStorage.setItem('slp_atividades', JSON.stringify(_atividades));
+  slpSet('slp_atividades', _atividades);
   renderAtividades();
   toast('Status atualizado!');
 }
@@ -5070,8 +5027,6 @@ function salvarTarefa() { salvarAtividade(); }
 // ══════════════════════════════════════════════════
 // FUNIS COMERCIAIS v2
 // ══════════════════════════════════════════════════
-var _funis = JSON.parse(localStorage.getItem('slp_funis') || '[]');
-
 var FUNIL_TIPOS = [
   {id:'aquisicao', label:'Funil de Aquisicao', icon:'🎯', desc:'Captacao e conversao de novos clientes', cor:'var(--blue)', corL:'var(--blue-l)'},
   {id:'live', label:'Funil de Live', icon:'📱', desc:'Planejamento e execucao de lives', cor:'var(--purple)', corL:'var(--purple-l)'},
@@ -5099,7 +5054,7 @@ var FUNIL_CHECK_DEFAULTS = [
 var _funilTipoSelecionado = null;
 
 function saveFunis() {
-  localStorage.setItem('slp_funis', JSON.stringify(_funis));
+  slpSet('slp_funis', _funis);
 }
 
 function getFunilTipo(id) {
@@ -5350,7 +5305,7 @@ function salvarResultadoFunil(fid) {
         var idx = _metas.findIndex(function(x){ return x.id===m.id; });
         if (idx !== -1) {
           _metas[idx].atual = val;
-          localStorage.setItem('slp_metas', JSON.stringify(_metas));
+          slpSet('slp_metas', _metas);
           renderMetas();
           toast('Meta atualizada tambem!');
         }
@@ -5664,7 +5619,7 @@ function editarClienteAtual() {
 // ════════════════════════════
 // WHATSAPP AUTOMATICO v1
 // ════════════════════════════
-var _wppAuto = JSON.parse(localStorage.getItem('slp_wpp_auto') || '[]');
+var _wppAuto = [];
 var WPP_DIAS_LBL = ['Dom','Seg','Ter','Qua','Qui','Sex','Sab'];
 var WPP_FONTES = [
   {id:'gopage',label:'Gopage',icon:'🛍️',desc:'Integração via API da sua loja Gopage'},
@@ -5673,7 +5628,7 @@ var WPP_FONTES = [
   {id:'manual',label:'Cadastro manual',icon:'✏️',desc:'Cadastre os produtos diretamente aqui'}
 ];
 
-function saveWppAuto(){ localStorage.setItem('slp_wpp_auto',JSON.stringify(_wppAuto)); }
+function saveWppAuto(){ slpSet('slp_wpp_auto', _wppAuto); }
 function getWpp(id){ return _wppAuto.find(function(x){return x.id===id;}); }
 
 function renderWppAuto(){
@@ -6680,8 +6635,9 @@ async function confirmarImportacao() {
 }
 
 // MÓDULO CASHBACK
-var _cbConfig=JSON.parse(localStorage.getItem('slp_cb_config')||'{"percentual":5,"validade":60,"minimo":0,"msg30":"Oi {nome}! Você tem R$ {valor} de cashback até {data}.","msg15":"{nome}, seu cashback de R$ {valor} vence em 15 dias!","msg5":"Últimos dias! Cashback de R$ {valor} expira em {data}, {nome}."}');
-function saveCbConfig(){localStorage.setItem('slp_cb_config',JSON.stringify(_cbConfig));}
+var _CB_CONFIG_PADRAO = {"percentual":5,"validade":60,"minimo":0,"msg30":"Oi {nome}! Você tem R$ {valor} de cashback até {data}.","msg15":"{nome}, seu cashback de R$ {valor} vence em 15 dias!","msg5":"Últimos dias! Cashback de R$ {valor} expira em {data}, {nome}."};
+var _cbConfig = Object.assign({}, _CB_CONFIG_PADRAO);
+function saveCbConfig(){slpSet('slp_cb_config', _cbConfig);}
 var _cashback=[];
 async function loadCashback(){
   if(!CU)return;
@@ -6974,6 +6930,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 </script>
+
 <!-- MODAL IMPORTAR CLIENTES -->
 <div class="mo" id="mo-importar">
  <div class="modal" style="max-width:640px;max-height:90vh;overflow-y:auto">
