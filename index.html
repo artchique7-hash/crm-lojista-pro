@@ -3625,31 +3625,40 @@ async function saveClient(){
   const obs=document.getElementById('c-obs').value.trim();
   const spid=document.getElementById('c-sp').value||null;
   const row={store_id:CU.id,name,phone:document.getElementById('c-phone').value.trim()||null,birth_date:document.getElementById('c-birth').value||null,city:document.getElementById('c-city').value.trim()||null,region:document.getElementById('c-region').value.trim()||null,address:document.getElementById('c-addr').value.trim()||null,origin:document.getElementById('c-origin').value||null,status:document.getElementById('c-status').value,loyalty:document.getElementById('c-loyalty').value,style:document.getElementById('c-style').value||null,reminder:document.getElementById('c-remind').value||null,payment_methods:pm,channels:ch,tags:[...TAGS],salesperson_id:spid};
-  if(editCID){
-    // Pede o registro salvo de volta em vez de simplesmente confiar que deu certo.
-    // Antes, se o Supabase rejeitasse a gravação por qualquer motivo, o sistema
-    // mesmo assim mostrava "Cliente atualizada!" e só a memória local mudava —
-    // a edição parecia salva até a próxima vez que os dados reais eram buscados.
-    const updRes = await _sb.from('clients').update(row).eq('id',editCID).select().single();
-    if (updRes.error || !updRes.data) {
-      toast('Não foi possível salvar: '+(updRes.error?updRes.error.message:'nenhum registro foi atualizado.'), 'e');
-      return;
+  try {
+    if(editCID){
+      // Pede o registro salvo de volta em vez de simplesmente confiar que deu certo.
+      // Antes, se o Supabase rejeitasse a gravação por qualquer motivo, o sistema
+      // mesmo assim mostrava "Cliente atualizada!" e só a memória local mudava —
+      // a edição parecia salva até a próxima vez que os dados reais eram buscados.
+      const updRes = await _sb.from('clients').update(row).eq('id',editCID).select().single();
+      if (updRes.error || !updRes.data) {
+        toast('Não foi possível salvar: '+(updRes.error?updRes.error.message:'nenhum registro foi atualizado.'), 'e');
+        return;
+      }
+      // Atualizar em memória e refletir na tela a partir do que o servidor confirmou —
+      // isso já conta como "salvo" antes de tentar a observação (etapa secundária),
+      // para que uma falha ali não mascare um cadastro que já foi salvo com sucesso.
+      var existing = _clients.find(function(x){ return x.id===editCID; });
+      if (existing) { Object.assign(existing, updRes.data); }
+      if (window._detailClient && window._detailClient.id===editCID) { Object.assign(window._detailClient, updRes.data); }
+      toast('Cliente atualizada!'); closeClientModal();
+      if (window._detailClient && window._detailClient.id===editCID) { atualizarFichaComMemoria(); } else { showDetail(editCID); }
+      loadAll(); // sincronizar em background
+      if (obs) {
+        try { await _sb.from('observations').insert({store_id:CU.id,client_id:editCID,text:obs}); }
+        catch(eObs) { toast('Cliente salva, mas a observação não pôde ser gravada.', 'e'); }
+      }
+    } else {
+      const {data,error}=await _sb.from('clients').insert(row).select().single();
+      if (error || !data) { toast('Não foi possível cadastrar: '+(error?error.message:'erro desconhecido.'), 'e'); return; }
+      if(obs) await _sb.from('observations').insert({store_id:CU.id,client_id:data.id,text:obs});
+      data.purchases=[]; _clients.unshift(data);
+      toast('Cliente cadastrada!'); closeClientModal(); renderClients(); updateBadges();
+      loadAll(); // atualizar em background
     }
-    if(obs) await _sb.from('observations').insert({store_id:CU.id,client_id:editCID,text:obs});
-    // atualizar em memória a partir do que o servidor confirmou, não do que foi enviado
-    var existing = _clients.find(function(x){ return x.id===editCID; });
-    if (existing) { Object.assign(existing, updRes.data); }
-    if (window._detailClient && window._detailClient.id===editCID) { Object.assign(window._detailClient, updRes.data); }
-    toast('Cliente atualizada!'); closeClientModal();
-    if (window._detailClient && window._detailClient.id===editCID) { atualizarFichaComMemoria(); } else { showDetail(editCID); }
-    loadAll(); // sincronizar em background
-  } else {
-    const {data,error}=await _sb.from('clients').insert(row).select().single();
-    if (error || !data) { toast('Não foi possível cadastrar: '+(error?error.message:'erro desconhecido.'), 'e'); return; }
-    if(obs) await _sb.from('observations').insert({store_id:CU.id,client_id:data.id,text:obs});
-    data.purchases=[]; _clients.unshift(data);
-    toast('Cliente cadastrada!'); closeClientModal(); renderClients(); updateBadges();
-    loadAll(); // atualizar em background
+  } catch (e) {
+    toast('Erro inesperado ao salvar: '+(e&&e.message?e.message:e), 'e');
   }
 }
 
