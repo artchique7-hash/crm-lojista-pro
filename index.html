@@ -841,6 +841,11 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   </div>
   </div>
  </div>
+  <div class="nav-i" data-page="cashback-opp" onclick="showPage('cashback-opp')">
+   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+   <span>Cashback</span>
+   <span class="bn-i" id="sb-cb" style="display:none">0</span>
+  </div>
   <div class="nav-i" data-page="messages" onclick="showPage('messages')">
    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
    Central de Atendimento
@@ -1279,11 +1284,63 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 
  <!-- ESCRITORIO DA LOJA -->
  
-<div id="page-cashback-opp" class="page">
- <div class="ph"><div><h1 class="pt">💰 Cashback</h1><p class="ps">Clientes com cashback disponível</p></div></div>
- <div id="cashback-opp-list"></div>
-</div>
+<div <div id="page-cashback-opp" class="page">
+ <div class="ph">
+  <div><h1 class="pt">💰 Cashback</h1><p class="ps">Gerencie o programa de cashback da loja</p></div>
+  <button class="btn btn-p btn-sm" onclick="salvarConfigCashback()">Salvar configurações</button>
+ </div>
 
+ <!-- CONFIGURAÇÃO -->
+ <div class="card" style="padding:18px;margin-bottom:20px">
+  <div style="font-size:13px;font-weight:700;margin-bottom:14px;font-family:Syne,sans-serif">⚙️ Configuração</div>
+  <div class="fgrid">
+   <div class="fg">
+    <label class="fl">Percentual de cashback (%)</label>
+    <input type="number" id="cb-percentual" class="fi" placeholder="Ex: 5" min="0" max="100" step="0.5">
+    <div style="font-size:11px;color:var(--text3);margin-top:4px">Sugestão para moda: 5% a 10%</div>
+   </div>
+   <div class="fg">
+    <label class="fl">Validade (dias)</label>
+    <div style="display:flex;gap:6px;margin-bottom:6px">
+     <button class="btn btn-g btn-xs cb-dias-btn" onclick="setCbDias(30,this)">30d</button>
+     <button class="btn btn-g btn-xs cb-dias-btn" onclick="setCbDias(60,this)">60d</button>
+     <button class="btn btn-g btn-xs cb-dias-btn" onclick="setCbDias(90,this)">90d</button>
+    </div>
+    <input type="number" id="cb-validade" class="fi" placeholder="Dias de validade" min="1">
+   </div>
+  </div>
+  <div class="fg" style="margin-top:8px">
+   <label class="fl">Valor mínimo de compra (opcional)</label>
+   <input type="number" id="cb-minimo" class="fi" placeholder="Deixe vazio para qualquer valor" min="0" step="0.01">
+  </div>
+  <div style="font-size:12px;font-weight:700;margin:14px 0 8px">Mensagens automáticas</div>
+  <div class="fg"><label class="fl">30 dias antes do vencimento</label><textarea id="cb-msg-30" class="fi" rows="2" placeholder="Oi {nome}! Você tem R$ {valor} de cashback disponível até {data}."></textarea></div>
+  <div class="fg"><label class="fl">15 dias antes</label><textarea id="cb-msg-15" class="fi" rows="2" placeholder="{nome}, seu cashback de R$ {valor} vence em 15 dias!"></textarea></div>
+  <div class="fg"><label class="fl">5 dias antes</label><textarea id="cb-msg-5" class="fi" rows="2" placeholder="Últimos dias! Cashback de R$ {valor} expira em {data}, {nome}."></textarea></div>
+ </div>
+
+ <!-- PESQUISA -->
+ <div class="card" style="padding:18px">
+  <div style="font-size:13px;font-weight:700;margin-bottom:14px;font-family:Syne,sans-serif">🔍 Clientes com Cashback</div>
+  <div class="fgrid">
+   <div class="fg">
+    <label class="fl">Filtrar</label>
+    <select id="cb-filtro" class="fi" onchange="renderCbPesquisa()">
+     <option value="">Todas com saldo disponível</option>
+     <option value="vencendo30">Vencendo em 30 dias</option>
+     <option value="vencendo15">Vencendo em 15 dias</option>
+     <option value="vencendo5">Vencendo em 5 dias</option>
+     <option value="alto">Saldo acima de R$ 50</option>
+    </select>
+   </div>
+   <div class="fg">
+    <label class="fl">Buscar por tag</label>
+    <input type="text" id="cb-tag-busca" class="fi" placeholder="Ex: tênis, vestido..." oninput="renderCbPesquisa()">
+   </div>
+  </div>
+  <div id="cb-pesquisa-list" style="margin-top:12px"></div>
+ </div>
+</div>
 <div id="page-escritorio" class="page">
   <div class="ph">
    <div>
@@ -1298,7 +1355,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
    <button class="escrit-tab" onclick="switchEscrit('funis',this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg> Funis</button>
    <button class="escrit-tab" onclick="switchEscrit('rotina',this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> Rotina Comercial</button>
    <button class="escrit-tab" onclick="switchEscrit('calendario',this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Conteúdo</button>
-   <button class="escrit-tab" onclick="switchEscrit('cashback',this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg> Cashback</button>
+   
   </div>
 
   <!-- OBJETIVOS -->
@@ -1844,20 +1901,8 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
    <div class="fg"><label class="fl">Checklist (opcional)</label>
     <div style="display:flex;gap:6px;margin-bottom:8px">
      <input type="text" id="rot-check-input" class="fi" placeholder="Item do checklist">
-     <button class="btn btn-g btn-sm" onclick="addCheckRotina()" style="flex-shrink:0">+</button>
-    </div>
-    <div id="rot-check-list"></div>
-   </div>
-   <div class="mf">
-    <button class="btn btn-g btn-sm" onclick="fecharModalRotina()">Cancelar</button>
-    <button class="btn btn-p btn-sm" onclick="salvarRotina()">Salvar</button>
-   </div>
-  </div>
- </div>
-</div>
-
+     <button class="btn btn-g btn-sm" onclick="addCheckRotina()
 <script>
-
 // ── CONFIG SUPABASE ──
 const _sb = supabase.createClient('https://ihpfexmourrvixtsxhrt.supabase.co', 'sb_publishable_M7vZQ1VPi_7BP3HQAp-ngA_cMB22bEG');
 
@@ -1974,6 +2019,7 @@ function enterApp() {
 
 // ── NAVIGATION ──
 function showPage(p) {
+  if (p === 'cashback-opp') { setTimeout(function(){ carregarConfigCashback(); renderCbPesquisa(); }, 50); }
   document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.nav-i').forEach(x=>x.classList.remove('active'));
   // Abrir grupo do menu correto
@@ -4021,7 +4067,6 @@ var _funis = JSON.parse(localStorage.getItem('slp_funis') || '[]');
 function switchEscrit(section, btn) {
   document.querySelectorAll('.escrit-section').forEach(function(el){ el.classList.remove('active'); });
   document.querySelectorAll('.escrit-tab').forEach(function(el){ el.classList.remove('active'); });
-  if (section === 'cashback') { setTimeout(function(){ carregarConfigCashback(); renderCbPesquisa(); }, 50); }
   var el = document.getElementById('escrit-' + section);
   if (el) el.classList.add('active');
   if (btn) btn.classList.add('active');
@@ -4274,7 +4319,7 @@ function renderCalGrid() {
     var div2 = document.createElement('div');
     div2.className = 'cal-day' + (dateStr===hoje?' today':'') + (evsDia.length?' has-event':'');
     div2.setAttribute('data-date', dateStr);
-    div2.onclick = function(){ abrirModalConteudo(null, 'ideias', this.getAttribute('data-date')); };
+    (function(ds){ div2.onclick = function(){ abrirModalConteudo(null, 'ideias', ds); }; })(dateStr);
     var html = '<div class="cal-dn">' + d2 + '</div>';
     evsDia.slice(0,2).forEach(function(ev){
       var cls = TIPOS_COR[ev.tipo] || 'outro';
@@ -4413,7 +4458,7 @@ function abrirModalMeta(id) {
     selFunil.value = m ? (m.funil_id||'') : '';
   }
     var noDash = document.getElementById('meta-no-dash');
-  if (noDash) noDash.checked = meta ? (meta.no_dashboard || false) : false;
+  if (noDash) noDash.checked = m ? (m.no_dashboard || false) : false;
   document.getElementById('modal-meta').classList.add('open');
 }
 
@@ -6917,9 +6962,7 @@ document.addEventListener('DOMContentLoaded', () => {
     checkSession();
   }
 });
-
 </script>
-
 <!-- MODAL IMPORTAR CLIENTES -->
 <div class="mo" id="mo-importar">
  <div class="modal" style="max-width:640px;max-height:90vh;overflow-y:auto">
