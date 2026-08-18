@@ -3616,17 +3616,28 @@ async function saveClient(){
   const spid=document.getElementById('c-sp').value||null;
   const row={store_id:CU.id,name,phone:document.getElementById('c-phone').value.trim()||null,birth_date:document.getElementById('c-birth').value||null,city:document.getElementById('c-city').value.trim()||null,region:document.getElementById('c-region').value.trim()||null,address:document.getElementById('c-addr').value.trim()||null,origin:document.getElementById('c-origin').value||null,status:document.getElementById('c-status').value,loyalty:document.getElementById('c-loyalty').value,style:document.getElementById('c-style').value||null,reminder:document.getElementById('c-remind').value||null,payment_methods:pm,channels:ch,tags:[...TAGS],salesperson_id:spid};
   if(editCID){
-    await _sb.from('clients').update(row).eq('id',editCID);
+    // Pede o registro salvo de volta em vez de simplesmente confiar que deu certo.
+    // Antes, se o Supabase rejeitasse a gravação por qualquer motivo, o sistema
+    // mesmo assim mostrava "Cliente atualizada!" e só a memória local mudava —
+    // a edição parecia salva até a próxima vez que os dados reais eram buscados.
+    const updRes = await _sb.from('clients').update(row).eq('id',editCID).select().single();
+    if (updRes.error || !updRes.data) {
+      toast('Não foi possível salvar: '+(updRes.error?updRes.error.message:'nenhum registro foi atualizado.'), 'e');
+      return;
+    }
     if(obs) await _sb.from('observations').insert({store_id:CU.id,client_id:editCID,text:obs});
-    // atualizar em memória imediatamente
+    // atualizar em memória a partir do que o servidor confirmou, não do que foi enviado
     var existing = _clients.find(function(x){ return x.id===editCID; });
-    if (existing) { Object.assign(existing, row); }
-    toast('Cliente atualizada!'); closeClientModal(); showDetail(editCID);
+    if (existing) { Object.assign(existing, updRes.data); }
+    if (window._detailClient && window._detailClient.id===editCID) { Object.assign(window._detailClient, updRes.data); }
+    toast('Cliente atualizada!'); closeClientModal();
+    if (window._detailClient && window._detailClient.id===editCID) { atualizarFichaComMemoria(); } else { showDetail(editCID); }
     loadAll(); // sincronizar em background
   } else {
-    const {data}=await _sb.from('clients').insert(row).select().single();
-    if(obs&&data) await _sb.from('observations').insert({store_id:CU.id,client_id:data.id,text:obs});
-    if(data) { data.purchases=[]; _clients.unshift(data); }
+    const {data,error}=await _sb.from('clients').insert(row).select().single();
+    if (error || !data) { toast('Não foi possível cadastrar: '+(error?error.message:'erro desconhecido.'), 'e'); return; }
+    if(obs) await _sb.from('observations').insert({store_id:CU.id,client_id:data.id,text:obs});
+    data.purchases=[]; _clients.unshift(data);
     toast('Cliente cadastrada!'); closeClientModal(); renderClients(); updateBadges();
     loadAll(); // atualizar em background
   }
@@ -6073,8 +6084,12 @@ function abrirModalAtend(canal) {
   _atendPerdaClienteId = null;
 
   // Reset campos
-  var ids = ['atend-origem-outro','atend-cliente-busca','atend-novo-nome','atend-novo-tel','atend-perda-produto','atend-perda-motivo','atend-produto-compra','atend-valor','atend-perda-cliente-busca','atend-perda-novo-nome','atend-perda-novo-tel'];
+  var ids = ['atend-origem-outro','atend-cliente-busca','atend-novo-nome','atend-novo-tel','atend-perda-produto','atend-perda-motivo','atend-produto-compra','atend-valor','atend-perda-cliente-busca','atend-perda-novo-nome','atend-perda-novo-tel','atend-lembrete-data','atend-lembrete-desc'];
   ids.forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+  var lembreteChk = document.getElementById('atend-lembrete-chk');
+  if (lembreteChk) lembreteChk.checked = false;
+  var lembreteCampos = document.getElementById('atend-lembrete-campos');
+  if (lembreteCampos) lembreteCampos.style.display = 'none';
 
   // Mostrar/ocultar origem
   var origWrap = document.getElementById('atend-origem-wrap');
@@ -6290,6 +6305,42 @@ async function salvarAtendUnificado() {
       client_id: perdaClienteId || null,
       ts: new Date().toISOString()
     });
+
+    // Lembrete de contato (manual, distinto do pós-venda automático de compra).
+    // Reaproveita a tabela "contacts" já existente: next_contact é o mesmo campo
+    // que a ficha do cliente e as oportunidades já leem para lembretes.
+    var lembreteChkEl = document.getElementById('atend-lembrete-chk');
+    if (lembreteChkEl && lembreteChkEl.checked) {
+      var lembreteData = (document.getElementById('atend-lembrete-data').value||'').trim();
+      var lembreteDesc = (document.getElementById('atend-lembrete-desc').value||'').trim();
+      if (!perdaClienteId) {
+        toast('Lembrete não criado: selecione ou cadastre a cliente.', 'e');
+      } else if (!lembreteData) {
+        toast('Lembrete não criado: informe a data.', 'e');
+      } else {
+        try {
+          var resLembrete = await _sb.from('contacts').insert({
+            store_id: CU.id, client_id: perdaClienteId,
+            type: 'outro', result: 'interesse',
+            next_contact: lembreteData,
+            observations: lembreteDesc || 'Entrar em contato.'
+          }).select().single();
+          await _sb.from('clients').update({reminder: lembreteData}).eq('id', perdaClienteId);
+          var clLembrete = _clients.find(function(x){ return x.id===perdaClienteId; });
+          if (clLembrete) clLembrete.reminder = lembreteData;
+          if (window._detailClient && window._detailClient.id===perdaClienteId) {
+            window._detailClient.reminder = lembreteData;
+            if (resLembrete.data) {
+              window._detailClient.contacts = window._detailClient.contacts || [];
+              window._detailClient.contacts.unshift(resLembrete.data);
+            }
+            atualizarFichaComMemoria();
+          }
+          updateBadges();
+          toast('Lembrete criado!');
+        } catch(e) {}
+      }
+    }
   }
 
   saveFluxoToDB(date);
@@ -7251,6 +7302,17 @@ document.addEventListener('DOMContentLoaded', () => {
      <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px">Cadastro rápido</div>
      <div class="fg"><input type="text" id="atend-perda-novo-nome" class="fi" placeholder="Nome *"></div>
      <div class="fg"><input type="text" id="atend-perda-novo-tel" class="fi" placeholder="Telefone (com DDD)"></div>
+    </div>
+    <div class="fg" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
+     <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:600">
+      <input type="checkbox" id="atend-lembrete-chk" onchange="document.getElementById('atend-lembrete-campos').style.display=this.checked?'block':'none'">
+      Criar lembrete para entrar em contato
+     </label>
+     <div id="atend-lembrete-campos" style="display:none;margin-top:8px">
+      <div class="fg"><label class="fl">Data para entrar em contato</label><input type="date" id="atend-lembrete-data" class="fi"></div>
+      <div class="fg"><label class="fl">Descrição / motivo do contato</label><textarea id="atend-lembrete-desc" class="fta" rows="2" placeholder="Ex: Avisar quando chegar o vestido preto tamanho M"></textarea></div>
+      <div style="font-size:11px;color:var(--text3)">O lembrete só pode ser criado se a cliente for selecionada ou cadastrada acima.</div>
+     </div>
     </div>
    </div>
    <div style="display:flex;gap:10px;justify-content:flex-end;padding-top:14px;border-top:1px solid var(--border);margin-top:8px">
