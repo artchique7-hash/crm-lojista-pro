@@ -2326,13 +2326,30 @@ function filterByTag(){
 }
 
 // ── CLIENT DETAIL ──
+var _detailReqId = 0;
 async function showDetail(id) {
+  var reqId = ++_detailReqId;
+
+  // Feedback imediato: troca para a tela do cliente e mostra "carregando" já
+  // no clique, em vez de só reagir depois que as 4 consultas terminarem.
+  // Era isso que fazia parecer que o clique não funcionava na primeira vez.
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-client-detail').classList.add('active');
+  var hfLoad = document.getElementById('detail-header-fixed');
+  if (hfLoad) hfLoad.style.display = 'none';
+  document.getElementById('detail-content').innerHTML = '<div class="empty" style="padding:50px"><div class="empty-d">Carregando...</div></div>';
+
   const [cr,obsr,pur,contr]=await Promise.all([
     _sb.from('clients').select('*').eq('id',id).single(),
     _sb.from('observations').select('*').eq('client_id',id).order('created_at',{ascending:false}),
     _sb.from('purchases').select('*').eq('client_id',id).order('date',{ascending:false}),
     _sb.from('contacts').select('*').eq('client_id',id).order('created_at',{ascending:false}),
   ]);
+
+  // Se enquanto essa consulta rodava o usuário já clicou em outro cliente,
+  // descarta essa resposta mais velha — evita mostrar dados do cliente errado.
+  if (reqId !== _detailReqId) return;
+
   if(!cr.data)return;
   const c={...cr.data, observations:obsr.data||[], purchases:pur.data||[], contacts:contr.data||[]};
   const col=avc(c.name), sps=gSP();
