@@ -866,7 +866,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   </div>
   <div class="nav-i" data-page="reminders" onclick="showPage('reminders')">
    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-   Lembretes <span class="nb red" id="sb-rem" style="display:none">0</span>
+   Retornos Pendentes <span class="nb red" id="sb-rem" style="display:none">0</span>
   </div>
   <div class="nav-i" data-page="filter" onclick="showPage('filter')">
    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
@@ -973,15 +973,6 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   <div id="dash-meta"></div>
  </div>
 
- <!-- ROTINA DO DIA -->
- <div style="margin-bottom:26px">
-  <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-   <div style="width:3px;height:18px;background:var(--green);border-radius:2px"></div>
-   <h2 style="font-size:13px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px">Rotina do Dia</h2>
-  </div>
-  <div id="dash-rotinas-dia" class="card" style="padding:12px"></div>
- </div>
-
  <!-- 2. RESUMO DO DIA -->
  <div style="margin-bottom:26px">
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
@@ -992,12 +983,12 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
  </div>
 
 
- <!-- 4. PROXIMAS ACOES -->
+ <!-- 4. ROTINA E PROXIMAS ACOES -->
  <div style="margin-bottom:26px">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
    <div style="display:flex;align-items:center;gap:8px">
     <div style="width:3px;height:18px;background:var(--purple);border-radius:2px"></div>
-    <h2 style="font-size:13px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px">Proximas Acoes</h2>
+    <h2 style="font-size:13px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px">Rotina e Proximas Acoes</h2>
    </div>
    <a onclick="showPage('escritorio')" style="font-size:12px;color:var(--green);cursor:pointer;font-weight:600">Ver Escritorio →</a>
   </div>
@@ -1031,7 +1022,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
  <div class="card" style="padding:0;overflow:hidden" id="postsale-list"></div>
  </div>
  <div id="page-reminders" class="page">
- <div class="ph"><div><h1 class="pt">Lembretes</h1><p class="ps">Clientes para contatar hoje ou em atraso</p></div></div>
+ <div class="ph"><div><h1 class="pt">Retornos Pendentes</h1><p class="ps">Clientes para contatar hoje ou em atraso</p></div></div>
  <div class="card" style="padding:0;overflow:hidden" id="reminders-list"></div>
  </div>
  <div id="page-filter" class="page">
@@ -1609,7 +1600,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
  <select id="c-style" class="fi"><option value="">Selecionar</option><option value="casual">Casual</option><option value="social">Social</option><option value="basica">Básica</option><option value="fashion">Fashion</option><option value="esportiva">Esportiva</option><option value="misto">Misto</option></select>
  </div>
  <div class="fg"><label class="fl">Vendedora responsável</label><select id="c-sp" class="fi"><option value="">Nenhuma</option></select></div>
- <div class="fg"><label class="fl">Lembrete — Entrar em contato em</label><input type="date" id="c-remind" class="fi"></div>
+ <div class="fg"><label class="fl">Retorno pendente — Entrar em contato em</label><input type="date" id="c-remind" class="fi"></div>
  </div>
  </div>
  <div class="fsec"><div class="fsec-t">Formas de Pagamento</div>
@@ -2136,7 +2127,7 @@ function renderDash() {
   if (prioEl) {
     var prioridades = [
       { label:'Aniversariantes este mes', count:bd.length, sub:'Clientes que fazem aniversario agora', page:'birthdays', cor:'var(--gold)', bg:'var(--gold-l)', icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>' },
-      { label:'Lembretes vencidos', count:rem.length, sub:'Contatos agendados para hoje ou atrasados', page:'reminders', cor:'var(--purple)', bg:'var(--purple-l)', icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>' },
+      { label:'Retornos pendentes', count:rem.length, sub:'Contatos agendados para hoje ou atrasados', page:'reminders', cor:'var(--purple)', bg:'var(--purple-l)', icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>' },
       { label:'Pos-venda pendente', count:ps.length, sub:'Compraram nos ultimos 7 dias', page:'postsale', cor:'var(--blue)', bg:'var(--blue-l)', icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>' },
       { label:'Clientes para reativar', count:ia.length, sub:'Somidas ha 60+ dias', page:'inactive', cor:'var(--red)', bg:'var(--red-l)', icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' },
       { label:'Buscar por interesse', count:clients.length, sub:'Filtrar clientes por produto ou tag', page:'filter', cor:'var(--green)', bg:'var(--green-l)', icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>' },
@@ -2185,81 +2176,68 @@ function renderDash() {
     }
   }
 
-  // ── 3. INSIGHTS ──
-  var insightsEl = document.getElementById('dash-insights');
-  if (insightsEl) {
-    var todasPerdas = [];
-    Object.values(_fluxo).forEach(function(d){ (d.perdas||[]).forEach(function(p){ todasPerdas.push(p); }); });
-
-    var prodCounts = {};
-    todasPerdas.forEach(function(p){ if(p.produto){ var k=p.produto.toLowerCase().trim(); prodCounts[k]=(prodCounts[k]||0)+1; } });
-    var topProd = Object.entries(prodCounts).sort(function(a,b){ return b[1]-a[1]; })[0];
-
-    var motivoCounts = {};
-    todasPerdas.forEach(function(p){ if(p.motivo){ var k=p.motivo.toLowerCase().trim(); motivoCounts[k]=(motivoCounts[k]||0)+1; } });
-    var topMotivo = Object.entries(motivoCounts).sort(function(a,b){ return b[1]-a[1]; })[0];
-
-    var allTags = {};
-    clients.forEach(function(cl){ (cl.tags||[]).forEach(function(t){ if(t) allTags[t]=(allTags[t]||0)+1; }); });
-    var topTag = Object.entries(allTags).sort(function(a,b){ return b[1]-a[1]; })[0];
-
-    var semCompra = clients.filter(function(cl){ return !cl.purchases||!cl.purchases.length; }).length;
-    var pctSemCompra = clients.length > 0 ? Math.round((semCompra/clients.length)*100) : 0;
-
-    var insights = [];
-    if (topProd) insights.push({ icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>', bg:'var(--green-l)', title:'Produto mais procurado', value:topProd[0], sub:topProd[1]+' ocorrencia'+(topProd[1]!==1?'s':'') });
-    if (topMotivo) insights.push({ icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>', bg:'var(--red-l)', title:'Principal motivo de perda', value:topMotivo[0], sub:topMotivo[1]+' registro'+(topMotivo[1]!==1?'s':'') });
-    if (topTag) insights.push({ icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>', bg:'var(--gold-l)', title:'Categoria mais buscada', value:topTag[0], sub:topTag[1]+' cliente'+(topTag[1]!==1?'s':'') });
-    if (pctSemCompra > 0) insights.push({ icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>', bg:'var(--blue-l)', title:'Oportunidade de venda', value:semCompra+' clientes ainda nao compraram', sub:pctSemCompra+'% da base - potencial de ativacao' });
-
-    if (!insights.length) {
-      insightsEl.innerHTML = '<div class="dash-vazio"><div style="font-size:24px;margin-bottom:6px">📊</div><div style="font-weight:600;margin-bottom:3px">Sem dados suficientes ainda</div><div style="font-size:12px">Registre perdas e cadastre mais clientes para ver insights aqui.</div></div>';
+  // ── META PRINCIPAL ──
+  var metaEl = document.getElementById('dash-meta');
+  if (metaEl) {
+    var metaPrincipal = (_metas||[]).find(function(m){ return m.no_dashboard; });
+    if (!metaPrincipal) {
+      metaEl.innerHTML = '';
     } else {
-      insightsEl.innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' +
-        insights.map(function(ins) {
-          return '<div class="dash-insight-card">' +
-            '<div class="dash-insight-icon" style="background:' + ins.bg + '">' + ins.icon + '</div>' +
-            '<div style="min-width:0"><div class="dash-insight-title">' + ins.title + '</div>' +
-            '<div class="dash-insight-value">' + ins.value + '</div>' +
-            '<div class="dash-insight-sub">' + ins.sub + '</div></div>' +
-          '</div>';
-        }).join('') + '</div>';
+      var pct = metaPrincipal.alvo>0 ? Math.min(100, Math.round((metaPrincipal.atual/metaPrincipal.alvo)*100)) : 0;
+      var corMeta = pct>=100 ? 'var(--green)' : pct>=60 ? 'var(--gold)' : 'var(--purple)';
+      metaEl.innerHTML = '<div class="card" style="padding:16px 18px;cursor:pointer" onclick="showPage(\'escritorio\');setTimeout(function(){switchEscrit(\'objetivos\',document.querySelector(\'.escrit-tab\'))},100)">'
+        +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'
+        +'<div style="font-size:13px;font-weight:700">🎯 '+metaPrincipal.titulo+'</div>'
+        +'<div style="font-size:12px;color:var(--text3)">'+(metaPrincipal.unidade==='valor'?'R$ '+metaPrincipal.atual.toFixed(2).replace('.',',')+' / R$ '+metaPrincipal.alvo.toFixed(2).replace('.',','):metaPrincipal.atual+' / '+metaPrincipal.alvo)+'</div>'
+        +'</div>'
+        +'<div style="height:8px;background:var(--bg4);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+corMeta+';border-radius:4px"></div></div>'
+        +'<div style="font-size:11px;color:var(--text3);margin-top:6px">'+pct+'% da meta</div>'
+        +'</div>';
     }
   }
 
-  // ── 4. PROXIMAS ACOES ──
+  // ── ROTINA E PROXIMAS ACOES ──
+  // Junta a rotina comercial de hoje (recorrente) com as atividades pontuais
+  // pendentes, ambas cadastradas no Escritorio da Loja > Rotina Comercial.
   var proxEl = document.getElementById('dash-proximas');
   if (proxEl) {
-    var hoje2 = new Date().toISOString().split('T')[0];
-    var proximos = (_eventos||[]).filter(function(e){ return e.data >= hoje2; })
-      .sort(function(a,b){ return a.data.localeCompare(b.data); }).slice(0,5);
+    var DIA_SEMANA_MAP = ['domingo','segunda','terca','quarta','quinta','sexta','sabado'];
+    var diaHoje = DIA_SEMANA_MAP[new Date().getDay()];
+    var rotinasHoje = (_rotinas||[]).filter(function(r){ return r.dia===diaHoje || r.dia==='diario'; });
+    var hojeStr = new Date().toISOString().split('T')[0];
+    var atividadesPendentes = (_atividades||[]).filter(function(a){ return a.status!=='concluida'; })
+      .sort(function(a,b){ return (a.data||'').localeCompare(b.data||''); }).slice(0,5);
 
-    var TIPO_COR_P = {stories:'#e07020', reels:'#7d3c98', live:'#b83232', campanha:'#1f5c3a', data:'#a07830', outro:'#8a9e90'};
-    var TIPO_LABEL = {stories:'Stories', reels:'Reels', live:'Live', campanha:'Campanha', data:'Data Especial', outro:'Evento'};
+    var itensRotina = rotinasHoje.map(function(r){
+      return '<div class="dash-prox-item">'
+        +'<div class="dash-prox-dot" style="background:var(--green)"></div>'
+        +'<div class="dash-prox-date">'+(r.hora||'Hoje')+'</div>'
+        +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">'+r.nome+'</div><div style="font-size:11px;color:var(--text3)">'+(r.resp?'Responsavel: '+r.resp:'Rotina recorrente')+'</div></div>'
+        +'<span class="badge bg-g" style="font-size:10px">Rotina</span>'
+        +'</div>';
+    });
+    var MESES_P = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+    var itensAtividade = atividadesPendentes.map(function(a){
+      var atrasada = a.data && a.data < hojeStr;
+      var dataFmt = a.data ? (function(){ var d=new Date(a.data+'T12:00:00'); return d.getDate()+' '+MESES_P[d.getMonth()]; })() : 'Sem data';
+      return '<div class="dash-prox-item">'
+        +'<div class="dash-prox-dot" style="background:'+(atrasada?'var(--red)':'var(--purple)')+'"></div>'
+        +'<div class="dash-prox-date">'+dataFmt+'</div>'
+        +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">'+a.titulo+'</div><div style="font-size:11px;color:var(--text3)">'+(a.resp?'Responsavel: '+a.resp:'Atividade pontual')+'</div></div>'
+        +'<span class="badge" style="background:'+(atrasada?'var(--red-l)':'var(--purple-l)')+';color:'+(atrasada?'var(--red)':'var(--purple)')+';font-size:10px">'+(atrasada?'Atrasada':'Pendente')+'</span>'
+        +'</div>';
+    });
+    var todosItens = itensRotina.concat(itensAtividade);
 
-    if (!proximos.length) {
+    if (!todosItens.length) {
       proxEl.innerHTML = '<div class="dash-vazio">' +
-        '<div style="font-size:24px;margin-bottom:6px">📅</div>' +
-        '<div style="font-weight:600;margin-bottom:3px">Nenhuma acao planejada</div>' +
-        '<div style="font-size:12px;margin-bottom:12px">Use o Escritorio da Loja para planejar suas campanhas, conteudos e datas.</div>' +
+        '<div style="font-size:24px;margin-bottom:6px">📋</div>' +
+        '<div style="font-weight:600;margin-bottom:3px">Nenhuma rotina ou atividade para hoje</div>' +
+        '<div style="font-size:12px;margin-bottom:12px">Use o Escritorio da Loja para planejar sua rotina comercial.</div>' +
         '<button class="btn btn-g btn-sm" onclick="showPage(\'escritorio\')">Abrir Escritorio</button>' +
       '</div>';
     } else {
-      var MESES_P = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
-      proxEl.innerHTML = proximos.map(function(ev) {
-        var d = new Date(ev.data + 'T12:00:00');
-        var dataFmt = d.getDate() + ' ' + MESES_P[d.getMonth()];
-        var cor = TIPO_COR_P[ev.tipo] || TIPO_COR_P.outro;
-        return '<div class="dash-prox-item">' +
-          '<div class="dash-prox-dot" style="background:' + cor + '"></div>' +
-          '<div class="dash-prox-date">' + dataFmt + '</div>' +
-          '<div style="flex:1;min-width:0">' +
-            '<div style="font-size:13px;font-weight:600">' + ev.titulo + '</div>' +
-            '<div style="font-size:11px;color:var(--text3)">' + (TIPO_LABEL[ev.tipo]||'Evento') + '</div>' +
-          '</div>' +
-          '<span class="badge" style="background:' + cor + '18;color:' + cor + ';font-size:10px">' + (TIPO_LABEL[ev.tipo]||'Evento') + '</span>' +
-        '</div>';
-      }).join('');
+      proxEl.innerHTML = todosItens.join('');
     }
   }
 }
@@ -2383,7 +2361,7 @@ async function marcarContatoFeito(btnEl, clientId, tipo, clientName) {
 function renderBirthdays(){renderOppList(getBD(gC()),'birthdays-list',c=>'Aniversario dia '+(c.birth_date||'').split('-')[2],'aniversario');}
 function renderInactive(){renderOppList(getIA(gC()),'inactive-list',c=>{const l=c.purchases.reduce((mx,p)=>p.date>mx?p.date:mx,'');return 'Ultima compra ha '+Math.floor((new Date()-new Date(l))/86400000)+' dias';},'inativos');}
 function renderPostSale(){renderOppList(getPS(gC()),'postsale-list',c=>{const l=c.purchases.reduce((mx,p)=>p.date>mx?p.date:mx,'');return 'Comprou ha '+Math.floor((new Date()-new Date(l))/86400000)+' dias';},'pos_venda');}
-function renderReminders(){renderOppList(getReminders(gC()),'reminders-list',c=>'Lembrete: '+fD(c.reminder),'lembrete');}
+function renderReminders(){renderOppList(getReminders(gC()),'reminders-list',c=>'Retorno: '+fD(c.reminder),'lembrete');}
 
 // ── TAG FILTER ──
 function renderFilter() {
@@ -2452,6 +2430,44 @@ function atualizarFichaComMemoria() {
   renderCashbackCliente(c.id);
 }
 
+// Cria (ou substitui) o retorno pendente de uma cliente: grava um registro em
+// "contacts" (mesma tabela do histórico de contatos, com next_contact = data
+// do retorno) e atualiza clients.reminder, que é o campo que a lista de
+// Retornos Pendentes e o Dashboard já leem. Usado tanto pelo Fluxo do Dia
+// quanto pela ficha do cliente — uma única implementação, sem duplicar.
+async function criarOuAtualizarLembrete(clientId, data, desc) {
+  try {
+    var res = await _sb.from('contacts').insert({
+      store_id: CU.id, client_id: clientId,
+      type: 'outro', result: 'interesse',
+      next_contact: data,
+      observations: desc || 'Entrar em contato.'
+    }).select().single();
+    if (res.error || !res.data) {
+      toast('Não foi possível criar o retorno: '+(res.error?res.error.message:'erro desconhecido.'), 'e');
+      return false;
+    }
+    const updRes = await _sb.from('clients').update({reminder: data}).eq('id', clientId).select().single();
+    if (updRes.error) {
+      toast('Retorno registrado, mas não foi possível atualizar o lembrete da cliente.', 'e');
+    }
+    var clG = _clients.find(function(x){ return x.id===clientId; });
+    if (clG) clG.reminder = data;
+    if (window._detailClient && window._detailClient.id===clientId) {
+      window._detailClient.reminder = data;
+      window._detailClient.contacts = window._detailClient.contacts || [];
+      window._detailClient.contacts.unshift(res.data);
+      atualizarFichaComMemoria();
+    }
+    updateBadges();
+    toast('Retorno agendado!');
+    return true;
+  } catch (e) {
+    toast('Erro inesperado ao criar retorno: '+(e&&e.message?e.message:e), 'e');
+    return false;
+  }
+}
+
 // Atendimentos do Fluxo do Dia (não comprou) vinculados a este cliente.
 // Duas gerações do Fluxo do Dia gravaram o vínculo com nomes de campo
 // diferentes (clienteId e client_id) — checamos os dois por segurança.
@@ -2506,7 +2522,7 @@ function montarFichaCliente(c) {
   // aplicada a uma única cliente — nada inventado)
   var opps=[];
   if (saldoCb>0) opps.push({icon:'💰',label:'Cashback disponível',sub:'R$ '+saldoCb.toFixed(2).replace('.',','),tab:'cashback'});
-  if (remVal) opps.push({icon:'⏰',label:remDue?'Lembrete vencido':'Lembrete agendado',sub:fD(remVal),tab:'lembretes'});
+  if (remVal) opps.push({icon:'⏰',label:remDue?'Retorno vencido':'Retorno agendado',sub:fD(remVal),tab:'lembretes'});
   if (ultimaCompra) {
     var diasUlt=Math.floor((new Date()-new Date(ultimaCompra))/86400000);
     if (diasUlt>=7&&diasUlt<=60) opps.push({icon:'📞',label:'Pós-venda pendente',sub:diasUlt+' dias sem contato',tab:'compras'});
@@ -2551,7 +2567,7 @@ function montarFichaCliente(c) {
   +'</div>';
 
   html+='<div class="cf-tabs">'
-    +['visao:Visão geral','compras:Compras','atendimentos:Atendimentos','contatos:Contatos','lembretes:Lembretes','cashback:Cashback'].map(function(t,i){
+    +['visao:Visão geral','compras:Compras','atendimentos:Atendimentos','contatos:Contatos','lembretes:Retornos','cashback:Cashback'].map(function(t,i){
       var p=t.split(':');
       return '<button class="cf-tab'+(i===0?' active':'')+'" data-tab="'+p[0]+'" onclick="switchClienteTab(\''+p[0]+'\',this)">'+p[1]+'</button>';
     }).join('')
@@ -2572,6 +2588,7 @@ function buildCfVisaoGeral(c,sortPurch,sortCont,sortObs,atend) {
   sortPurch.forEach(function(p){ eventos.push({date:p.date||'',tipo:'compra',cor:'var(--green)',label:'Compra realizada'+(p.amount?' — R$ '+parseFloat(p.amount).toFixed(2).replace('.',','):''),sub:p.description||''}); });
   atend.forEach(function(a){ eventos.push({date:a.date||'',tipo:'atendimento',cor:'var(--blue)',label:'Não comprou'+(a.canal?' — '+(a.canal==='online'?'Online':'Físico'):''),sub:a.motivo||a.produto||''}); });
   sortCont.forEach(function(ct){ eventos.push({date:(ct.created_at||'').substring(0,10),tipo:'contato',cor:'var(--purple)',label:(CTL[ct.type]||ct.type)+' — '+(CRL[ct.result]||ct.result),sub:ct.observations||''}); });
+  getLogCliente(c.id).forEach(function(l){ eventos.push({date:(l.created_at||'').substring(0,10),tipo:'log',cor:'var(--gold)',label:l.titulo,sub:l.tipoLabel}); });
   eventos.sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); });
   eventos=eventos.slice(0,8);
 
@@ -2610,11 +2627,44 @@ function buildCfAtendimentos(c,atend) {
     +'</div>';
 }
 
+// Ações registradas em sent_log para esta cliente (mensagem enviada por
+// template, ou marcada como feita manualmente nas listas do Dashboard).
+// Usado para unificar o Histórico de Contatos da ficha com o que acontece
+// fora da própria ficha.
+function getLogCliente(clientId) {
+  var TIPO_LBL = {pos_venda:'Pós-venda', aniversario:'Aniversário', inativos:'Reativação', lembrete:'Retorno', outro:'Outro'};
+  return (_log||[]).filter(function(l){ return l.client_id===clientId; }).map(function(l){
+    return {
+      created_at: l.sent_at,
+      titulo: l.message_title || (TIPO_LBL[l.message_type]||'Contato'),
+      tipoLabel: TIPO_LBL[l.message_type] || 'Contato',
+      salesperson: l.salesperson
+    };
+  });
+}
+
 function buildCfContatos(c,sortCont) {
+  var logItems = getLogCliente(c.id);
+  var combinados = sortCont.map(function(ct){
+    return {
+      created_at: ct.created_at,
+      html: '<strong>'+(CTL[ct.type]||ct.type)+'</strong> - '+(CRL[ct.result]||ct.result)
+        +(ct.observations?'<div style="font-size:12px;color:var(--text2);margin-top:2px">'+ct.observations+'</div>':'')
+        +(ct.next_contact?'<div style="font-size:11px;color:var(--purple);margin-top:2px">Proximo: '+fD(ct.next_contact)+'</div>':''),
+      sub: fDT(ct.created_at)+(ct.salesperson?' - '+ct.salesperson:'')
+    };
+  }).concat(logItems.map(function(l){
+    return {
+      created_at: l.created_at,
+      html: '<strong>'+l.titulo+'</strong> <span class="badge bg-g" style="font-size:10px">'+l.tipoLabel+'</span>',
+      sub: fDT(l.created_at)+(l.salesperson?' - '+l.salesperson:'')
+    };
+  })).sort(function(a,b){ return (b.created_at||'').localeCompare(a.created_at||''); });
+
   return '<div class="card card-sm">'
     +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div class="fsec-t" style="margin-bottom:0;border-bottom:none;padding-bottom:0">Histórico de Contatos</div><button class="btn btn-o btn-sm" onclick="openContactModal(\''+c.id+'\')">+ Registrar</button></div>'
-    +(!sortCont.length?'<div class="empty" style="padding:18px"><div class="empty-d">Nenhum contato registrado</div></div>':
-      '<div class="tl">'+sortCont.map(ct=>'<div class="tl-i"><div class="tl-dot" style="background:var(--blue)"></div><div><div class="tl-text"><strong>'+(CTL[ct.type]||ct.type)+'</strong> - '+(CRL[ct.result]||ct.result)+'</div>'+(ct.observations?'<div style="font-size:12px;color:var(--text2);margin-top:2px">'+ct.observations+'</div>':'')+(ct.next_contact?'<div style="font-size:11px;color:var(--purple);margin-top:2px">Proximo: '+fD(ct.next_contact)+'</div>':'')+'<div class="tl-date">'+fDT(ct.created_at)+(ct.salesperson?' - '+ct.salesperson:'')+'</div></div></div>').join('')+'</div>')
+    +(!combinados.length?'<div class="empty" style="padding:18px"><div class="empty-d">Nenhum contato registrado</div></div>':
+      '<div class="tl">'+combinados.map(function(item){ return '<div class="tl-i"><div class="tl-dot" style="background:var(--blue)"></div><div><div class="tl-text">'+item.html+'</div><div class="tl-date">'+item.sub+'</div></div></div>'; }).join('')+'</div>')
     +'</div>';
 }
 
@@ -2624,14 +2674,25 @@ function buildCfLembretes(c, compacto) {
   var today=new Date().toISOString().split('T')[0];
   var remDue=remVal&&remVal<=today;
   var corpo=(!remVal)
-    ? '<div class="empty" style="padding:'+(compacto?'10px':'18px')+'"><div class="empty-d">Nenhum lembrete agendado</div></div>'
-    : '<div class="tl"><div class="tl-i"><div class="tl-dot" style="background:'+(remDue?'var(--red)':'var(--purple)')+'"></div><div><div class="tl-text"><strong>'+(remDue?'Lembrete vencido':'Entrar em contato')+'</strong></div><div class="tl-date">'+fD(remVal)+'</div></div></div></div>';
+    ? '<div class="empty" style="padding:'+(compacto?'10px':'18px')+'"><div class="empty-d">Nenhum retorno agendado</div></div>'
+    : '<div class="tl"><div class="tl-i"><div class="tl-dot" style="background:'+(remDue?'var(--red)':'var(--purple)')+'"></div><div><div class="tl-text"><strong>'+(remDue?'Retorno vencido':'Retorno agendado')+'</strong></div><div class="tl-date">'+fD(remVal)+'</div></div></div></div>';
   if (compacto) {
-    return corpo+'<div style="font-size:11px;color:var(--text3);margin-top:10px">O lembrete é criado a partir do Fluxo do Dia ou de um contato com "próximo contato".</div>';
+    return corpo+'<div style="font-size:11px;color:var(--text3);margin-top:10px">Retornos nascem no Fluxo do Dia, num contato com "próximo contato", ou editando aqui na ficha.</div>';
   }
-  return '<div class="card card-sm"><div class="fsec-t">Lembretes</div>'+corpo
-    +'<div style="font-size:11px;color:var(--text3);margin-top:12px">Novos lembretes são criados no Fluxo do Dia (atendimento) ou ao registrar um contato com data de "próximo contato". Aqui você só acompanha.</div>'
+  return '<div class="card card-sm"><div class="fsec-t">Retornos Pendentes</div>'+corpo
+    +'<div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">'
+    +'<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">'+(remVal?'Alterar retorno':'Agendar retorno')+'</div>'
+    +'<div class="fg"><label class="fl">Data para entrar em contato</label><input type="date" id="lembrete-ed-data-'+c.id+'" class="fi" value="'+remVal+'"></div>'
+    +'<div class="fg"><label class="fl">Descrição / motivo do contato</label><textarea id="lembrete-ed-desc-'+c.id+'" class="fta" rows="2" placeholder="Ex: Avisar quando chegar o vestido preto tamanho M"></textarea></div>'
+    +'<button class="btn btn-p btn-sm" onclick="salvarLembreteFicha(\''+c.id+'\')">Salvar retorno</button>'
+    +'</div>'
     +'</div>';
+}
+async function salvarLembreteFicha(cid) {
+  var data = (document.getElementById('lembrete-ed-data-'+cid).value||'').trim();
+  var desc = (document.getElementById('lembrete-ed-desc-'+cid).value||'').trim();
+  if (!data) { toast('Informe a data.', 'e'); return; }
+  await criarOuAtualizarLembrete(cid, data, desc);
 }
 
 function goBack(){
@@ -3484,8 +3545,46 @@ function renderReports(period) {
   // ── PERDAS OPORTUNIDADES ──
   var captadosDePerdas = todasPerdas.filter(function(p){ return p.clienteId; }).length;
 
+  // ── INSIGHTS AUTOMATICOS ──
+  // Movido do Dashboard pra ca: e leitura/analise, nao acao do dia a dia.
+  // Usa os mesmos filtClients/todasPerdas ja filtrados pelo periodo escolhido acima.
+  var prodCounts = {};
+  todasPerdas.forEach(function(p){ if(p.produto){ var k=p.produto.toLowerCase().trim(); prodCounts[k]=(prodCounts[k]||0)+1; } });
+  var topProd = Object.entries(prodCounts).sort(function(a,b){ return b[1]-a[1]; })[0];
+
+  var motivoCounts = {};
+  todasPerdas.forEach(function(p){ if(p.motivo){ var k=p.motivo.toLowerCase().trim(); motivoCounts[k]=(motivoCounts[k]||0)+1; } });
+  var topMotivo = Object.entries(motivoCounts).sort(function(a,b){ return b[1]-a[1]; })[0];
+
+  var allTags = {};
+  filtClients.forEach(function(cl){ (cl.tags||[]).forEach(function(t){ if(t) allTags[t]=(allTags[t]||0)+1; }); });
+  var topTag = Object.entries(allTags).sort(function(a,b){ return b[1]-a[1]; })[0];
+
+  var semCompra = filtClients.filter(function(cl){ return !cl.purchases||!cl.purchases.length; }).length;
+  var pctSemCompra = filtClients.length > 0 ? Math.round((semCompra/filtClients.length)*100) : 0;
+
+  var insightsAuto = [];
+  if (topProd) insightsAuto.push({ icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>', bg:'var(--green-l)', title:'Produto mais procurado', value:topProd[0], sub:topProd[1]+' ocorrencia'+(topProd[1]!==1?'s':'') });
+  if (topMotivo) insightsAuto.push({ icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>', bg:'var(--red-l)', title:'Principal motivo de perda', value:topMotivo[0], sub:topMotivo[1]+' registro'+(topMotivo[1]!==1?'s':'') });
+  if (topTag) insightsAuto.push({ icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>', bg:'var(--gold-l)', title:'Categoria mais buscada', value:topTag[0], sub:topTag[1]+' cliente'+(topTag[1]!==1?'s':'') });
+  if (pctSemCompra > 0) insightsAuto.push({ icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>', bg:'var(--blue-l)', title:'Oportunidade de venda', value:semCompra+' clientes ainda nao compraram', sub:pctSemCompra+'% da base - potencial de ativacao' });
+
+  var insightsHTML = !insightsAuto.length ? '' :
+    '<div class="card" style="margin-bottom:18px">' +
+    '<div style="font-size:13px;font-weight:700;margin-bottom:12px;border-bottom:1px solid var(--border);padding-bottom:8px">Insights Automaticos</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' +
+    insightsAuto.map(function(ins) {
+      return '<div class="dash-insight-card">' +
+        '<div class="dash-insight-icon" style="background:' + ins.bg + '">' + ins.icon + '</div>' +
+        '<div style="min-width:0"><div class="dash-insight-title">' + ins.title + '</div>' +
+        '<div class="dash-insight-value">' + ins.value + '</div>' +
+        '<div class="dash-insight-sub">' + ins.sub + '</div></div>' +
+      '</div>';
+    }).join('') + '</div></div>';
+
   // ── RENDER ──
   document.getElementById('rep-container').innerHTML =
+    insightsHTML +
 
     // RESUMO COMERCIAL - FLUXO
     '<div class="card" style="margin-bottom:18px;background:var(--dark-grad);color:#fff">' +
@@ -6370,38 +6469,16 @@ async function salvarAtendUnificado() {
     });
 
     // Lembrete de contato (manual, distinto do pós-venda automático de compra).
-    // Reaproveita a tabela "contacts" já existente: next_contact é o mesmo campo
-    // que a ficha do cliente e as oportunidades já leem para lembretes.
     var lembreteChkEl = document.getElementById('atend-lembrete-chk');
     if (lembreteChkEl && lembreteChkEl.checked) {
       var lembreteData = (document.getElementById('atend-lembrete-data').value||'').trim();
       var lembreteDesc = (document.getElementById('atend-lembrete-desc').value||'').trim();
       if (!perdaClienteId) {
-        toast('Lembrete não criado: selecione ou cadastre a cliente.', 'e');
+        toast('Retorno não criado: selecione ou cadastre a cliente.', 'e');
       } else if (!lembreteData) {
-        toast('Lembrete não criado: informe a data.', 'e');
+        toast('Retorno não criado: informe a data.', 'e');
       } else {
-        try {
-          var resLembrete = await _sb.from('contacts').insert({
-            store_id: CU.id, client_id: perdaClienteId,
-            type: 'outro', result: 'interesse',
-            next_contact: lembreteData,
-            observations: lembreteDesc || 'Entrar em contato.'
-          }).select().single();
-          await _sb.from('clients').update({reminder: lembreteData}).eq('id', perdaClienteId);
-          var clLembrete = _clients.find(function(x){ return x.id===perdaClienteId; });
-          if (clLembrete) clLembrete.reminder = lembreteData;
-          if (window._detailClient && window._detailClient.id===perdaClienteId) {
-            window._detailClient.reminder = lembreteData;
-            if (resLembrete.data) {
-              window._detailClient.contacts = window._detailClient.contacts || [];
-              window._detailClient.contacts.unshift(resLembrete.data);
-            }
-            atualizarFichaComMemoria();
-          }
-          updateBadges();
-          toast('Lembrete criado!');
-        } catch(e) {}
+        await criarOuAtualizarLembrete(perdaClienteId, lembreteData, lembreteDesc);
       }
     }
   }
@@ -7369,7 +7446,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <div class="fg" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:600">
       <input type="checkbox" id="atend-lembrete-chk" onchange="document.getElementById('atend-lembrete-campos').style.display=this.checked?'block':'none'">
-      Criar lembrete para entrar em contato
+      Agendar retorno para entrar em contato
      </label>
      <div id="atend-lembrete-campos" style="display:none;margin-top:8px">
       <div class="fg"><label class="fl">Data para entrar em contato</label><input type="date" id="atend-lembrete-data" class="fi"></div>
