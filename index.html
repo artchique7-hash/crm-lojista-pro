@@ -2337,11 +2337,11 @@ function renderOppList(items,cid,subFn,tipo) {
   el.innerHTML='<div class="ol">'+items.map(c=>{
     const col=avc(c.name);
     const nomeEsc=c.name.replace(/'/g,"\\'");
-    const feitoBtn = tipo ? '<button class="btn btn-o btn-sm" style="padding:7px 10px" onclick="event.stopPropagation();marcarContatoFeito(\''+c.id+'\',\''+tipo+'\',\''+nomeEsc+'\')" title="Marcar que voce ja fez esse contato (ligacao, presencial, etc.)">✓ Feito</button>' : '';
+    const feitoBtn = tipo ? '<button class="btn btn-o btn-sm" style="padding:7px 10px" onclick="event.stopPropagation();marcarContatoFeito(this,\''+c.id+'\',\''+tipo+'\',\''+nomeEsc+'\')" title="Marcar que voce ja fez esse contato (ligacao, presencial, etc.)">✓ Feito</button>' : '';
     return '<div class="ol-i" onclick="showDetail(\''+c.id+'\')">'+
       '<div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0"><div class="av-sm" style="background:'+col+'18;color:'+col+'">'+ini(c.name)+'</div>'+
       '<div style="min-width:0"><div style="font-weight:600;font-size:13px">'+c.name+'</div><div style="font-size:11px;color:var(--text3)">'+subFn(c)+'</div></div></div>'+
-      '<div style="display:flex;gap:5px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;max-width:150px">'+
+      '<div style="display:flex;gap:5px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">'+
       feitoBtn+
       '<button class="btn btn-g btn-sm" onclick="event.stopPropagation();openSendModal(\''+c.id+'\')">Msg</button>'+
       (c.phone?'<a class="wa" href="https://wa.me/55'+(c.phone||'').replace(/\D/g,'')+'\" target="_blank" onclick="event.stopPropagation()">WA</a>':'')+
@@ -2351,30 +2351,34 @@ function renderOppList(items,cid,subFn,tipo) {
 // Marca a cliente como já contatada para esta oportunidade, sem precisar mandar
 // mensagem por template (ex: ligou, atendeu pessoalmente). Usa a mesma tabela
 // sent_log que o envio de mensagem já usa — por isso também conta nos Relatórios.
-async function marcarContatoFeito(clientId, tipo, clientName) {
-  var titulos = {pos_venda:'Pós-venda', aniversario:'Aniversário', inativos:'Reativação', lembrete:'Lembrete'};
-  var res;
+async function marcarContatoFeito(btnEl, clientId, tipo, clientName) {
+  // Feedback imediato, antes de qualquer chamada de rede — se isso não aparecer
+  // ao clicar, o clique não está chegando no JavaScript (problema de cache/deploy).
+  var textoOriginal = btnEl ? btnEl.textContent : '';
+  if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'Registrando...'; }
   try {
-    res = await _sb.from('sent_log').insert({
+    var titulos = {pos_venda:'Pós-venda', aniversario:'Aniversário', inativos:'Reativação', lembrete:'Lembrete'};
+    var res = await _sb.from('sent_log').insert({
       store_id: CU.id, client_id: clientId, client_name: clientName,
       message_id: null, message_title: 'Contato manual - '+(titulos[tipo]||tipo),
       message_type: tipo, salesperson: null
     }).select().single();
+    if (res.error || !res.data) {
+      toast('Não foi possível registrar: '+(res.error?res.error.message:'nenhum registro criado.'), 'e');
+      if (btnEl) { btnEl.disabled = false; btnEl.textContent = textoOriginal; }
+      return;
+    }
+    _log.unshift(res.data);
+    toast('Marcado como feito!');
+    updateBadges();
+    if (tipo==='pos_venda') renderPostSale();
+    else if (tipo==='aniversario') renderBirthdays();
+    else if (tipo==='inativos') renderInactive();
+    else if (tipo==='lembrete') renderReminders();
   } catch (e) {
-    toast('Não foi possível registrar: '+(e&&e.message?e.message:e), 'e');
-    return;
+    toast('Erro inesperado: '+(e&&e.message?e.message:e), 'e');
+    if (btnEl) { btnEl.disabled = false; btnEl.textContent = textoOriginal; }
   }
-  if (res.error || !res.data) {
-    toast('Não foi possível registrar: '+(res.error?res.error.message:'nenhum registro criado.'), 'e');
-    return;
-  }
-  _log.unshift(res.data);
-  toast('Marcado como feito!');
-  updateBadges();
-  if (tipo==='pos_venda') renderPostSale();
-  else if (tipo==='aniversario') renderBirthdays();
-  else if (tipo==='inativos') renderInactive();
-  else if (tipo==='lembrete') renderReminders();
 }
 function renderBirthdays(){renderOppList(getBD(gC()),'birthdays-list',c=>'Aniversario dia '+(c.birth_date||'').split('-')[2],'aniversario');}
 function renderInactive(){renderOppList(getIA(gC()),'inactive-list',c=>{const l=c.purchases.reduce((mx,p)=>p.date>mx?p.date:mx,'');return 'Ultima compra ha '+Math.floor((new Date()-new Date(l))/86400000)+' dias';},'inativos');}
