@@ -2337,11 +2337,11 @@ function renderOppList(items,cid,subFn,tipo) {
   el.innerHTML='<div class="ol">'+items.map(c=>{
     const col=avc(c.name);
     const nomeEsc=c.name.replace(/'/g,"\\'");
-    const feitoBtn = tipo ? '<button class="btn btn-o btn-sm" onclick="event.stopPropagation();marcarContatoFeito(\''+c.id+'\',\''+tipo+'\',\''+nomeEsc+'\')" title="Marcar que voce ja fez esse contato (ligacao, presencial, etc.)">Feito</button>' : '';
+    const feitoBtn = tipo ? '<button class="btn btn-o btn-sm" style="padding:7px 10px" onclick="event.stopPropagation();marcarContatoFeito(\''+c.id+'\',\''+tipo+'\',\''+nomeEsc+'\')" title="Marcar que voce ja fez esse contato (ligacao, presencial, etc.)">✓ Feito</button>' : '';
     return '<div class="ol-i" onclick="showDetail(\''+c.id+'\')">'+
       '<div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0"><div class="av-sm" style="background:'+col+'18;color:'+col+'">'+ini(c.name)+'</div>'+
       '<div style="min-width:0"><div style="font-weight:600;font-size:13px">'+c.name+'</div><div style="font-size:11px;color:var(--text3)">'+subFn(c)+'</div></div></div>'+
-      '<div style="display:flex;gap:5px;flex-shrink:0">'+
+      '<div style="display:flex;gap:5px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;max-width:150px">'+
       feitoBtn+
       '<button class="btn btn-g btn-sm" onclick="event.stopPropagation();openSendModal(\''+c.id+'\')">Msg</button>'+
       (c.phone?'<a class="wa" href="https://wa.me/55'+(c.phone||'').replace(/\D/g,'')+'\" target="_blank" onclick="event.stopPropagation()">WA</a>':'')+
@@ -2353,14 +2353,22 @@ function renderOppList(items,cid,subFn,tipo) {
 // sent_log que o envio de mensagem já usa — por isso também conta nos Relatórios.
 async function marcarContatoFeito(clientId, tipo, clientName) {
   var titulos = {pos_venda:'Pós-venda', aniversario:'Aniversário', inativos:'Reativação', lembrete:'Lembrete'};
+  var res;
   try {
-    await _sb.from('sent_log').insert({
+    res = await _sb.from('sent_log').insert({
       store_id: CU.id, client_id: clientId, client_name: clientName,
       message_id: null, message_title: 'Contato manual - '+(titulos[tipo]||tipo),
       message_type: tipo, salesperson: null
-    });
-  } catch(e) { toast('Não foi possível registrar.', 'e'); return; }
-  _log.unshift({store_id:CU.id, client_id:clientId, client_name:clientName, message_type:tipo, sent_at:new Date().toISOString()});
+    }).select().single();
+  } catch (e) {
+    toast('Não foi possível registrar: '+(e&&e.message?e.message:e), 'e');
+    return;
+  }
+  if (res.error || !res.data) {
+    toast('Não foi possível registrar: '+(res.error?res.error.message:'nenhum registro criado.'), 'e');
+    return;
+  }
+  _log.unshift(res.data);
   toast('Marcado como feito!');
   updateBadges();
   if (tipo==='pos_venda') renderPostSale();
