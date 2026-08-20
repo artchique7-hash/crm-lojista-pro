@@ -2317,29 +2317,61 @@ async function excluirClienteLista(id) {
 }
 
 // ── OPPORTUNITIES ──
-function getBD(c){const m=new Date().getMonth()+1;return c.filter(x=>{const bd=x.birth_date||'';return bd&&parseInt(bd.split('-')[1])===m});}
-function getIA(c){const d=new Date();d.setDate(d.getDate()-60);return c.filter(x=>x.purchases&&x.purchases.length&&new Date(x.purchases.reduce((mx,p)=>p.date>mx?p.date:mx,''))<d);}
-function getPS(c){const d=new Date();d.setDate(d.getDate()-7);return c.filter(x=>x.purchases&&x.purchases.length&&new Date(x.purchases.reduce((mx,p)=>p.date>mx?p.date:mx,''))>=d);}
-function getReminders(c){const t=new Date().toISOString().split('T')[0];return c.filter(x=>x.reminder&&x.reminder.substring(0,10)<=t);}
+// Verifica se já existe um registro de contato (mensagem enviada OU marcado manualmente
+// como feito) para esta cliente, neste tipo de oportunidade, desde a data de referência.
+// Reaproveita a tabela sent_log que já existia (alimentada pelo envio de mensagens);
+// não foi criada nenhuma tabela nova para isso.
+function foiContatado(clientId, tipo, desde) {
+  return (_log||[]).some(function(l){
+    return l.client_id===clientId && l.message_type===tipo && (!desde || (l.sent_at||'') >= desde);
+  });
+}
+function getBD(c){const m=new Date().getMonth()+1;const anoInicio=new Date().getFullYear()+'-01-01';return c.filter(x=>{const bd=x.birth_date||'';if(!bd||parseInt(bd.split('-')[1])!==m)return false;return !foiContatado(x.id,'aniversario',anoInicio);});}
+function getIA(c){const d=new Date();d.setDate(d.getDate()-60);return c.filter(x=>{if(!x.purchases||!x.purchases.length)return false;const ultima=x.purchases.reduce((mx,p)=>p.date>mx?p.date:mx,'');if(new Date(ultima)>=d)return false;return !foiContatado(x.id,'inativos',ultima);});}
+function getPS(c){const d=new Date();d.setDate(d.getDate()-7);return c.filter(x=>{if(!x.purchases||!x.purchases.length)return false;const ultima=x.purchases.reduce((mx,p)=>p.date>mx?p.date:mx,'');if(new Date(ultima)<d)return false;return !foiContatado(x.id,'pos_venda',ultima);});}
+function getReminders(c){const t=new Date().toISOString().split('T')[0];return c.filter(x=>{if(!x.reminder||x.reminder.substring(0,10)>t)return false;return !foiContatado(x.id,'lembrete',x.reminder);});}
 
-function renderOppList(items,cid,subFn) {
+function renderOppList(items,cid,subFn,tipo) {
   const el=document.getElementById(cid); if(!el)return;
   if(!items.length){el.innerHTML='<div class="empty"><div class="empty-t">Nenhuma cliente aqui</div><div class="empty-d">Tudo certo por aqui!</div></div>';return;}
   el.innerHTML='<div class="ol">'+items.map(c=>{
     const col=avc(c.name);
+    const nomeEsc=c.name.replace(/'/g,"\\'");
+    const feitoBtn = tipo ? '<button class="btn btn-o btn-sm" onclick="event.stopPropagation();marcarContatoFeito(\''+c.id+'\',\''+tipo+'\',\''+nomeEsc+'\')" title="Marcar que voce ja fez esse contato (ligacao, presencial, etc.)">Feito</button>' : '';
     return '<div class="ol-i" onclick="showDetail(\''+c.id+'\')">'+
       '<div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0"><div class="av-sm" style="background:'+col+'18;color:'+col+'">'+ini(c.name)+'</div>'+
       '<div style="min-width:0"><div style="font-weight:600;font-size:13px">'+c.name+'</div><div style="font-size:11px;color:var(--text3)">'+subFn(c)+'</div></div></div>'+
       '<div style="display:flex;gap:5px;flex-shrink:0">'+
+      feitoBtn+
       '<button class="btn btn-g btn-sm" onclick="event.stopPropagation();openSendModal(\''+c.id+'\')">Msg</button>'+
       (c.phone?'<a class="wa" href="https://wa.me/55'+(c.phone||'').replace(/\D/g,'')+'\" target="_blank" onclick="event.stopPropagation()">WA</a>':'')+
       '</div></div>';
   }).join('')+'</div>';
 }
-function renderBirthdays(){renderOppList(getBD(gC()),'birthdays-list',c=>'Aniversario dia '+(c.birth_date||'').split('-')[2]);}
-function renderInactive(){renderOppList(getIA(gC()),'inactive-list',c=>{const l=c.purchases.reduce((mx,p)=>p.date>mx?p.date:mx,'');return 'Ultima compra ha '+Math.floor((new Date()-new Date(l))/86400000)+' dias';});}
-function renderPostSale(){renderOppList(getPS(gC()),'postsale-list',c=>{const l=c.purchases.reduce((mx,p)=>p.date>mx?p.date:mx,'');return 'Comprou ha '+Math.floor((new Date()-new Date(l))/86400000)+' dias';});}
-function renderReminders(){renderOppList(getReminders(gC()),'reminders-list',c=>'Lembrete: '+fD(c.reminder));}
+// Marca a cliente como já contatada para esta oportunidade, sem precisar mandar
+// mensagem por template (ex: ligou, atendeu pessoalmente). Usa a mesma tabela
+// sent_log que o envio de mensagem já usa — por isso também conta nos Relatórios.
+async function marcarContatoFeito(clientId, tipo, clientName) {
+  var titulos = {pos_venda:'Pós-venda', aniversario:'Aniversário', inativos:'Reativação', lembrete:'Lembrete'};
+  try {
+    await _sb.from('sent_log').insert({
+      store_id: CU.id, client_id: clientId, client_name: clientName,
+      message_id: null, message_title: 'Contato manual - '+(titulos[tipo]||tipo),
+      message_type: tipo, salesperson: null
+    });
+  } catch(e) { toast('Não foi possível registrar.', 'e'); return; }
+  _log.unshift({store_id:CU.id, client_id:clientId, client_name:clientName, message_type:tipo, sent_at:new Date().toISOString()});
+  toast('Marcado como feito!');
+  updateBadges();
+  if (tipo==='pos_venda') renderPostSale();
+  else if (tipo==='aniversario') renderBirthdays();
+  else if (tipo==='inativos') renderInactive();
+  else if (tipo==='lembrete') renderReminders();
+}
+function renderBirthdays(){renderOppList(getBD(gC()),'birthdays-list',c=>'Aniversario dia '+(c.birth_date||'').split('-')[2],'aniversario');}
+function renderInactive(){renderOppList(getIA(gC()),'inactive-list',c=>{const l=c.purchases.reduce((mx,p)=>p.date>mx?p.date:mx,'');return 'Ultima compra ha '+Math.floor((new Date()-new Date(l))/86400000)+' dias';},'inativos');}
+function renderPostSale(){renderOppList(getPS(gC()),'postsale-list',c=>{const l=c.purchases.reduce((mx,p)=>p.date>mx?p.date:mx,'');return 'Comprou ha '+Math.floor((new Date()-new Date(l))/86400000)+' dias';},'pos_venda');}
+function renderReminders(){renderOppList(getReminders(gC()),'reminders-list',c=>'Lembrete: '+fD(c.reminder),'lembrete');}
 
 // ── TAG FILTER ──
 function renderFilter() {
