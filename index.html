@@ -6559,8 +6559,6 @@ function abrirCadastroRapidoPerdaAtend() {
   if (wrap) wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
 }
 
-async 
-
 async function excluirCliente(id) {
   var cl = gC().find(function(x){ return x.id===id; }) || window._detailClient;
   if (!cl) { toast('Cliente nao encontrado.','e'); return; }
