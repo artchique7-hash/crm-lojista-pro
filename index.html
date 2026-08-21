@@ -1955,7 +1955,7 @@ async function login() {
     if (!data.user) { authErr('Usuario nao encontrado.'); btn.textContent='Entrar'; btn.disabled=false; return; }
     const {data:store, error:storeErr} = await _sb.from('stores').select('*').eq('id', data.user.id).single();
     if (storeErr) { authErr('Erro store: '+storeErr.message); btn.textContent='Entrar'; btn.disabled=false; return; }
-    CU = {id:data.user.id, email:data.user.email, name:store?.owner_name||'', store:store?.name||''};
+    CU = {id:data.user.id, email:data.user.email, name:store?.owner_name||'', store:store?.name||'', cashback_config:store?.cashback_config||null};
     await loadAll();
     enterApp();
   } catch(e) {
@@ -1995,7 +1995,7 @@ async function checkSession() {
   const {data:{session}} = await _sb.auth.getSession();
   if (session?.user) {
     const {data:store} = await _sb.from('stores').select('*').eq('id', session.user.id).single();
-    CU = {id:session.user.id, email:session.user.email, name:store?.owner_name||'', store:store?.name||''};
+    CU = {id:session.user.id, email:session.user.email, name:store?.owner_name||'', store:store?.name||'', cashback_config:store?.cashback_config||null};
     await loadAll(); enterApp(); return;
   }
   document.getElementById('auth-screen').style.display='flex';
@@ -2026,7 +2026,14 @@ function carregarDadosLocaisDaLoja() {
   _rotinas = slpGet('slp_rotinas', []);
   _atividades = slpGet('slp_atividades', []);
   _wppAuto = slpGet('slp_wpp_auto', []);
-  _cbConfig = Object.assign({}, _CB_CONFIG_PADRAO, slpGet('slp_cb_config', {}));
+  _cbConfig = Object.assign({}, _CB_CONFIG_PADRAO, (CU && CU.cashback_config) || {});
+  if (CU && !CU.cashback_config) {
+    var configAntigaNoNavegador = slpGet('slp_cb_config', null);
+    if (configAntigaNoNavegador) {
+      _cbConfig = Object.assign({}, _CB_CONFIG_PADRAO, configAntigaNoNavegador);
+      saveCbConfig();
+    }
+  }
 }
 
 function enterApp() {
@@ -2125,16 +2132,18 @@ function renderDash() {
   // ── 1. PRIORIDADES DO DIA ──
   var prioEl = document.getElementById('dash-prioridades');
   if (prioEl) {
+    var cbDash = getCbDashboard();
     var prioridades = [
       { label:'Aniversariantes este mes', count:bd.length, sub:'Clientes que fazem aniversario agora', page:'birthdays', cor:'var(--gold)', bg:'var(--gold-l)', icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>' },
       { label:'Retornos pendentes', count:rem.length, sub:'Contatos agendados para hoje ou atrasados', page:'reminders', cor:'var(--purple)', bg:'var(--purple-l)', icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>' },
       { label:'Pos-venda pendente', count:ps.length, sub:'Compraram nos ultimos 7 dias', page:'postsale', cor:'var(--blue)', bg:'var(--blue-l)', icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>' },
       { label:'Clientes para reativar', count:ia.length, sub:'Somidas ha 60+ dias', page:'inactive', cor:'var(--red)', bg:'var(--red-l)', icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' },
+      { label:'Cashback a vencer', count:cbDash.venc30, sub:'Saldo disponivel vencendo em 30 dias', page:'cashback-opp', cor:'var(--gold)', bg:'var(--gold-l)', icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>' },
       { label:'Buscar por interesse', count:clients.length, sub:'Filtrar clientes por produto ou tag', page:'filter', cor:'var(--green)', bg:'var(--green-l)', icon:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>' },
     ];
     // Ordenar por urgência (maior count primeiro, exceto o último que é informativo)
-    var urgentes = prioridades.slice(0,4).sort(function(a,b){ return b.count - a.count; });
-    urgentes.push(prioridades[4]);
+    var urgentes = prioridades.slice(0,5).sort(function(a,b){ return b.count - a.count; });
+    urgentes.push(prioridades[5]);
     prioEl.innerHTML = urgentes.map(function(p) {
       return '<div class="dash-prior-item" onclick="showPage(\'' + p.page + '\')">' +
         '<div class="dash-prior-icon" style="background:' + p.bg + '">' + p.icon + '</div>' +
@@ -6244,6 +6253,9 @@ function abrirModalAtend(canal) {
   _atendResultado = null;
   _atendClienteId = null;
   _atendPerdaClienteId = null;
+  _salvandoAtend = false;
+  var btnReg = document.getElementById('btn-registrar-atend');
+  if (btnReg) { btnReg.disabled = false; btnReg.textContent = 'Registrar'; }
 
   // Reset campos
   var ids = ['atend-origem-outro','atend-cliente-busca','atend-novo-nome','atend-novo-tel','atend-perda-produto','atend-perda-motivo','atend-produto-compra','atend-valor','atend-perda-cliente-busca','atend-perda-novo-nome','atend-perda-novo-tel','atend-lembrete-data','atend-lembrete-desc'];
@@ -6357,8 +6369,15 @@ function abrirCadastroRapidoAtend() {
   if (wrap) wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
 }
 
-async function salvarAtendUnificado() {
+var _salvandoAtend = false;
+async function salvarAtendUnificado(btnEl) {
   if (!_atendResultado) { toast('Selecione o resultado.', 'e'); return; }
+  if (_salvandoAtend) return; // já tem um registro em andamento — ignora cliques extras
+  _salvandoAtend = true;
+  var textoOriginalBtn = btnEl ? btnEl.textContent : '';
+  if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'Registrando...'; }
+
+  try {
 
   var date = getFluxoDate();
   if (!_fluxo[date]) _fluxo[date] = {fisico:0, online:0, perdas:[], id:null};
@@ -6495,6 +6514,13 @@ async function salvarAtendUnificado() {
   var mo = document.getElementById('mo-atend');
   if (mo) mo.classList.remove('open');
   toast('Atendimento registrado!');
+
+  } catch (e) {
+    toast('Erro ao registrar: '+(e&&e.message?e.message:e), 'e');
+  } finally {
+    _salvandoAtend = false;
+    if (btnEl) { btnEl.disabled = false; btnEl.textContent = textoOriginalBtn; }
+  }
 }
 
 // ── CLIENTE NO NÃO COMPROU ──
@@ -7013,7 +7039,12 @@ async function confirmarImportacao() {
 // MÓDULO CASHBACK
 var _CB_CONFIG_PADRAO = {"percentual":5,"validade":60,"minimo":0,"msg30":"Oi {nome}! Você tem R$ {valor} de cashback até {data}.","msg15":"{nome}, seu cashback de R$ {valor} vence em 15 dias!","msg5":"Últimos dias! Cashback de R$ {valor} expira em {data}, {nome}."};
 var _cbConfig = Object.assign({}, _CB_CONFIG_PADRAO);
-function saveCbConfig(){slpSet('slp_cb_config', _cbConfig);}
+async function saveCbConfig(){
+  const res = await _sb.from('stores').update({cashback_config:_cbConfig}).eq('id', CU.id).select().single();
+  if (res.error) { toast('Não foi possível salvar a configuração: '+res.error.message, 'e'); return false; }
+  if (res.data) CU.cashback_config = res.data.cashback_config;
+  return true;
+}
 var _cashback=[];
 async function loadCashback(){
   if(!CU)return;
@@ -7173,17 +7204,21 @@ function carregarConfigCashback(){
   var m15=document.getElementById('cb-msg-15');if(m15)m15.value=_cbConfig.msg15||'';
   var m5=document.getElementById('cb-msg-5');if(m5)m5.value=_cbConfig.msg5||'';
 }
-function salvarConfigCashback(){
+async function salvarConfigCashback(){
   var p=document.getElementById('cb-percentual');
   var v=document.getElementById('cb-validade');
   var m=document.getElementById('cb-minimo');
-  _cbConfig.percentual=parseFloat((p&&p.value)||5);
-  _cbConfig.validade=parseInt((v&&v.value)||60);
-  _cbConfig.minimo=parseFloat((m&&m.value)||0);
-  var m30=document.getElementById('cb-msg-30');if(m30)_cbConfig.msg30=m30.value;
-  var m15=document.getElementById('cb-msg-15');if(m15)_cbConfig.msg15=m15.value;
-  var m5=document.getElementById('cb-msg-5');if(m5)_cbConfig.msg5=m5.value;
-  saveCbConfig();
+  var novoConfig = Object.assign({}, _cbConfig);
+  novoConfig.percentual=parseFloat((p&&p.value)||5);
+  novoConfig.validade=parseInt((v&&v.value)||60);
+  novoConfig.minimo=parseFloat((m&&m.value)||0);
+  var m30=document.getElementById('cb-msg-30');if(m30)novoConfig.msg30=m30.value;
+  var m15=document.getElementById('cb-msg-15');if(m15)novoConfig.msg15=m15.value;
+  var m5=document.getElementById('cb-msg-5');if(m5)novoConfig.msg5=m5.value;
+  var anterior = _cbConfig;
+  _cbConfig = novoConfig;
+  var ok = await saveCbConfig();
+  if (!ok) { _cbConfig = anterior; return; }
   toast('Configurações de cashback salvas!');
 }
 function setCbDias(dias,el){
@@ -7457,7 +7492,7 @@ document.addEventListener('DOMContentLoaded', () => {
    </div>
    <div style="display:flex;gap:10px;justify-content:flex-end;padding-top:14px;border-top:1px solid var(--border);margin-top:8px">
     <button class="btn btn-g btn-sm" id="btn-cancela-atend">Cancelar</button>
-    <button class="btn btn-p btn-sm" onclick="salvarAtendUnificado()">Registrar</button>
+    <button class="btn btn-p btn-sm" id="btn-registrar-atend" onclick="salvarAtendUnificado(this)">Registrar</button>
    </div>
   </div>
  </div>
