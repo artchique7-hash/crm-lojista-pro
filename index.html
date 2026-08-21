@@ -4121,13 +4121,8 @@ function verificarCaptacaoPublica() {
 
 function carregarTagsPublicas() {
   if (!_capStoreId) return;
-  _sb.from('clients').select('tags').eq('store_id', _capStoreId).then(function(res) {
-    var allTags = [];
-    (res.data || []).forEach(function(cl) {
-      (cl.tags || []).forEach(function(t) {
-        if (t && !allTags.includes(t)) allTags.push(t);
-      });
-    });
+  _sb.rpc('get_tags_publicas', {p_store_id: _capStoreId}).then(function(res) {
+    var allTags = res.data || [];
     var el = document.getElementById('pub-tags-list');
     var wrap = document.getElementById('pub-tags-wrap');
     if (allTags.length && el && wrap) {
