@@ -2026,11 +2026,11 @@ function carregarDadosLocaisDaLoja() {
   _rotinas = slpGet('slp_rotinas', []);
   _atividades = slpGet('slp_atividades', []);
   _wppAuto = slpGet('slp_wpp_auto', []);
-  _cbConfig = Object.assign({}, _CB_CONFIG_PADRAO, (CU && CU.cashback_config) || {});
+  _cbConfig = mesclarConfigCashback(CU && CU.cashback_config);
   if (CU && !CU.cashback_config) {
     var configAntigaNoNavegador = slpGet('slp_cb_config', null);
     if (configAntigaNoNavegador) {
-      _cbConfig = Object.assign({}, _CB_CONFIG_PADRAO, configAntigaNoNavegador);
+      _cbConfig = mesclarConfigCashback(configAntigaNoNavegador);
       saveCbConfig();
     }
   }
@@ -2054,7 +2054,6 @@ function enterApp() {
 
 // ── NAVIGATION ──
 function showPage(p) {
-  if (p === 'cashback-opp') { setTimeout(function(){ carregarConfigCashback(); renderCbPesquisa(); }, 50); }
   document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.nav-i').forEach(x=>x.classList.remove('active'));
   // Abrir grupo do menu correto
@@ -2071,7 +2070,7 @@ function showPage(p) {
   const bni=document.querySelectorAll('.bn-i');
   if (bnMap[p]!==undefined && bni[bnMap[p]]) bni[bnMap[p]].classList.add('active');
   closeSB();
-  const R={dashboard:renderDash,clients:renderClients,escritorio:renderEscritorio,fluxo:renderFluxo,captacao:renderCaptacao,birthdays:renderBirthdays,inactive:renderInactive,postsale:renderPostSale,reminders:renderReminders,filter:renderFilter,messages:renderMsgs,salespeople:renderSP,reports:renderReports,export:renderExport};
+  const R={dashboard:renderDash,clients:renderClients,escritorio:renderEscritorio,fluxo:renderFluxo,captacao:renderCaptacao,birthdays:renderBirthdays,inactive:renderInactive,postsale:renderPostSale,reminders:renderReminders,filter:renderFilter,messages:renderMsgs,salespeople:renderSP,reports:renderReports,export:renderExport,'cashback-opp':function(){ carregarConfigCashback(); renderCbPesquisa(); }};
   if (R[p]) R[p]();
 }
 function toggleSB() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sb-overlay').classList.toggle('open'); }
@@ -2112,7 +2111,7 @@ function renderDash() {
   var ia = getIA(clients);
   var ps = getPS(clients);
   var rem = getReminders(clients);
-  var hoje = new Date().toISOString().split('T')[0];
+  var hoje = getTodayStr();
   var fluxoHoje = _fluxo[hoje] || {fisico:0, online:0, vendas_fisico:0, vendas_online:0, perdas:[]};
 
   // Saudação dinâmica
@@ -2213,7 +2212,7 @@ function renderDash() {
     var DIA_SEMANA_MAP = ['domingo','segunda','terca','quarta','quinta','sexta','sabado'];
     var diaHoje = DIA_SEMANA_MAP[new Date().getDay()];
     var rotinasHoje = (_rotinas||[]).filter(function(r){ return r.dia===diaHoje || r.dia==='diario'; });
-    var hojeStr = new Date().toISOString().split('T')[0];
+    var hojeStr = getTodayStr();
     var atividadesPendentes = (_atividades||[]).filter(function(a){ return a.status!=='concluida'; })
       .sort(function(a,b){ return (a.data||'').localeCompare(b.data||''); }).slice(0,5);
 
@@ -2316,7 +2315,7 @@ function foiContatado(clientId, tipo, desde) {
 function getBD(c){const m=new Date().getMonth()+1;const anoInicio=new Date().getFullYear()+'-01-01';return c.filter(x=>{const bd=x.birth_date||'';if(!bd||parseInt(bd.split('-')[1])!==m)return false;return !foiContatado(x.id,'aniversario',anoInicio);});}
 function getIA(c){const d=new Date();d.setDate(d.getDate()-60);return c.filter(x=>{if(!x.purchases||!x.purchases.length)return false;const ultima=x.purchases.reduce((mx,p)=>p.date>mx?p.date:mx,'');if(new Date(ultima)>=d)return false;return !foiContatado(x.id,'inativos',ultima);});}
 function getPS(c){const d=new Date();d.setDate(d.getDate()-7);return c.filter(x=>{if(!x.purchases||!x.purchases.length)return false;const ultima=x.purchases.reduce((mx,p)=>p.date>mx?p.date:mx,'');if(new Date(ultima)<d)return false;return !foiContatado(x.id,'pos_venda',ultima);});}
-function getReminders(c){const t=new Date().toISOString().split('T')[0];return c.filter(x=>{if(!x.reminder||x.reminder.substring(0,10)>t)return false;return !foiContatado(x.id,'lembrete',x.reminder);});}
+function getReminders(c){const t=getTodayStr();return c.filter(x=>{if(!x.reminder||x.reminder.substring(0,10)>t)return false;return !foiContatado(x.id,'lembrete',x.reminder);});}
 
 function renderOppList(items,cid,subFn,tipo) {
   const el=document.getElementById(cid); if(!el)return;
@@ -2523,7 +2522,7 @@ function montarFichaCliente(c) {
   var ticketMedio=sortPurch.length?totalSpent/sortPurch.length:0;
   var ultimaCompra=sortPurch.length?sortPurch[0].date:null;
   var saldoCb=getCbSaldo(c.id);
-  var today=new Date().toISOString().split('T')[0];
+  var today=getTodayStr();
   var remVal=(c.reminder||'').substring(0,10);
   var remDue=remVal&&remVal<=today;
 
@@ -2680,7 +2679,7 @@ function buildCfContatos(c,sortCont) {
 // compacto=true → usado dentro do card "Próximas ações" da Visão Geral
 function buildCfLembretes(c, compacto) {
   var remVal=(c.reminder||'').substring(0,10);
-  var today=new Date().toISOString().split('T')[0];
+  var today=getTodayStr();
   var remDue=remVal&&remVal<=today;
   var corpo=(!remVal)
     ? '<div class="empty" style="padding:'+(compacto?'10px':'18px')+'"><div class="empty-d">Nenhum retorno agendado</div></div>'
@@ -3364,13 +3363,13 @@ function renderReports(period) {
   // Filtro por periodo
   var dataInicio = null, dataFim = null;
   if (period === 'hoje') {
-    var hoje = now.toISOString().split('T')[0];
+    var hoje = toLocalDateStr(now);
     dataInicio = dataFim = hoje;
   } else if (period === 'semana') {
     var dow = now.getDay();
     var seg = new Date(now); seg.setDate(now.getDate() - dow + (dow === 0 ? -6 : 1));
-    dataInicio = seg.toISOString().split('T')[0];
-    dataFim = now.toISOString().split('T')[0];
+    dataInicio = toLocalDateStr(seg);
+    dataFim = toLocalDateStr(now);
   } else if (month > 0) {
     dataInicio = year + '-' + String(month).padStart(2,'0') + '-01';
     var lastDay = new Date(year, month, 0).getDate();
@@ -3690,12 +3689,12 @@ function expCSV(){
   const rows=[['Nome','Telefone','Nascimento','Endereco','Cidade','Bairro','Origem','Status','Fidelidade','Estilo','Pagamento','Canais','Tags','Score','Compras','Criado em']];
   c.forEach(x=>rows.push([x.name,x.phone||'',x.birth_date||'',x.address||'',x.city||'',x.region||'',x.origin||'',x.status||'',x.loyalty||'',x.style||'',(x.payment_methods||[]).join(';'),(x.channels||[]).join(';'),(x.tags||[]).join(';'),calcScore(x),(x.purchases||[]).length,(x.created_at||'').split('T')[0]]));
   const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
-  dl('clientes_'+new Date().toISOString().split('T')[0]+'.csv','data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv));
+  dl('clientes_'+getTodayStr()+'.csv','data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv));
   toast(c.length+' clientes exportadas!');
 }
 function expJSON(){
   const data={clientes:_clients,vendedoras:_sp,mensagens:_msgs,envios:_log,exportedAt:new Date().toISOString(),loja:CU.store};
-  dl('backup_'+new Date().toISOString().split('T')[0]+'.json','data:application/json,'+encodeURIComponent(JSON.stringify(data,null,2)));
+  dl('backup_'+getTodayStr()+'.json','data:application/json,'+encodeURIComponent(JSON.stringify(data,null,2)));
   toast('Backup exportado!');
 }
 function impJSON(e){
@@ -3817,7 +3816,7 @@ async function saveClient(){
 // ── PURCHASES ──
 function openPurchModal(cid){
   document.getElementById('p-cid').value=cid;
-  document.getElementById('p-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('p-date').value=getTodayStr();
   ['p-desc','p-obs'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('p-amt').value='';
   fillSPSelect('p-sp','');
@@ -3901,7 +3900,15 @@ function updateBadges(){
 // ── FLUXO DO DIA ──
 var _fluxo = {};
 
-function getTodayStr() { return new Date().toISOString().split('T')[0]; }
+function toLocalDateStr(d) {
+  var y = d.getFullYear();
+  var m = String(d.getMonth()+1).padStart(2,'0');
+  var day = String(d.getDate()).padStart(2,'0');
+  return y+'-'+m+'-'+day;
+}
+function getTodayStr() {
+  return toLocalDateStr(new Date());
+}
 
 function getFluxoDate() {
   var inp = document.getElementById('fluxo-date');
@@ -4641,7 +4648,7 @@ function renderCalGrid() {
   while (grid.children.length > 7) grid.removeChild(grid.lastChild);
   var primeiro = new Date(_calAno, _calMes, 1);
   var ultimo = new Date(_calAno, _calMes + 1, 0);
-  var hoje = new Date().toISOString().split('T')[0];
+  var hoje = getTodayStr();
   var inicioDow = (primeiro.getDay() + 6) % 7;
   for (var i = 0; i < inicioDow; i++) {
     var d = new Date(_calAno, _calMes, -inicioDow + i + 1);
@@ -4681,7 +4688,7 @@ function abrirModalConteudo(id, statusDefault, dataDefault) {
   document.getElementById('ev-titulo').value = ev ? ev.titulo : '';
   document.getElementById('ev-tipo').value = ev ? (ev.tipo||'stories') : 'stories';
   document.getElementById('ev-status').value = ev ? (ev.status||'ideias') : (statusDefault||'ideias');
-  document.getElementById('ev-data').value = ev ? (ev.data||'') : (dataDefault||new Date().toISOString().split('T')[0]);
+  document.getElementById('ev-data').value = ev ? (ev.data||'') : (dataDefault||getTodayStr());
   document.getElementById('ev-objetivo').value = ev ? (ev.objetivo||'') : '';
   document.getElementById('ev-campanha').value = ev ? (ev.campanha||'') : '';
   document.getElementById('ev-obs').value = ev ? (ev.obs||'') : '';
@@ -4751,7 +4758,7 @@ var CAT_ICONE = {
 };
 
 function getStatusMeta(m) {
-  var hoje = new Date().toISOString().split('T')[0];
+  var hoje = getTodayStr();
   var pct = m.alvo > 0 ? (m.atual / m.alvo) * 100 : 0;
   if (pct >= 100) return {label:'Concluida', cls:'bg-g', cor:'var(--green)'};
   if (m.fim && hoje > m.fim && pct < 100) return {label:'Atrasada', cls:'bg-r', cor:'var(--red)'};
@@ -4780,7 +4787,7 @@ function abrirModalMeta(id) {
   document.getElementById('meta-titulo').value = m ? m.titulo : '';
   document.getElementById('meta-cat').value = m ? (m.cat||'faturamento') : 'faturamento';
   document.getElementById('meta-unidade').value = m ? (m.unidade||'numero') : 'numero';
-  document.getElementById('meta-inicio').value = m ? (m.inicio||'') : new Date().toISOString().split('T')[0];
+  document.getElementById('meta-inicio').value = m ? (m.inicio||'') : getTodayStr();
   document.getElementById('meta-fim').value = m ? (m.fim||'') : '';
   document.getElementById('meta-alvo').value = m ? m.alvo : '';
   document.getElementById('meta-atual').value = m ? m.atual : '0';
@@ -5221,7 +5228,7 @@ function abrirModalAtividade(id) {
   document.getElementById('modal-ativ-title').textContent = at ? 'Editar Atividade' : 'Nova Atividade';
   document.getElementById('ativ-edit-id').value = id || '';
   document.getElementById('ativ-titulo').value = at ? at.titulo : '';
-  document.getElementById('ativ-data').value = at ? (at.data||'') : new Date().toISOString().split('T')[0];
+  document.getElementById('ativ-data').value = at ? (at.data||'') : getTodayStr();
   document.getElementById('ativ-prio').value = at ? (at.prio||'normal') : 'normal';
   document.getElementById('ativ-resp').value = at ? (at.resp||'') : '';
   document.getElementById('ativ-status').value = at ? (at.status||'pendente') : 'pendente';
@@ -5351,7 +5358,7 @@ function renderAtividades() {
     var totalCheck = (at.checklist||[]).length;
     var doneCheck = (at.checklist||[]).filter(function(i){ return i.done; }).length;
     var pct = totalCheck > 0 ? Math.round((doneCheck/totalCheck)*100) : 0;
-    var hoje = new Date().toISOString().split('T')[0];
+    var hoje = getTodayStr();
     var vencida = at.data && at.data < hoje && at.status !== 'concluida';
 
     return '<div class="ativ-card ' + at.status + '" data-darg="' + at.id + '" onclick="abrirModalAtividade(this.dataset.darg)">' +
@@ -6229,25 +6236,6 @@ function salvarProdutoWpp(){
   toast('Produto adicionado!');
 }
 
-
-// ── ATENDIMENTO ONLINE COM ORIGEM ──
-var _onlineResultado = null;
-
-function toggleOutroOnline(val) {
-  var inp = document.getElementById('online-origem-outro');
-  if (inp) inp.style.display = val === 'outro' ? 'block' : 'none';
-}
-
-function setResultadoOnline(val) {
-  _onlineResultado = val;
-  var btnC = document.getElementById('btn-online-comprou');
-  var btnN = document.getElementById('btn-online-nao-comprou');
-  var perdaWrap = document.getElementById('online-perda-wrap');
-  if (btnC) btnC.style.background = val === 'comprou' ? 'var(--green)' : '';
-  if (btnN) btnN.style.background = val === 'nao_comprou' ? 'var(--red)' : '';
-  if (perdaWrap) perdaWrap.style.display = val === 'nao_comprou' ? 'block' : 'none';
-}
-
 function abrirModalAtend(canal) {
   _atendCanal = canal;
   _atendResultado = null;
@@ -6505,15 +6493,14 @@ async function salvarAtendUnificado(btnEl) {
   saveFluxoToDB(date);
   renderFluxo();
 
-  // Recarregar clientes para atualizar histórico e oportunidades
-  if (_atendResultado === 'comprou') {
-    await loadAll();
-    updateBadges();
-  }
-
   var mo = document.getElementById('mo-atend');
   if (mo) mo.classList.remove('open');
   toast('Atendimento registrado!');
+
+  // Sincronizar clientes/oportunidades em segundo plano — não trava a confirmação visual
+  if (_atendResultado === 'comprou') {
+    loadAll().then(function(){ updateBadges(); });
+  }
 
   } catch (e) {
     toast('Erro ao registrar: '+(e&&e.message?e.message:e), 'e');
@@ -7038,6 +7025,15 @@ async function confirmarImportacao() {
 
 // MÓDULO CASHBACK
 var _CB_CONFIG_PADRAO = {"percentual":5,"validade":60,"minimo":0,"msg30":"Oi {nome}! Você tem R$ {valor} de cashback até {data}.","msg15":"{nome}, seu cashback de R$ {valor} vence em 15 dias!","msg5":"Últimos dias! Cashback de R$ {valor} expira em {data}, {nome}."};
+function mesclarConfigCashback(salvo) {
+  var r = Object.assign({}, _CB_CONFIG_PADRAO);
+  if (!salvo) return r;
+  Object.keys(salvo).forEach(function(k){
+    var v = salvo[k];
+    if (v !== null && v !== undefined && v !== '') r[k] = v;
+  });
+  return r;
+}
 var _cbConfig = Object.assign({}, _CB_CONFIG_PADRAO);
 async function saveCbConfig(){
   const res = await _sb.from('stores').update({cashback_config:_cbConfig}).eq('id', CU.id).select().single();
