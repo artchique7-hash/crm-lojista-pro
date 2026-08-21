@@ -3982,7 +3982,7 @@ function renderCaptacao() {
   }
 }
 
-function gerarLinkCaptacao() {
+async function gerarLinkCaptacao() {
   var titulo = document.getElementById('cap-titulo').value.trim();
   var desc = document.getElementById('cap-desc').value.trim();
   if (!titulo) { toast('Informe o titulo do formulario', 'e'); return; }
@@ -3994,18 +3994,27 @@ function gerarLinkCaptacao() {
   var formId = '';
   for (var i = 0; i < 6; i++) formId += chars[Math.floor(Math.random() * chars.length)];
 
-  // Salvar no Supabase
-  _sb.from('captacao_forms').insert({
-    id: formId,
-    store_id: CU.id,
-    titulo: titulo,
-    descricao: desc
-  }).then(function(res) {
-    if (btn) { btn.textContent = 'Gerar Link e QR Code'; btn.disabled = false; }
-    if (res.error) {
-      formId = formId + Math.floor(Math.random()*9);
-      _sb.from('captacao_forms').insert({id:formId, store_id:CU.id, titulo:titulo, descricao:desc}).then(function(){});
-    }
+  // Salvar no Supabase — confirma de verdade antes de mostrar sucesso
+  var res = await _sb.from('captacao_forms').insert({
+    id: formId, store_id: CU.id, titulo: titulo, descricao: desc
+  }).select().single();
+
+  if (res.error) {
+    // colisão de ID improvável, mas tenta mais uma vez com outro id antes de desistir
+    formId = formId + Math.floor(Math.random()*9);
+    res = await _sb.from('captacao_forms').insert({
+      id: formId, store_id: CU.id, titulo: titulo, descricao: desc
+    }).select().single();
+  }
+
+  if (btn) { btn.textContent = 'Gerar Link e QR Code'; btn.disabled = false; }
+
+  if (res.error || !res.data) {
+    toast('Não foi possível gerar o link: '+(res.error?res.error.message:'erro desconhecido.'), 'e');
+    return;
+  }
+
+  {
     var base = window.location.href.split('?')[0];
     _capLink = base + '?f=' + formId;
 
@@ -4030,7 +4039,7 @@ function gerarLinkCaptacao() {
       qrEl.appendChild(img);
     }
     toast('Link gerado com sucesso!');
-  });
+  }
 }
 
 function copiarLinkCaptacao() {
