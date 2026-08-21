@@ -1257,6 +1257,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
           <button class="btn btn-p btn-sm" onclick="copiarLinkCaptacao()">Copiar Link</button>
           <a id="cap-wa-btn" class="wa" target="_blank">Compartilhar no WhatsApp</a>
           <button class="btn btn-g btn-sm" onclick="baixarQRCode()">Baixar QR Code</button>
+          <button class="btn btn-g btn-sm" id="cap-toggle-btn" onclick="alternarAtivoCaptacao()">Desativar formulário</button>
         </div>
         <div style="margin-top:14px;padding:12px;background:var(--green-l);border-radius:var(--rs);font-size:12px;color:var(--green)">
           Compartilhe esse link no Instagram, WhatsApp ou imprima o QR Code para sua loja fisica.
@@ -3985,8 +3986,11 @@ function removePerdaBtn(btn) {
 
 // ── CAPTACAO DE CLIENTES ──
 var _capStoreId = null;
+var _capFormId = null;
 var _capTags = [];
 var _capLink = '';
+var _capGeradoFormId = null;
+var _capGeradoAtivo = true;
 
 function renderCaptacao() {
   // Preview tags
@@ -4035,6 +4039,8 @@ async function gerarLinkCaptacao() {
   {
     var base = window.location.href.split('?')[0];
     _capLink = base + '?f=' + formId;
+    _capGeradoFormId = formId;
+    _capGeradoAtivo = true;
 
     // Mostrar resultado
     document.getElementById('cap-resultado').style.display = 'block';
@@ -4087,16 +4093,35 @@ function baixarQRCode() {
   toast('QR Code baixado!');
 }
 
+async function alternarAtivoCaptacao() {
+  if (!_capGeradoFormId) { toast('Gere o link primeiro', 'e'); return; }
+  var novoEstado = !_capGeradoAtivo;
+  var res = await _sb.from('captacao_forms').update({active: novoEstado}).eq('id', _capGeradoFormId).select().single();
+  if (res.error) { toast('Não foi possível alterar o formulário: '+res.error.message, 'e'); return; }
+  _capGeradoAtivo = novoEstado;
+  var btn = document.getElementById('cap-toggle-btn');
+  if (btn) btn.textContent = novoEstado ? 'Desativar formulário' : 'Reativar formulário';
+  toast(novoEstado ? 'Formulário reativado!' : 'Formulário desativado — não aceita mais cadastros.');
+}
+
 // ── FORMULARIO PUBLICO ──
 function verificarCaptacaoPublica() {
   var params = new URLSearchParams(window.location.search);
   var formId = params.get('f');
-  var cap = params.get('cap');
 
-  if (!formId && !cap) return false;
+  if (!formId) return false;
+
+  function mostrarErroPublico(msg) {
+    document.getElementById('pub-form-card').style.display = 'none';
+    var errBox = document.getElementById('pub-titulo');
+    if (errBox) errBox.textContent = 'Ops!';
+    var descBox = document.getElementById('pub-desc');
+    if (descBox) descBox.textContent = msg;
+  }
 
   function mostrarForm(titulo, desc, storeId) {
     _capStoreId = storeId;
+    _capFormId = formId;
     document.getElementById('auth-screen').style.display = 'none';
     document.getElementById('app').style.display = 'none';
     document.getElementById('captacao-publica').style.display = 'block';
@@ -4105,36 +4130,32 @@ function verificarCaptacaoPublica() {
     carregarTagsPublicas();
   }
 
-  if (formId) {
-    // Link curto - buscar no Supabase
-    _sb.from('captacao_forms').select('*').eq('id', formId).single().then(function(res) {
-      if (res.error || !res.data) {
-        document.getElementById('auth-screen').style.display = 'flex';
-        return;
-      }
-      mostrarForm(res.data.titulo, res.data.descricao || '', res.data.store_id);
-    });
-    // Mostrar loading enquanto busca
-    document.getElementById('auth-screen').style.display = 'none';
-    document.getElementById('captacao-publica').style.display = 'block';
-    document.getElementById('pub-titulo').textContent = 'Carregando...';
-    document.getElementById('pub-desc').textContent = '';
-    return true;
-  }
+  // Buscar o formulario no Supabase pelo id publico -- nunca confiamos em
+  // nada vindo da URL alem desse id; loja, titulo e descricao vem do banco.
+  _sb.from('captacao_forms').select('*').eq('id', formId).maybeSingle().then(function(res) {
+    if (res.error) {
+      mostrarErroPublico('Não conseguimos carregar o formulário. Tente novamente.');
+      return;
+    }
+    if (!res.data) {
+      mostrarErroPublico('Este formulário não está disponível.');
+      return;
+    }
+    if (res.data.active === false) {
+      mostrarErroPublico('Este formulário está temporariamente indisponível.');
+      return;
+    }
+    mostrarForm(res.data.titulo, res.data.descricao || '', res.data.store_id);
+  }).catch(function() {
+    mostrarErroPublico('Não conseguimos carregar o formulário. Tente novamente.');
+  });
 
-  if (cap) {
-    // Link longo antigo - manter compatibilidade
-    try {
-      var padded = cap.replace(/-/g,'+').replace(/_/g,'/');
-      while (padded.length % 4) padded += '=';
-      var decoded = decodeURIComponent(escape(atob(padded)));
-      var parts = decoded.split('|');
-      mostrarForm(parts[1]||'Cadastre-se em nossa loja', parts[2]||'', parts[0]);
-      return true;
-    } catch(e) { return false; }
-  }
-
-  return false;
+  // Mostrar loading enquanto busca -- nunca a tela de login
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('captacao-publica').style.display = 'block';
+  document.getElementById('pub-titulo').textContent = 'Carregando...';
+  document.getElementById('pub-desc').textContent = '';
+  return true;
 }
 
 function carregarTagsPublicas() {
@@ -4171,31 +4192,25 @@ function enviarCaptacao() {
 
   if (!nome) { errEl.textContent = 'Por favor, informe seu nome.'; errEl.style.display='block'; return; }
   if (!phone) { errEl.textContent = 'Por favor, informe seu WhatsApp.'; errEl.style.display='block'; return; }
+  if (!_capFormId) { errEl.textContent = 'Não conseguimos identificar o formulário. Recarregue a página.'; errEl.style.display='block'; return; }
   errEl.style.display = 'none';
 
   var btn = document.getElementById('pub-submit-btn');
   btn.textContent = 'Enviando...';
   btn.disabled = true;
 
-  var row = {
-    store_id: _capStoreId,
-    name: nome,
-    phone: phone,
-    birth_date: birth,
-    city: city,
-    origin: 'captacao',
-    status: 'ainda_nao_comprou',
-    loyalty: 'regular',
-    tags: _capTags,
-    payment_methods: [],
-    channels: [],
-  };
-
-  _sb.from('clients').insert(row).then(function(res) {
+  _sb.rpc('submit_public_captacao', {
+    p_public_id: _capFormId,
+    p_name: nome,
+    p_phone: phone,
+    p_birth_date: birth,
+    p_city: city,
+    p_tags: _capTags
+  }).then(function(res) {
     btn.textContent = 'Enviar Cadastro';
     btn.disabled = false;
-    if (res.error) {
-      errEl.textContent = 'Erro ao enviar. Tente novamente.';
+    if (res.error || !res.data || res.data.ok !== true) {
+      errEl.textContent = 'Não conseguimos concluir seu cadastro. Tente novamente.';
       errEl.style.display = 'block';
       return;
     }
@@ -4204,7 +4219,7 @@ function enviarCaptacao() {
   }).catch(function(e) {
     btn.textContent = 'Enviar Cadastro';
     btn.disabled = false;
-    errEl.textContent = 'Erro ao enviar. Tente novamente.';
+    errEl.textContent = 'Não conseguimos concluir seu cadastro. Tente novamente.';
     errEl.style.display = 'block';
   });
 }
