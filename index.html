@@ -862,7 +862,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   </div>
   <div class="nav-i" data-page="postsale" onclick="showPage('postsale')">
    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-   Pós-venda
+   Pós-venda <span class="nb" id="sb-pv" style="display:none">0</span>
   </div>
   <div class="nav-i" data-page="reminders" onclick="showPage('reminders')">
    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
@@ -1188,6 +1188,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
    <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border)">
     <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Vendas realizadas</div>
     <div class="fluxo-num" id="count-vendas-online" style="font-size:36px">0</div>
+    <div style="margin-top:10px;font-size:12px;font-weight:600;color:var(--blue)" id="conv-online-label">Conversao: -</div>
    </div>
   </div>
  </div>
@@ -1205,7 +1206,6 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
     <div class="fg"><label class="fl">Vincular cliente</label>
      <div style="display:flex;gap:7px;align-items:center">
       <select id="perda-cliente" class="fi" style="flex:1"><option value="">Sem vinculo</option></select>
-      <button class="btn btn-o btn-sm" onclick="abrirModalClienteRapido()" style="white-space:nowrap;flex-shrink:0">+ Novo</button>
      </div>
     </div>
    </div>
@@ -1683,25 +1683,6 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
  </div>
 </div>
 
-<!-- MSG MODAL -->
-<div class="mo" id="msg-modal">
- <div class="modal" style="max-width:500px">
- <div class="mh"><h3 class="mt" id="msg-title">Novo Modelo</h3><button class="mc" onclick="closeMsgModal()"></button></div>
- <div class="mb">
- <input type="hidden" id="edit-msgid">
- <div class="fg"><label class="fl">Tipo</label>
- <select id="msg-type" class="fi"><option value="aniversario">Nasc. Aniversário</option><option value="pos_venda">Pós-venda</option><option value="inativos">⏰ Reativação</option><option value="outro"> Outro</option></select>
- </div>
- <div class="fg"><label class="fl">Título</label><input type="text" id="msg-ttl" class="fi" placeholder="Ex: Feliz Aniversário com desconto"></div>
- <div class="fg">
- <label class="fl">Mensagem</label>
- <p style="font-size:11px;color:var(--text3);margin-bottom:5px">Use {nome} e {loja} como campos automáticos</p>
- <textarea id="msg-body" class="fta" style="min-height:130px" placeholder="Olá {nome}! ..."></textarea>
- </div>
- </div>
- <div class="mf"><button class="btn btn-g" onclick="closeMsgModal()">Cancelar</button><button class="btn btn-p" style="width:auto" onclick="saveMsg()">Salvar</button></div>
- </div>
-</div>
 
 <!-- SEND MSG MODAL -->
 <div class="mo" id="send-modal">
@@ -1818,7 +1799,10 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
    </div>
    <div class="fgrid">
     <div class="fg"><label class="fl">Data Prevista</label><input type="date" id="ev-data" class="fi"></div>
-    <div class="fg"><label class="fl">Responsavel</label><input type="text" id="ev-resp" class="fi" placeholder="Ex: Minha equipe"></div>
+    <div class="fg"><label class="fl">Responsavel</label>
+     <select id="ev-resp" class="fi"><option value="">— Selecionar —</option></select>
+     <input type="text" id="ev-resp-manual" class="fi" style="display:none;margin-top:6px" placeholder="Outro nome">
+    </div>
    </div>
    <div class="fg"><label class="fl">Objetivo</label><input type="text" id="ev-objetivo" class="fi" placeholder="Ex: Aumentar engajamento, divulgar campanha..."></div>
    <div class="fg"><label class="fl">Campanha Relacionada</label><input type="text" id="ev-campanha" class="fi" placeholder="Ex: Liquidacao de Inverno"></div>
@@ -2089,7 +2073,26 @@ const CRL = {sem_resposta:'Sem resposta', respondeu:'Respondeu', comprou:'Compro
 
 function fD(s)  { if(!s)return''; try{return new Date(s+(s.length===10?'T12:00:00':'')).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'})}catch{return s} }
 function fDT(s) { if(!s)return''; try{return new Date(s).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}catch{return s} }
-function toast(m,t='s') { const c=document.getElementById('toast-c'); const el=document.createElement('div'); el.className='toast '+t; el.innerHTML='<span>'+(t==='s'?'ok':'!')+'</span> '+m; c.appendChild(el); setTimeout(()=>el.remove(),3200); }
+function toast(m,t='s') {
+  try {
+    var c = document.getElementById('toast-c');
+    if (!c) {
+      // Rede de segurança: se o container sumir por qualquer motivo, cria um na hora
+      // em vez de deixar a notificação (e o resto da função que a chamou) quebrar.
+      c = document.createElement('div');
+      c.id = 'toast-c';
+      c.style.cssText = 'position:fixed;top:18px;right:18px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none';
+      document.body.appendChild(c);
+    }
+    var el = document.createElement('div');
+    el.className = 'toast ' + t;
+    el.innerHTML = '<span>' + (t === 's' ? 'ok' : '!') + '</span> ' + m;
+    c.appendChild(el);
+    setTimeout(function(){ try { el.remove(); } catch(e){} }, 3200);
+  } catch (e) {
+    console.log('[toast]', t, m);
+  }
+}
 
 // ── SCORE ──
 function calcScore(c) {
@@ -3293,13 +3296,16 @@ async function sendMsg(){
   var loja = (CU&&CU.store)||'nossa loja';
   var text = (m.corpo||'').replace(/{nome}/gi, nome).replace(/{loja}/gi, loja);
   var sp = gSP().find(function(s){ return s.id===spid; });
-  try {
-    await _sb.from('sent_log').insert({
+  var resLog = await _sb.from('sent_log').insert({
       store_id: CU.id, client_id: cid, client_name: cl.name,
       message_id: mid||null, message_title: m.titulo||'',
       message_type: m.cat||'outro', salesperson: sp?sp.name:null
-    });
-  } catch(e) {}
+    }).select().single();
+  if (resLog.error) {
+    toast('Mensagem pronta, mas não foi possível registrar no histórico.', 'e');
+  } else if (resLog.data) {
+    _log.unshift(resLog.data);
+  }
   closeSendModal();
   if(cl.phone) {
     window.open('https://wa.me/55'+(cl.phone||'').replace(/\D/g,'')+'?text='+encodeURIComponent(text),'_blank');
@@ -3829,14 +3835,26 @@ async function savePurch(){
   const spid=document.getElementById('p-sp').value||null;
   const sp=gSP().find(s=>s.id===spid);
   const amt=document.getElementById('p-amt').value;
-  await _sb.from('purchases').insert({store_id:CU.id,client_id:cid,date,description:document.getElementById('p-desc').value.trim()||null,amount:amt?parseFloat(amt):null,observations:document.getElementById('p-obs').value.trim()||null,salesperson:sp?.name||null});
-  await _sb.from('clients').update({status:'comprou'}).eq('id',cid).eq('status','ainda_nao_comprou');
+
+  const resPurch = await _sb.from('purchases').insert({store_id:CU.id,client_id:cid,date,description:document.getElementById('p-desc').value.trim()||null,amount:amt?parseFloat(amt):null,observations:document.getElementById('p-obs').value.trim()||null,salesperson:sp?.name||null}).select().single();
+  if (resPurch.error || !resPurch.data) {
+    toast('Não foi possível registrar a compra: '+(resPurch.error?resPurch.error.message:'erro desconhecido.'), 'e');
+    return;
+  }
+  const purchaseId = resPurch.data.id;
+
+  const updRes = await _sb.from('clients').update({status:'comprou'}).eq('id',cid).eq('status','ainda_nao_comprou').select();
+  if (updRes.error) {
+    // a compra já foi salva; não desfazemos por causa de um status que não atualizou, só avisamos
+    toast('Compra salva, mas não foi possível atualizar o status da cliente.', 'e');
+  }
+
   // Atualizar memória local sem recarregar tudo
   var resP = await _sb.from('purchases').select('*').eq('client_id', cid).order('date', {ascending:false});
   var cl = _clients.find(function(x){ return x.id===cid; });
   if (cl) { cl.purchases = resP.data || []; cl.status = 'comprou'; }
   closePurchModal(); toast('Compra registrada!');
-  if (amt) { await gerarCashbackVenda(cid, parseFloat(amt), null); }
+  if (amt) { await gerarCashbackVenda(cid, parseFloat(amt), purchaseId); }
   updateBadges();
   if (window._detailClient && window._detailClient.id===cid) {
     window._detailClient.purchases = resP.data || [];
@@ -4302,24 +4320,24 @@ function changeCount(tipo, delta) {
   saveFluxoToDB(date);
 }
 
-function saveFluxoToDB(date) {
+async function saveFluxoToDB(date) {
   var day = getFluxoDay(date);
   var row = {
     store_id: CU.id, date: date,
     fisico: day.fisico, online: day.online,
     perdas: day.perdas,
     fisico_vendas: day.vendas_fisico || 0,
-    online_vendas: day.vendas_online || 0
+    online_vendas: day.vendas_online || 0,
+    online_origens: day.online_origens || []
   };
-  if (day.id) {
-    _sb.from('daily_flow').update(row).eq('id', day.id).then(function(){});
-  } else {
-    _sb.from('daily_flow').insert(row).select().single().then(function(res) {
-      if (res.data) {
-        if (!_fluxo[date]) _fluxo[date] = {fisico:0, online:0, vendas_fisico:0, vendas_online:0, perdas:[]};
-        _fluxo[date].id = res.data.id;
-      }
-    });
+  var res = await _sb.from('daily_flow').upsert(row, {onConflict: 'store_id,date'}).select().single();
+  if (res.error) {
+    toast('Não foi possível salvar o fluxo do dia: '+res.error.message, 'e');
+    return;
+  }
+  if (res.data) {
+    if (!_fluxo[date]) _fluxo[date] = {fisico:0, online:0, vendas_fisico:0, vendas_online:0, perdas:[], online_origens:[]};
+    _fluxo[date].id = res.data.id;
   }
 }
 
@@ -4335,53 +4353,13 @@ function loadFluxoFromDB() {
         vendas_fisico: row.fisico_vendas || 0,
         vendas_online: row.online_vendas || 0,
         perdas: row.perdas || [],
+        online_origens: row.online_origens || [],
         id: row.id
       };
     });
   }).catch(function(e) { console.log('fluxo load err', e); });
 }
 
-// Modal cliente rapido para perdas
-function abrirModalClienteRapido() {
-  document.getElementById('cr-nome').value = '';
-  document.getElementById('cr-phone').value = '';
-  document.getElementById('modal-cliente-rapido').classList.add('open');
-  setTimeout(function(){ document.getElementById('cr-nome').focus(); }, 100);
-}
-
-function fecharModalClienteRapido() {
-  document.getElementById('modal-cliente-rapido').classList.remove('open');
-}
-
-function salvarClienteRapido() {
-  var nome = document.getElementById('cr-nome').value.trim();
-  if (!nome) { toast('Informe o nome da cliente', 'e'); return; }
-  var phone = document.getElementById('cr-phone').value.trim() || null;
-  var btns = document.querySelectorAll('#modal-cliente-rapido .btn-p');
-  var btn = btns[btns.length - 1];
-  if (btn) { btn.textContent = 'Salvando...'; btn.disabled = true; }
-  _sb.from('clients').insert({
-    store_id: CU.id, name: nome, phone: phone,
-    status: 'ainda_nao_comprou', loyalty: 'regular',
-    origin: null, payment_methods: [], channels: [], tags: []
-  }).select().single().then(function(res) {
-    if (btn) { btn.textContent = 'Salvar e Vincular'; btn.disabled = false; }
-    if (res.error || !res.data) { toast('Erro: ' + (res.error ? res.error.message : 'sem resposta'), 'e'); return; }
-    _clients.unshift(res.data);
-    // Atualizar select de perdas
-    var sel = document.getElementById('perda-cliente');
-    if (sel) {
-      var opt = document.createElement('option');
-      opt.value = res.data.id;
-      opt.textContent = nome + (phone ? ' - ' + phone : '');
-      opt.selected = true;
-      sel.insertBefore(opt, sel.options[1]);
-      sel.value = res.data.id;
-    }
-    fecharModalClienteRapido();
-    toast(nome + ' cadastrada e vinculada!');
-  });
-}
 
 
 // ── ESCRITORIO DA LOJA ──
@@ -5091,7 +5069,7 @@ function addCheckRotina() {
 }
 
 function renderCheckTempRotina() {
-  var el = document.getElementById('rot-checklist-items');
+  var el = document.getElementById('rot-check-list');
   if (!el) return;
   el.innerHTML = _rotCheckTemp.map(function(item, i) {
     return '<div class="modal-check-item">' +
@@ -5257,7 +5235,7 @@ function addCheckAtividade() {
 }
 
 function renderCheckTempAtiv() {
-  var el = document.getElementById('ativ-checklist-items');
+  var el = document.getElementById('ativ-check-list');
   if (!el) return;
   el.innerHTML = _ativCheckTemp.map(function(item, i) {
     return '<div class="modal-check-item">' +
@@ -6416,20 +6394,20 @@ async function salvarAtendUnificado(btnEl) {
         clienteId = existente.id;
         toast('Cliente já cadastrado — vínculo automático!');
       } else {
-        try {
-          var resCliente = await _sb.from('clients').insert({
+        var resCliente = await _sb.from('clients').insert({
             store_id: CU.id,
             name: novoNome,
             phone: novoTel || null,
             status: 'comprou',
             origin: _atendCanal === 'online' ? origem : 'loja_fisica'
           }).select().single();
-          if (resCliente.data) {
-            clienteId = resCliente.data.id;
-            _clients.unshift(resCliente.data);
-            toast('Cliente cadastrado!');
-          }
-        } catch(e) {}
+        if (resCliente.error || !resCliente.data) {
+          toast('Não foi possível cadastrar a cliente: '+(resCliente.error?resCliente.error.message:'erro desconhecido.'), 'e');
+        } else {
+          clienteId = resCliente.data.id;
+          _clients.unshift(resCliente.data);
+          toast('Cliente cadastrado!');
+        }
       }
     }
 
@@ -6437,20 +6415,24 @@ async function salvarAtendUnificado(btnEl) {
     if (clienteId) {
       var valor = document.getElementById('atend-valor').value;
       var descricao = (document.getElementById('atend-produto-compra').value||'').trim();
-      try {
-        await _sb.from('purchases').insert({
+      var resCompra = await _sb.from('purchases').insert({
           store_id: CU.id,
           client_id: clienteId,
           date: date,
           description: descricao || null,
           amount: valor ? parseFloat(valor) : null
-        });
+        }).select().single();
+      if (resCompra.error || !resCompra.data) {
+        toast('Atendimento registrado, mas a compra não pôde ser salva: '+(resCompra.error?resCompra.error.message:'erro desconhecido.'), 'e');
+      } else {
         // Atualizar status do cliente para 'comprou'
-        await _sb.from('clients').update({status:'comprou'}).eq('id', clienteId);
+        var updResCompra = await _sb.from('clients').update({status:'comprou'}).eq('id', clienteId);
+        if (updResCompra.error) { toast('Compra salva, mas não foi possível atualizar o status da cliente.', 'e'); }
         var cl = _clients.find(function(x){ return x.id===clienteId; });
         if (cl) cl.status = 'comprou';
         toast('Compra registrada no histórico!');
-      } catch(e) {}
+        if (valor) { await gerarCashbackVenda(clienteId, parseFloat(valor), resCompra.data.id); }
+      }
     }
   }
 
@@ -6461,13 +6443,15 @@ async function salvarAtendUnificado(btnEl) {
     var perdaNovoTel = (document.getElementById('atend-perda-novo-tel').value||'').trim();
     var perdaClienteId = _atendPerdaClienteId;
     if (perdaNovoNome && !perdaClienteId) {
-      try {
-        var resPerdaCl = await _sb.from('clients').insert({
+      var resPerdaCl = await _sb.from('clients').insert({
           store_id: CU.id, name: perdaNovoNome, phone: perdaNovoTel || null,
           status: 'ainda_nao_comprou', origin: _atendCanal === 'online' ? origem : 'loja_fisica'
         }).select().single();
-        if (resPerdaCl.data) { perdaClienteId = resPerdaCl.data.id; _clients.unshift(resPerdaCl.data); toast('Cliente cadastrado!'); }
-      } catch(e) {}
+      if (resPerdaCl.error || !resPerdaCl.data) {
+        toast('Não foi possível cadastrar a cliente: '+(resPerdaCl.error?resPerdaCl.error.message:'erro desconhecido.'), 'e');
+      } else {
+        perdaClienteId = resPerdaCl.data.id; _clients.unshift(resPerdaCl.data); toast('Cliente cadastrado!');
+      }
     }
     if (!_fluxo[date].perdas) _fluxo[date].perdas = [];
     _fluxo[date].perdas.push({
@@ -7070,6 +7054,13 @@ async function gerarCashbackVenda(clientId,valorVenda,purchaseId){
   if(valorCb<=0)return;
   var val=new Date();val.setDate(val.getDate()+(_cbConfig.validade||60));
   var res=await _sb.from('cashback').insert({store_id:CU.id,client_id:clientId,valor:valorCb,percentual:perc,origem:'compra',purchase_id:purchaseId||null,status:'disponivel',validade:val.toISOString().slice(0,10)}).select().single();
+  if (res.error) {
+    // codigo 23505 = violacao de unicidade: essa compra ja gerou cashback antes (protecao contra duplicar)
+    if (res.error.code !== '23505') {
+      toast('Compra registrada, mas o cashback não pôde ser gerado: '+res.error.message, 'e');
+    }
+    return;
+  }
   if(res.data){_cashback.unshift(res.data);toast('💰 Cashback de R$ '+valorCb.toFixed(2).replace('.',',')+' gerado!');}
 }
 function abrirModalCashbackManual(cid){
@@ -7284,39 +7275,6 @@ async function excluirCompra(purchaseId, clientId) {
 }
 
 
-function renderCashbackOpp() {
-  var el = document.getElementById('cashback-opp-list');
-  if (!el) return;
-  var hoje = new Date();
-  var lista = gC().filter(function(cl){ return getCbSaldo(cl.id) > 0; });
-  lista.sort(function(a, b){
-    var da = _cashback.filter(function(cb){return cb.client_id===a.id&&cb.status==='disponivel'&&cb.validade;}).map(function(cb){return cb.validade;}).sort()[0] || '9999';
-    var db = _cashback.filter(function(cb){return cb.client_id===b.id&&cb.status==='disponivel'&&cb.validade;}).map(function(cb){return cb.validade;}).sort()[0] || '9999';
-    return da < db ? -1 : 1;
-  });
-  if (!lista.length) {
-    el.innerHTML = '<div class="empty"><div class="empty-t">Nenhum cashback disponível</div><div class="empty-d">As oportunidades de cashback aparecerão aqui quando houver saldo ativo</div></div>';
-    return;
-  }
-  el.innerHTML = '<div class="ol">' + lista.map(function(cl) {
-    var saldo = getCbSaldo(cl.id);
-    var prox = _cashback.filter(function(cb){return cb.client_id===cl.id&&cb.status==='disponivel'&&cb.validade;}).map(function(cb){return cb.validade;}).sort()[0];
-    var dias = prox ? Math.ceil((new Date(prox) - hoje) / 86400000) : null;
-    var urgente = dias !== null && dias <= 15;
-    var col = avc(cl.name);
-    return '<div class="ol-i" data-cid="'+cl.id+'" onclick="showDetail(this.dataset.cid)">'+
-      '<div class="av-sm" style="background:'+col+'18;color:'+col+'">'+ini(cl.name)+'</div>'+
-      '<div style="flex:1">'+
-        '<div style="font-weight:600;font-size:13px">'+cl.name+'</div>'+
-        '<div style="font-size:11px;color:var(--text3)">'+
-          'R$ '+saldo.toFixed(2).replace('.',',')+' disponível'+
-          (dias !== null ? ' · Vence em '+dias+' dia'+(dias!==1?'s':'') : '')+
-        '</div>'+
-      '</div>'+
-      (urgente ? '<span style="background:var(--red-l);color:var(--red);font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px">Urgente</span>' : '<span style="background:var(--green-l);color:var(--green);font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px">Ativo</span>')+
-    '</div>';
-  }).join('') + '</div>';
-}
 
 document.addEventListener('DOMContentLoaded', () => {
   // Tags input
@@ -7331,7 +7289,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const tagInp=document.getElementById('tag-q');
   if(tagInp){ tagInp.addEventListener('input', filterByTag); }
   // Modal close on overlay
-  ['client-modal','purch-modal','contact-modal','sp-modal','msg-modal','send-modal'].forEach(id=>{
+  ['client-modal','purch-modal','contact-modal','sp-modal','send-modal'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.addEventListener('click', function(e){if(e.target===this)this.classList.remove('open');});
   });
@@ -7532,7 +7490,7 @@ document.addEventListener('DOMContentLoaded', () => {
    <div class="fg"><label class="fl">Checklist</label>
     <div style="display:flex;gap:6px;margin-bottom:6px">
      <input type="text" id="ativ-check-input" class="fi" placeholder="Item do checklist">
-     <button class="btn btn-g btn-sm" onclick="addCheckAtiv()" style="flex-shrink:0">+</button>
+     <button class="btn btn-g btn-sm" onclick="addCheckAtividade()" style="flex-shrink:0">+</button>
     </div>
     <div id="ativ-check-list"></div>
    </div>
@@ -7543,6 +7501,8 @@ document.addEventListener('DOMContentLoaded', () => {
   </div>
  </div>
 </div>
+
+<div id="toast-c" style="position:fixed;top:18px;right:18px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none"></div>
 
 </body>
 </html>
