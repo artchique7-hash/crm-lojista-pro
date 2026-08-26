@@ -3689,7 +3689,46 @@ function renderExport(){
     '<div class="card"><div style="font-size:26px;margin-bottom:10px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div style="font-weight:700;margin-bottom:3px">Clientes CSV</div><div style="font-size:12px;color:var(--text2);margin-bottom:14px">Abre no Excel e Google Sheets</div><button class="btn btn-p" onclick="expCSV()">Baixar CSV</button></div>'+
     '<div class="card"><div style="font-size:26px;margin-bottom:10px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg></div><div style="font-weight:700;margin-bottom:3px">Backup JSON</div><div style="font-size:12px;color:var(--text2);margin-bottom:14px">Backup completo de todos os dados</div><button class="btn btn-p" onclick="expJSON()">Baixar Backup</button></div>'+
     '<div class="card"><div style="font-size:26px;margin-bottom:10px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div><div style="font-weight:700;margin-bottom:3px">Importar Backup</div><div style="font-size:12px;color:var(--text2);margin-bottom:14px">Restaurar dados de um backup anterior</div><input type="file" id="imp-file" accept=".json" style="display:none" onchange="impJSON(event)"><button class="btn btn-g" onclick="document.getElementById(\'imp-file\').click()">Selecionar arquivo</button></div>'+
-    '<div class="card"><div style="font-size:26px;margin-bottom:10px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div style="font-weight:700;margin-bottom:3px">Relatorio PDF</div><div style="font-size:12px;color:var(--text2);margin-bottom:14px">Va em Relatorios e use Ctrl+P</div><button class="btn btn-g" onclick="showPage(\'reports\')">Ver Relatorios</button></div>';
+    '<div class="card"><div style="font-size:26px;margin-bottom:10px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div style="font-weight:700;margin-bottom:3px">Relatorio PDF</div><div style="font-size:12px;color:var(--text2);margin-bottom:14px">Va em Relatorios e use Ctrl+P</div><button class="btn btn-g" onclick="showPage(\'reports\')">Ver Relatorios</button></div>'+
+    '<div class="card"><div style="font-size:26px;margin-bottom:10px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div style="font-weight:700;margin-bottom:3px">Backup Escritorio Digital</div><div style="font-size:12px;color:var(--text2);margin-bottom:14px">Calendario, rotinas, tarefas, metas e funis salvos neste aparelho</div><button class="btn btn-p" onclick="expEscritorioDigital()" style="margin-bottom:8px;width:100%">Baixar backup</button><button class="btn btn-g" onclick="copiarBackupEscritorio()" style="width:100%">Copiar para enviar</button></div>';
+}
+function coletarDadosEscritorioLocal(){
+  return {
+    eventos: slpGet('slp_eventos', []),
+    rotinas: slpGet('slp_rotinas', []),
+    tarefas: slpGet('slp_tarefas', []),
+    metas: slpGet('slp_metas', []),
+    funis: slpGet('slp_funis', []),
+    plan: slpGet('slp_plan', {}),
+    atividades: slpGet('slp_atividades', []),
+    wpp_auto: slpGet('slp_wpp_auto', []),
+    ca_msgs: slpGet('slp_ca_msgs', []),
+    ca_roteiros: slpGet('slp_ca_roteiros', []),
+    ca_objecoes: slpGet('slp_ca_objecoes', []),
+    ca_favs: slpGet('slp_ca_favs', []),
+    ca_com: slpGet('slp_ca_com', {}),
+    exportedAt: new Date().toISOString(),
+    loja: CU.store,
+    storeId: CU.id
+  };
+}
+function expEscritorioDigital(){
+  var data = coletarDadosEscritorioLocal();
+  dl('backup_escritorio_'+getTodayStr()+'.json','data:application/json,'+encodeURIComponent(JSON.stringify(data,null,2)));
+  toast('Backup do Escritorio Digital exportado!');
+}
+function copiarBackupEscritorio(){
+  var data = coletarDadosEscritorioLocal();
+  var text = JSON.stringify(data);
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){
+      toast('Copiado! Cole numa conversa e envie para o suporte.');
+    }).catch(function(){
+      toast('Nao foi possivel copiar. Use o botao Baixar backup.','e');
+    });
+  } else {
+    toast('Use o botao Baixar backup neste aparelho.','e');
+  }
 }
 function expCSV(){
   const c=_clients;
