@@ -39,6 +39,12 @@ function rowToMeta(row){ return {id:row.id, titulo:row.titulo, cat:row.cat, no_d
 function funilToRow(f){ return {id:f.id, tipo:f.tipo, nome:f.nome, objetivo:f.objetivo, inicio:f.inicio||null, fim:f.fim||null, responsavel:f.responsavel, canal:f.canal, descricao:f.descricao, publico:f.publico, obs:f.obs, status:f.status, checklist:f.checklist||[], resultados:f.resultados||{}, meta_id:f.meta_id||null, aberto: f._open!==false}; }
 function rowToFunil(row){ return {id:row.id, tipo:row.tipo, nome:row.nome, objetivo:row.objetivo, inicio:row.inicio, fim:row.fim, responsavel:row.responsavel, canal:row.canal, descricao:row.descricao, publico:row.publico, obs:row.obs, status:row.status, checklist:row.checklist||[], resultados:row.resultados||{}, meta_id:row.meta_id, _open: row.aberto!==false}; }
 
+// Acoes diarias de funil: tarefas que se repetem pelos dias do periodo de um
+// funil (ex: "postar no grupo" todo dia por uma semana), cada uma com seu
+// proprio resultado. Aparecem tanto no detalhe do funil quanto na Rotina.
+function funilAcaoToRow(a){ return {id:a.id, funil_id:a.funil_id, data:a.data||null, titulo:a.titulo, tipo_resultado:a.tipo_resultado||'', feito:!!a.feito, resultado_valor:(a.resultado_valor===''||a.resultado_valor==null)?null:a.resultado_valor, resultado_obs:a.resultado_obs||''}; }
+function rowToFunilAcao(row){ return {id:row.id, funil_id:row.funil_id, data:row.data, titulo:row.titulo, tipo_resultado:row.tipo_resultado, feito:row.feito, resultado_valor:row.resultado_valor, resultado_obs:row.resultado_obs}; }
+
 // ── Funcoes de salvamento chamadas pelas telas (substituem os antigos slpSet) ──
 function saveEventos(){ eoBulkUpsert('eo_eventos', _eventos.map(eventoToRow)); }
 function saveRotinas(){ eoBulkUpsert('eo_rotinas', _rotinas.map(rotinaToRow)); }
@@ -54,22 +60,24 @@ async function savePlanMes(key){
 
 // ── Carga inicial (chamada no login, no lugar do antigo slpGet) ──
 async function carregarEscritorioDigital(){
-  if (!CU) { _eventos=[]; _rotinas=[]; _atividades=[]; _metas=[]; _funis=[]; _planMes={}; return; }
-  var [ev, rot, ativ, met, fun, plan] = await Promise.all([
+  if (!CU) { _eventos=[]; _rotinas=[]; _atividades=[]; _metas=[]; _funis=[]; _funilAcoes=[]; _planMes={}; return; }
+  var [ev, rot, ativ, met, fun, plan, facoes] = await Promise.all([
     _sb.from('eo_eventos').select('*').eq('store_id', CU.id),
     _sb.from('eo_rotinas').select('*').eq('store_id', CU.id),
     _sb.from('eo_atividades').select('*').eq('store_id', CU.id),
     _sb.from('eo_metas').select('*').eq('store_id', CU.id),
     _sb.from('eo_funis').select('*').eq('store_id', CU.id),
-    _sb.from('eo_planejamento_mensal').select('*').eq('store_id', CU.id)
+    _sb.from('eo_planejamento_mensal').select('*').eq('store_id', CU.id),
+    _sb.from('eo_funil_acoes').select('*').eq('store_id', CU.id)
   ]);
-  var erro = ev.error || rot.error || ativ.error || met.error || fun.error || plan.error;
+  var erro = ev.error || rot.error || ativ.error || met.error || fun.error || plan.error || facoes.error;
   if (erro) { console.error('Erro ao carregar Escritorio Digital', erro); toast('Erro ao carregar o Escritorio Digital. Puxe para atualizar.', 'e'); }
   _eventos = (ev.data||[]).map(rowToEvento);
   _rotinas = (rot.data||[]).map(rowToRotina);
   _atividades = (ativ.data||[]).map(rowToAtividade);
   _metas = (met.data||[]).map(rowToMeta);
   _funis = (fun.data||[]).map(rowToFunil);
+  _funilAcoes = (facoes.data||[]).map(rowToFunilAcao);
   _planMes = {};
   (plan.data||[]).forEach(function(row){
     _planMes[row.mes] = {tema:row.tema, objetivo:row.objetivo, campanhas:row.campanhas, datas:row.datas, narrativa:row.narrativa, obs:row.obs};
@@ -101,6 +109,7 @@ function onRespChange(selEl, manualId) {
 }
 
 var _funis = [];
+var _funilAcoes = [];
 
 function switchEscrit(section, btn) {
   document.querySelectorAll('.escrit-section').forEach(function(el){ el.classList.remove('active'); });
@@ -854,6 +863,7 @@ function toggleRotExpand(id) {
 }
 
 function renderRotinas() {
+  renderAcoesFunisRotina();
   var grid = document.getElementById('rotinas-grid');
   var countEl = document.getElementById('rotinas-count');
   if (!grid) return;
@@ -1126,6 +1136,10 @@ function saveFunis() {
   eoBulkUpsert('eo_funis', _funis.map(funilToRow));
 }
 
+function saveFunilAcoes() {
+  eoBulkUpsert('eo_funil_acoes', _funilAcoes.map(funilAcaoToRow));
+}
+
 function getFunilTipo(id) {
   return FUNIL_TIPOS.find(function(t){ return t.id === id; }) || FUNIL_TIPOS[4];
 }
@@ -1180,10 +1194,12 @@ function renderFunilBodyTabs(f) {
   return '<div class="funil-body-tabs">' +
     '<div class="funil-body-tab active" data-fid="' + f.id + '" data-tab="info" onclick="switchFunilTab(this.dataset.fid,this.dataset.tab,this)">Informacoes</div>' +
     '<div class="funil-body-tab" data-fid="' + f.id + '" data-tab="execucao" onclick="switchFunilTab(this.dataset.fid,this.dataset.tab,this)">Execucao</div>' +
+    '<div class="funil-body-tab" data-fid="' + f.id + '" data-tab="acoes" onclick="switchFunilTab(this.dataset.fid,this.dataset.tab,this)">Acoes Diarias</div>' +
     '<div class="funil-body-tab" data-fid="' + f.id + '" data-tab="resultados" onclick="switchFunilTab(this.dataset.fid,this.dataset.tab,this)">Resultados</div>' +
   '</div>' +
   '<div id="ftab-info-' + f.id + '" class="funil-body-panel active">' + renderFunilInfo(f) + '</div>' +
   '<div id="ftab-execucao-' + f.id + '" class="funil-body-panel">' + renderFunilExecucao(f) + '</div>' +
+  '<div id="ftab-acoes-' + f.id + '" class="funil-body-panel">' + renderAcoesFunil(f) + '</div>' +
   '<div id="ftab-resultados-' + f.id + '" class="funil-body-panel">' + renderFunilResultados(f) + '</div>';
 }
 
@@ -1243,7 +1259,26 @@ function renderFunilExecucao(f) {
 function renderFunilResultados(f) {
   var r = f.resultados || {};
   var mVinc = f.meta_id ? _metas.find(function(m){ return m.id === f.meta_id; }) : null;
-  
+
+  var acoesFunil = _funilAcoes.filter(function(a){ return a.funil_id === f.id; });
+  var acoesResumo = '';
+  if (acoesFunil.length) {
+    var feitas = acoesFunil.filter(function(a){ return a.feito; }).length;
+    var porTipo = {};
+    acoesFunil.forEach(function(a){
+      if (a.resultado_valor == null || isNaN(a.resultado_valor)) return;
+      var chave = a.tipo_resultado || 'Resultado';
+      porTipo[chave] = (porTipo[chave] || 0) + a.resultado_valor;
+    });
+    var linhasTipo = Object.keys(porTipo).map(function(k){
+      return '<div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0"><span style="color:var(--text3)">' + k + '</span><span style="font-weight:700">' + porTipo[k].toLocaleString('pt-BR') + '</span></div>';
+    }).join('');
+    acoesResumo = '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:14px;margin-bottom:18px">' +
+      '<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Acoes diarias · ' + feitas + '/' + acoesFunil.length + ' registradas</div>' +
+      (linhasTipo || '<div style="font-size:12px;color:var(--text3)">Nenhum resultado numerico registrado ainda.</div>') +
+    '</div>';
+  }
+
   var metaDestaque = '';
   if (mVinc) {
     var pct = mVinc.alvo > 0 ? Math.min(100, Math.round((mVinc.atual/mVinc.alvo)*100)) : 0;
@@ -1258,7 +1293,7 @@ function renderFunilResultados(f) {
     '</div>';
   }
 
-  return metaDestaque +
+  return acoesResumo + metaDestaque +
   '<div class="funil-section-label">Resultados da Campanha</div>' +
   '<div style="font-size:12px;color:var(--text3);margin-bottom:12px">Preencha os resultados ao encerrar a campanha e clique em Salvar.</div>' +
   '<div class="funil-resultado-grid" id="fres-grid-' + f.id + '">' +
@@ -1400,6 +1435,213 @@ function switchFunilTab(fid, tab, el) {
   el.classList.add('active');
   var panel = document.getElementById('ftab-' + tab + '-' + fid);
   if (panel) panel.classList.add('active');
+}
+
+// ── ACOES DIARIAS DE FUNIL ──
+// Uma acao diaria e uma tarefa que se repete pelos dias do periodo de um
+// funil (ex: "postar no grupo" de segunda a sexta por uma semana). Cada
+// ocorrencia e uma linha propria com seu proprio campo de resultado, e todas
+// aparecem tambem na Rotina, organizadas por dia — sem precisar recriar nada.
+
+var DIA_SEMANA_JS = {dom:0, seg:1, ter:2, qua:3, qui:4, sex:5, sab:6};
+var _acaoFunilContexto = null;
+
+function abrirModalAcaoFunil(fid) {
+  var f = _funis.find(function(x){ return x.id===fid; });
+  if (!f) return;
+  _acaoFunilContexto = fid;
+  document.getElementById('acaofunil-titulo').value = '';
+  document.getElementById('acaofunil-tipo').value = '';
+  document.getElementById('acaofunil-inicio').value = f.inicio || getTodayStr();
+  document.getElementById('acaofunil-fim').value = f.fim || (f.inicio || getTodayStr());
+  Object.keys(DIA_SEMANA_JS).forEach(function(d){
+    var el = document.getElementById('acaofunil-dia-' + d);
+    if (el) el.checked = true;
+  });
+  document.getElementById('modal-acao-funil').classList.add('open');
+  setTimeout(function(){ document.getElementById('acaofunil-titulo').focus(); }, 100);
+}
+
+function fecharModalAcaoFunil() {
+  document.getElementById('modal-acao-funil').classList.remove('open');
+}
+
+function salvarAcaoFunilRecorrente() {
+  var fid = _acaoFunilContexto;
+  var f = _funis.find(function(x){ return x.id===fid; });
+  if (!f) return;
+  var titulo = document.getElementById('acaofunil-titulo').value.trim();
+  if (!titulo) { toast('Informe o que precisa ser feito.', 'e'); return; }
+  var tipo = document.getElementById('acaofunil-tipo').value.trim();
+  var ini = document.getElementById('acaofunil-inicio').value;
+  var fim = document.getElementById('acaofunil-fim').value;
+  if (!ini || !fim) { toast('Informe o periodo.', 'e'); return; }
+  if (fim < ini) { toast('A data final nao pode ser antes da data inicial.', 'e'); return; }
+
+  var diasSelecionados = {};
+  Object.keys(DIA_SEMANA_JS).forEach(function(d){
+    var el = document.getElementById('acaofunil-dia-' + d);
+    diasSelecionados[DIA_SEMANA_JS[d]] = !!(el && el.checked);
+  });
+
+  var novas = [];
+  var cursor = new Date(ini + 'T12:00:00');
+  var limite = new Date(fim + 'T12:00:00');
+  var seguranca = 0;
+  while (cursor <= limite && seguranca < 366) {
+    seguranca++;
+    if (diasSelecionados[cursor.getDay()]) {
+      var dataStr = cursor.getFullYear() + '-' + String(cursor.getMonth()+1).padStart(2,'0') + '-' + String(cursor.getDate()).padStart(2,'0');
+      novas.push({
+        id: Date.now().toString(36) + Math.random().toString(36).substr(2,6),
+        funil_id: fid,
+        data: dataStr,
+        titulo: titulo,
+        tipo_resultado: tipo,
+        feito: false,
+        resultado_valor: null,
+        resultado_obs: ''
+      });
+    }
+    cursor.setDate(cursor.getDate() + 1);
+  }
+
+  if (!novas.length) { toast('Nenhum dia do periodo corresponde aos dias selecionados.', 'e'); return; }
+
+  _funilAcoes = _funilAcoes.concat(novas);
+  saveFunilAcoes();
+  fecharModalAcaoFunil();
+  renderFunis();
+  renderRotinas();
+  setTimeout(function(){
+    var tab = document.querySelector('#funil-body-' + fid + ' [data-tab="acoes"]');
+    if (tab) switchFunilTab(fid, 'acoes', tab);
+  }, 30);
+  toast(novas.length + ' acao(oes) criada(s) para o periodo!');
+}
+
+function excluirAcaoFunil(id) {
+  if (!confirm('Excluir esta acao?')) return;
+  _funilAcoes = _funilAcoes.filter(function(a){ return a.id !== id; });
+  eoDelete('eo_funil_acoes', id);
+  renderFunis();
+  renderRotinas();
+  toast('Acao excluida.');
+}
+
+var _resultadoAcaoId = null;
+
+function abrirModalResultadoAcao(id) {
+  var a = _funilAcoes.find(function(x){ return x.id === id; });
+  if (!a) return;
+  _resultadoAcaoId = id;
+  var dataFmt = a.data ? a.data.split('-').reverse().join('/') : '';
+  document.getElementById('resacao-titulo').textContent = a.titulo + (dataFmt ? ' — ' + dataFmt : '');
+  document.getElementById('resacao-label').textContent = a.tipo_resultado || 'Resultado';
+  document.getElementById('resacao-valor').value = a.resultado_valor != null ? a.resultado_valor : '';
+  document.getElementById('resacao-obs').value = a.resultado_obs || '';
+  document.getElementById('modal-resultado-acao').classList.add('open');
+}
+
+function fecharModalResultadoAcao() {
+  document.getElementById('modal-resultado-acao').classList.remove('open');
+}
+
+function salvarResultadoAcao() {
+  var a = _funilAcoes.find(function(x){ return x.id === _resultadoAcaoId; });
+  if (!a) return;
+  var valorRaw = document.getElementById('resacao-valor').value.trim();
+  var valorNum = valorRaw === '' ? null : parseFloat(valorRaw.toString().replace(',','.'));
+  a.resultado_valor = (valorNum != null && isNaN(valorNum)) ? null : valorNum;
+  a.resultado_obs = document.getElementById('resacao-obs').value.trim();
+  a.feito = true;
+  saveFunilAcoes();
+  fecharModalResultadoAcao();
+  renderFunis();
+  renderRotinas();
+  toast('Resultado registrado!');
+}
+
+function toggleFeitoAcao(id) {
+  var a = _funilAcoes.find(function(x){ return x.id === id; });
+  if (!a) return;
+  if (!a.feito) { abrirModalResultadoAcao(id); return; }
+  a.feito = false;
+  saveFunilAcoes();
+  renderFunis();
+  renderRotinas();
+}
+
+// Conteudo da aba "Acoes Diarias" dentro do detalhe do funil.
+function renderAcoesFunil(f) {
+  var acoes = _funilAcoes.filter(function(a){ return a.funil_id === f.id; })
+    .sort(function(x,y){ return (x.data||'').localeCompare(y.data||''); });
+
+  var html = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">' +
+    '<div class="funil-section-label" style="margin:0">Acoes Diarias</div>' +
+    '<button class="btn btn-g btn-xs" data-fid="' + f.id + '" onclick="abrirModalAcaoFunil(this.dataset.fid)">+ Adicionar acoes</button>' +
+  '</div>';
+
+  if (!acoes.length) {
+    html += '<div style="text-align:center;padding:24px;color:var(--text3);font-size:13px">Nenhuma acao diaria cadastrada. Crie uma vez e ela se repete pelos dias do periodo — aparece tambem na Rotina, e cada dia tem seu proprio campo de resultado.</div>';
+    return html;
+  }
+
+  var totalNum = 0, temNum = false;
+  acoes.forEach(function(a){ if (a.resultado_valor != null && !isNaN(a.resultado_valor)) { totalNum += a.resultado_valor; temNum = true; } });
+  if (temNum) {
+    html += '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--text2)">' +
+      '<strong>Soma dos resultados registrados:</strong> ' + totalNum.toLocaleString('pt-BR') +
+    '</div>';
+  }
+
+  html += '<div class="funil-checklist">';
+  acoes.forEach(function(a){
+    var dataFmt = a.data ? a.data.split('-').reverse().join('/') : '—';
+    var sub = dataFmt + (a.tipo_resultado ? ' · ' + a.tipo_resultado : '') + (a.feito && a.resultado_valor != null ? ' · Resultado: ' + a.resultado_valor : '');
+    html += '<div class="funil-check-item' + (a.feito ? ' done' : '') + '" style="cursor:default">' +
+      '<div class="funil-check-box" data-aid="' + a.id + '" style="cursor:pointer" onclick="toggleFeitoAcao(this.dataset.aid)">' + (a.feito ? '✓' : '') + '</div>' +
+      '<div class="funil-check-text">' + a.titulo + '<div style="font-size:11px;opacity:.75;margin-top:2px">' + sub + '</div></div>' +
+      '<button class="btn btn-g btn-xs" data-aid="' + a.id + '" onclick="abrirModalResultadoAcao(this.dataset.aid)">Resultado</button>' +
+      '<span class="funil-check-del" data-aid="' + a.id + '" onclick="excluirAcaoFunil(this.dataset.aid)">×</span>' +
+    '</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+// Bloco "Acoes de Funis" na pagina de Rotina — proximos 7 dias, todos os funis.
+function renderAcoesFunisRotina() {
+  var el = document.getElementById('funil-acoes-grid');
+  if (!el) return;
+  var hoje = getTodayStr();
+  var lim = new Date();
+  lim.setDate(lim.getDate() + 6);
+  var limiteStr = lim.getFullYear() + '-' + String(lim.getMonth()+1).padStart(2,'0') + '-' + String(lim.getDate()).padStart(2,'0');
+
+  var acoesSemana = _funilAcoes.filter(function(a){ return a.data && a.data >= hoje && a.data <= limiteStr; })
+    .sort(function(x,y){ return x.data.localeCompare(y.data); });
+
+  var countEl = document.getElementById('funil-acoes-count');
+  if (countEl) countEl.textContent = acoesSemana.length;
+
+  if (!acoesSemana.length) {
+    el.innerHTML = '<div class="dash-vazio" style="padding:18px">' +
+      '<div style="font-size:12px;color:var(--text3)">Nenhuma acao de funil programada para os proximos 7 dias. Acoes diarias criadas dentro de um funil aparecem aqui automaticamente.</div>' +
+    '</div>';
+    return;
+  }
+
+  el.innerHTML = '<div class="funil-checklist">' + acoesSemana.map(function(a){
+    var f = _funis.find(function(x){ return x.id === a.funil_id; });
+    var dataFmt = a.data.split('-').reverse().join('/');
+    var sub = dataFmt + (f ? ' · ' + f.nome : '') + (a.tipo_resultado ? ' · ' + a.tipo_resultado : '');
+    return '<div class="funil-check-item' + (a.feito ? ' done' : '') + '" style="cursor:default">' +
+      '<div class="funil-check-box" data-aid="' + a.id + '" style="cursor:pointer" onclick="toggleFeitoAcao(this.dataset.aid)">' + (a.feito ? '✓' : '') + '</div>' +
+      '<div class="funil-check-text">' + a.titulo + '<div style="font-size:11px;opacity:.75;margin-top:2px">' + sub + '</div></div>' +
+      '<button class="btn btn-g btn-xs" data-aid="' + a.id + '" onclick="abrirModalResultadoAcao(this.dataset.aid)">Resultado</button>' +
+    '</div>';
+  }).join('') + '</div>';
 }
 
 function toggleCheckFunil(fid, idx) {
@@ -1632,10 +1874,14 @@ function editarFunil(fid) {
 }
 
 function excluirFunil(fid) {
-  if (!confirm('Excluir este funil?')) return;
+  if (!confirm('Excluir este funil? As acoes diarias vinculadas tambem serao excluidas.')) return;
   _funis = _funis.filter(function(x){ return x.id!==fid; });
+  var acoesDoFunil = _funilAcoes.filter(function(a){ return a.funil_id === fid; });
+  _funilAcoes = _funilAcoes.filter(function(a){ return a.funil_id !== fid; });
   eoDelete('eo_funis', fid);
+  acoesDoFunil.forEach(function(a){ eoDelete('eo_funil_acoes', a.id); });
   renderFunis();
+  renderRotinas();
   toast('Funil excluido.');
 }
 
