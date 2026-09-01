@@ -1513,6 +1513,16 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
     </div>
    </div>
 
+   <!-- ACOES DE FUNIS -->
+   <div style="margin-bottom:28px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+     <div style="width:3px;height:16px;background:var(--purple);border-radius:2px"></div>
+     <h3 style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px">Acoes de Funis (proximos 7 dias)</h3>
+     <span class="badge bg-b" id="funil-acoes-count">0</span>
+    </div>
+    <div id="funil-acoes-grid"></div>
+   </div>
+
    <!-- ROTINAS RECORRENTES -->
    <div style="margin-bottom:28px">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
@@ -1859,6 +1869,53 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
  </div>
 </div>
 
+<!-- ACOES DIARIAS DE FUNIL: cria uma acao que se repete pelos dias do periodo escolhido. -->
+<div class="mo" id="modal-acao-funil">
+ <div class="modal" style="max-width:480px">
+  <div class="mh"><h3 class="mt2">Nova Acao Diaria do Funil</h3><button class="mc" onclick="fecharModalAcaoFunil()">x</button></div>
+  <div class="mb">
+   <div class="fg"><label class="fl">O que precisa ser feito *</label><input type="text" id="acaofunil-titulo" class="fi" placeholder="Ex: Postar no grupo"></div>
+   <div class="fg"><label class="fl">O que registrar como resultado (opcional)</label><input type="text" id="acaofunil-tipo" class="fi" placeholder="Ex: Faturamento (R$), Contatos, Participantes..."></div>
+   <div class="fgrid">
+    <div class="fg"><label class="fl">De</label><input type="date" id="acaofunil-inicio" class="fi"></div>
+    <div class="fg"><label class="fl">Ate</label><input type="date" id="acaofunil-fim" class="fi"></div>
+   </div>
+   <div class="fg"><label class="fl">Em quais dias se repete</label>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+     <label style="display:flex;align-items:center;gap:5px;font-size:12px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:6px 10px;cursor:pointer"><input type="checkbox" id="acaofunil-dia-seg" checked style="margin:0">Seg</label>
+     <label style="display:flex;align-items:center;gap:5px;font-size:12px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:6px 10px;cursor:pointer"><input type="checkbox" id="acaofunil-dia-ter" checked style="margin:0">Ter</label>
+     <label style="display:flex;align-items:center;gap:5px;font-size:12px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:6px 10px;cursor:pointer"><input type="checkbox" id="acaofunil-dia-qua" checked style="margin:0">Qua</label>
+     <label style="display:flex;align-items:center;gap:5px;font-size:12px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:6px 10px;cursor:pointer"><input type="checkbox" id="acaofunil-dia-qui" checked style="margin:0">Qui</label>
+     <label style="display:flex;align-items:center;gap:5px;font-size:12px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:6px 10px;cursor:pointer"><input type="checkbox" id="acaofunil-dia-sex" checked style="margin:0">Sex</label>
+     <label style="display:flex;align-items:center;gap:5px;font-size:12px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:6px 10px;cursor:pointer"><input type="checkbox" id="acaofunil-dia-sab" checked style="margin:0">Sab</label>
+     <label style="display:flex;align-items:center;gap:5px;font-size:12px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:6px 10px;cursor:pointer"><input type="checkbox" id="acaofunil-dia-dom" checked style="margin:0">Dom</label>
+    </div>
+    <div style="font-size:11px;color:var(--text3);margin-top:6px">Cria uma tarefa em cada dia marcado dentro do periodo — elas aparecem tambem na Rotina, e cada uma tem seu proprio campo de resultado.</div>
+   </div>
+   <div class="mf">
+    <button class="btn btn-g btn-sm" onclick="fecharModalAcaoFunil()">Cancelar</button>
+    <button class="btn btn-p btn-sm" onclick="salvarAcaoFunilRecorrente()">Criar Acoes</button>
+   </div>
+  </div>
+ </div>
+</div>
+
+<!-- Registrar o resultado de UMA acao diaria especifica (um dia do funil). -->
+<div class="mo" id="modal-resultado-acao">
+ <div class="modal" style="max-width:420px">
+  <div class="mh"><h3 class="mt2">Registrar Resultado do Dia</h3><button class="mc" onclick="fecharModalResultadoAcao()">x</button></div>
+  <div class="mb">
+   <div class="fg"><div style="font-size:14px;font-weight:700" id="resacao-titulo"></div></div>
+   <div class="fg"><label class="fl" id="resacao-label">Resultado</label><input type="text" id="resacao-valor" class="fi" placeholder="Numero ou valor"></div>
+   <div class="fg"><label class="fl">Observacoes</label><textarea id="resacao-obs" class="fi" rows="3" placeholder="O que aconteceu nesse dia..."></textarea></div>
+   <div class="mf">
+    <button class="btn btn-g btn-sm" onclick="fecharModalResultadoAcao()">Cancelar</button>
+    <button class="btn btn-p btn-sm" onclick="salvarResultadoAcao()">Salvar Resultado</button>
+   </div>
+  </div>
+ </div>
+</div>
+
 <script>
 
 // 
@@ -1867,6 +1924,7 @@ const _sb = supabase.createClient('https://ihpfexmourrvixtsxhrt.supabase.co', 's
 
 // ── STATE ──
 let CU=null, TAGS=[], editCID=null, editSPID=null, editMSGID=null;
+
 
 // ── Armazenamento local isolado por loja ──
 // Todo dado que hoje só existe no navegador (nao no Supabase) precisa ser
@@ -1969,7 +2027,7 @@ async function logout() {
   await _sb.auth.signOut();
   CU=null; _clients=[]; _sp=[]; _msgs=[]; _log=[];
   _caMsgs=[]; _caRoteiros=[]; _caObjecoes=[]; _caCom={}; _caFavs=[];
-  _eventos=[]; _metas=[]; _tarefas=[]; _funis=[]; _planMes={};
+  _eventos=[]; _metas=[]; _tarefas=[]; _funis=[]; _funilAcoes=[]; _planMes={};
   _rotinas=[]; _atividades=[]; _wppAuto=[]; _cbConfig=Object.assign({}, _CB_CONFIG_PADRAO);
   document.getElementById('app').style.display='none';
   document.getElementById('auth-screen').style.display='flex';
@@ -4734,10 +4792,14 @@ function abrirModalAtend(canal) {
   document.getElementById('atend-cliente-lista').style.display = 'none';
   var selDiv = document.getElementById('atend-cliente-sel');
   if (selDiv) selDiv.style.display = 'none';
+  var buscaEl = document.getElementById('atend-cliente-busca');
+  if (buscaEl) buscaEl.style.display = 'block';
   var perdaNovoCl = document.getElementById('atend-perda-novo-cliente');
   if (perdaNovoCl) perdaNovoCl.style.display = 'none';
   var perdaSel = document.getElementById('atend-perda-cliente-sel');
   if (perdaSel) perdaSel.style.display = 'none';
+  var perdaBuscaEl = document.getElementById('atend-perda-cliente-busca');
+  if (perdaBuscaEl) perdaBuscaEl.style.display = 'block';
   var perdaLista = document.getElementById('atend-perda-cliente-lista');
   if (perdaLista) perdaLista.style.display = 'none';
 
