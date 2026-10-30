@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Sistema Loja Previsivel — SLP v3.5</title>
+<title>Sistema Loja Previsivel — SLP v3.6</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -744,6 +744,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
         <p style="font-size:11px;color:var(--text3);margin-bottom:8px">Selecione o que voce tem interesse</p>
         <div id="pub-tags-list" class="cg"></div>
       </div>
+      <div class="fg"><label class="fl">O que você procura? (opcional)</label><textarea id="pub-obs" class="fta" maxlength="500" placeholder="Ex: vestidos para festa, calças de alfaiataria, tamanho M..."></textarea></div>
       <div id="pub-err" style="display:none;background:var(--red-l);border:1px solid rgba(184,50,50,.2);color:var(--red);padding:10px 14px;border-radius:var(--rs);font-size:13px;margin-bottom:12px"></div>
       <button class="btn btn-p btn-full" id="pub-submit-btn" onclick="enviarCaptacao()" style="margin-top:8px">Enviar Cadastro</button>
     </div>
@@ -1722,10 +1723,11 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
  <div class="modal" style="max-width:480px">
  <div class="mh"><h3 class="mt">Enviar Mensagem</h3><button class="mc" onclick="closeSendModal()"></button></div>
  <div class="mb">
- <input type="hidden" id="sm-cid">
+ <input type="hidden" id="sm-cid"><input type="hidden" id="sm-tipo">
+ <div id="sm-para" style="font-size:13px;color:var(--text2);margin-bottom:10px"></div>
  <div class="fg"><label class="fl">Modelo</label><select id="sm-msg" class="fi" onchange="previewMsg()"><option value="">Selecionar...</option></select></div>
+ <div id="sm-prev-wrap" style="display:none"><label class="fl">Mensagem (pode ajustar antes de enviar)</label><textarea id="sm-prev" class="fta" style="min-height:110px;margin-top:5px"></textarea></div>
  <div class="fg"><label class="fl">Vendedora que vai enviar</label><select id="sm-sp" class="fi"><option value="">Sem vendedora</option></select></div>
- <div id="sm-prev-wrap" style="display:none"><label class="fl">Prévia</label><div id="sm-prev" class="msg-b" style="min-height:70px;margin-top:5px"></div></div>
  </div>
  <div class="mf"><button class="btn btn-g" onclick="closeSendModal()">Cancelar</button><button class="btn btn-p" style="width:auto" onclick="sendMsg()">Abrir no WhatsApp</button></div>
  </div>
@@ -2497,13 +2499,13 @@ function renderOppList(items,cid,subFn,tipo) {
     const col=avc(c.name);
     const nomeEsc=c.name.replace(/'/g,"\\'");
     const feitoBtn = tipo ? '<button class="btn btn-o btn-sm" style="padding:7px 10px" onclick="event.stopPropagation();marcarContatoFeito(this,\''+c.id+'\',\''+tipo+'\',\''+nomeEsc+'\')" title="Marcar que voce ja fez esse contato (ligacao, presencial, etc.)">✓ Feito</button>' : '';
-    return '<div class="ol-i" onclick="showDetail(\''+c.id+'\')">'+
+    return '<div class="ol-i" onclick="abrirFichaRapidaOuDetalhe(\''+c.id+'\')">'+
       '<div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0"><div class="av-sm" style="background:'+col+'18;color:'+col+'">'+ini(c.name)+'</div>'+
       '<div style="min-width:0"><div style="font-weight:600;font-size:13px">'+c.name+'</div><div style="font-size:11px;color:var(--text3)">'+subFn(c)+'</div></div></div>'+
       '<div style="display:flex;gap:5px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">'+
       feitoBtn+
-      '<button class="btn btn-g btn-sm" onclick="event.stopPropagation();openSendModal(\''+c.id+'\')">Msg</button>'+
-      (c.phone?'<a class="wa" href="https://wa.me/55'+(c.phone||'').replace(/\D/g,'')+'\" target="_blank" onclick="event.stopPropagation()">WA</a>':'')+
+      '<button class="btn btn-g btn-sm" onclick="event.stopPropagation();openSendModal(\''+c.id+'\',\''+(tipo||'')+'\')">Mensagem</button>'+
+      (c.phone?'<a class="wa" href="https://wa.me/55'+telDigitos(c.phone)+'" target="_blank" onclick="event.stopPropagation()">WA</a>':'')+
       '</div></div>';
   }).join('')+'</div>';
 }
@@ -2570,8 +2572,8 @@ function renderPostSale(){
         '<div style="display:flex;gap:5px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">'+
         '<button class="btn btn-o btn-sm" style="padding:7px 10px" onclick="event.stopPropagation();marcarContatoFeito(this,\''+c.id+'\',\'pos_venda\',\''+nomeEsc+'\')" title="Marcar que o pós-venda foi feito">✓ Feito</button>'+
         '<button class="btn btn-g btn-sm" style="padding:7px 10px" onclick="event.stopPropagation();abrirPosVendaNaoFeito(\''+c.id+'\',\''+nomeEsc+'\')" title="Tirar da lista sem fazer o contato">Não vou fazer</button>'+
-        '<button class="btn btn-g btn-sm" onclick="event.stopPropagation();openSendModal(\''+c.id+'\')">Msg</button>'+
-        (c.phone?'<a class="wa" href="https://wa.me/55'+(c.phone||'').replace(/\D/g,'')+'" target="_blank" onclick="event.stopPropagation()">WA</a>':'')+
+        '<button class="btn btn-g btn-sm" onclick="event.stopPropagation();openSendModal(\''+c.id+'\',\'pos_venda\')">Mensagem</button>'+
+        (c.phone?'<a class="wa" href="https://wa.me/55'+telDigitos(c.phone)+'" target="_blank" onclick="event.stopPropagation()">WA</a>':'')+
         '</div></div>';
     }).join('')+'</div>';
   });
@@ -2786,7 +2788,7 @@ function montarFichaCliente(c) {
         +'<div>'
           +'<div class="cf-name">'+c.name+'</div>'
           +'<div class="cf-info-grid">'
-            +'<div><b>Telefone</b>'+(c.phone?c.phone+' <a class="wa" href="https://wa.me/55'+(c.phone||'').replace(/\D/g,'')+'" target="_blank" style="margin-left:4px">WhatsApp</a>':'—')+'</div>'
+            +'<div><b>Telefone</b>'+(c.phone?c.phone+' <a class="wa" href="https://wa.me/55'+telDigitos(c.phone)+'" target="_blank" style="margin-left:4px">WhatsApp</a>':'—')+'</div>'
             +'<div><b>Cidade</b>'+(c.city||'—')+'</div>'
             +'<div><b>Origem</b>'+(OL[c.origin]||'—')+'</div>'
             +'<div><b>Vendedora</b>'+(spName||'—')+'</div>'
@@ -2983,7 +2985,7 @@ function clicarVoltar(){
 }
 window.addEventListener('popstate', function(){
   // Com uma janela aberta, o voltar do celular fecha a janela em vez de trocar de tela.
-  var aberto = document.querySelector('.mo.open');
+  var aberto = document.querySelector('.mo.open') || document.querySelector('#ficha-rapida.open');
   if (aberto) { aberto.classList.remove('open'); try { history.pushState({slp:_navHist.length}, ''); } catch(e) {} return; }
   if (_navHist.length) voltarPagina();
 });
@@ -3534,25 +3536,60 @@ function renderMsgs() {
 
 
 
-function openSendModal(cid) {
+// ── ENVIO DE MENSAGEM PRONTA ──
+// Abre já com o modelo da categoria certa escolhido e o texto montado com o
+// nome da cliente (e valor/vencimento do cashback). A lojista só confere e
+// toca em "Abrir no WhatsApp". O envio fica registrado no histórico e tira a
+// cliente da lista da oportunidade de onde veio.
+var SM_TIPO_CAT = {pos_venda:'pos_venda', aniversario:'aniversario', inativos:'reativacao', lembrete:null, cashback:'cashback'};
+var SM_CAT_TIPO = {pos_venda:'pos_venda', aniversario:'aniversario', reativacao:'inativos'};
+var SM_TITULO = {pos_venda:'Pós-venda', aniversario:'Aniversário', inativos:'Reativação', lembrete:'Retorno', cashback:'Cashback'};
+function smModelos(tipo) {
+  var lista = (_caMsgs || []).slice();
+  if (tipo === 'cashback' && typeof _cbConfig !== 'undefined') {
+    [['cb30','Cashback — aviso 30 dias',_cbConfig.msg30],['cb15','Cashback — aviso 15 dias',_cbConfig.msg15],['cb5','Cashback — últimos dias',_cbConfig.msg5]].forEach(function(x){
+      if (x[2]) lista.unshift({id:x[0], titulo:x[1], corpo:x[2], cat:'cashback'});
+    });
+  }
+  var cat = SM_TIPO_CAT[tipo];
+  if (cat) lista.sort(function(a,b){
+    var fa = (a.cat===cat?2:0) + (typeof isFav==='function' && isFav('msg',a.id)?1:0);
+    var fb = (b.cat===cat?2:0) + (typeof isFav==='function' && isFav('msg',b.id)?1:0);
+    return fb - fa;
+  });
+  return {lista:lista, cat:cat};
+}
+function smMontarTexto(m, cl) {
+  var nome = cl ? (cl.name||'').split(' ')[0] : '{nome}';
+  var saldo = cl && typeof getCbSaldo==='function' ? getCbSaldo(cl.id) : 0;
+  var prox = cl ? (_cashback||[]).filter(function(cb){ return cb.client_id===cl.id && cb.status==='disponivel' && cb.validade; }).map(function(cb){ return cb.validade; }).sort()[0] : null;
+  return (m.corpo||'').replace(/{nome}/gi, nome).replace(/{loja}/gi, (CU&&CU.store)||'nossa loja')
+    .replace(/{valor}/gi, saldo.toFixed(2).replace('.',',')).replace(/{data}/gi, prox ? fD(prox) : '');
+}
+function openSendModal(cid, tipo) {
   var el = document.getElementById('send-modal');
   if (!el) return;
   document.getElementById('sm-cid').value = cid || '';
-  // Usar mensagens da Central de Atendimento (_caMsgs)
-  var msgs = _caMsgs || [];
+  document.getElementById('sm-tipo').value = tipo || '';
+  var cl = gC().find(function(x){ return x.id===cid; });
+  var para = document.getElementById('sm-para');
+  if (para) para.innerHTML = cl ? 'Para <strong>'+cl.name+'</strong>'+(cl.phone?' · '+cl.phone:' · <span style="color:var(--red)">sem telefone</span>')+(tipo&&SM_TITULO[tipo]?' · '+SM_TITULO[tipo]:'') : '';
+  var r = smModelos(tipo);
   var sel = document.getElementById('sm-msg');
-  if (sel) {
-    if (!msgs.length) {
-      sel.innerHTML = '<option value="">Nenhum modelo cadastrado</option>';
-    } else {
-      sel.innerHTML = '<option value="">Selecionar modelo...</option>' +
-        msgs.map(function(m){ return '<option value="'+m.id+'">['+((m.cat||'geral').toUpperCase())+'] '+m.titulo+'</option>'; }).join('');
-    }
+  if (!r.lista.length) {
+    sel.innerHTML = '<option value="">Nenhum modelo cadastrado — crie na Central de Atendimento</option>';
+  } else {
+    sel.innerHTML = '<option value="">Selecionar modelo...</option>' + r.lista.map(function(m){
+      return '<option value="'+m.id+'">'+(m.cat&&m.cat!==r.cat?'['+m.cat.toUpperCase()+'] ':'')+m.titulo+'</option>'; }).join('');
+    var primeiro = r.cat ? r.lista.find(function(m){ return m.cat===r.cat; }) : null;
+    sel.value = primeiro ? primeiro.id : '';
   }
   var selSP = document.getElementById('sm-sp');
-  if (selSP) selSP.innerHTML = '<option value="">Sem vendedora</option>' + gSP().map(function(s){ return '<option value="'+s.id+'">'+s.name+'</option>'; }).join('');
-  var pw = document.getElementById('sm-prev-wrap');
-  if (pw) pw.style.display = 'none';
+  if (selSP) {
+    selSP.innerHTML = '<option value="">Sem vendedora</option>' + gSP().map(function(s){ return '<option value="'+s.id+'">'+s.name+'</option>'; }).join('');
+    try { var ult = localStorage.getItem(slpKey('slp_ultima_vendedora')); if (ult && gSP().some(function(s){return s.id===ult;})) selSP.value = ult; } catch(e) {}
+  }
+  previewMsg();
   el.classList.add('open');
 }
 function closeSendModal() {
@@ -3565,44 +3602,40 @@ function previewMsg() {
   var wrap = document.getElementById('sm-prev-wrap');
   var prev = document.getElementById('sm-prev');
   if (!mid || !wrap || !prev) { if(wrap) wrap.style.display='none'; return; }
-  var m = (_caMsgs||[]).find(function(x){ return x.id===mid; });
-  var cl = gC().find(function(x){ return x.id===cid; });
+  var m = smModelos(document.getElementById('sm-tipo').value).lista.find(function(x){ return x.id===mid; });
   if (!m) { wrap.style.display='none'; return; }
-  var nome = cl ? cl.name.split(' ')[0] : '{nome}';
-  var txt = (m.corpo||'').replace(/{nome}/gi, nome).replace(/{loja}/gi, (CU&&CU.store)||'nossa loja');
-  prev.textContent = txt;
+  prev.value = smMontarTexto(m, gC().find(function(x){ return x.id===cid; }));
   wrap.style.display = 'block';
 }
-
 async function sendMsg(){
   var mid=document.getElementById('sm-msg').value;
   var cid=document.getElementById('sm-cid').value;
+  var tipo=document.getElementById('sm-tipo').value;
   var spid=document.getElementById('sm-sp').value;
   if(!mid){ toast('Selecione um modelo.','e'); return; }
-  var m = (_caMsgs||[]).find(function(x){ return x.id===mid; });
+  var m = smModelos(tipo).lista.find(function(x){ return x.id===mid; });
   var cl = gC().find(function(x){ return x.id===cid; });
   if(!m){ toast('Modelo não encontrado.','e'); return; }
   if(!cl){ toast('Cliente não encontrado.','e'); return; }
-  var nome = cl.name.split(' ')[0];
-  var loja = (CU&&CU.store)||'nossa loja';
-  var text = (m.corpo||'').replace(/{nome}/gi, nome).replace(/{loja}/gi, loja);
+  var tel = telDigitos(cl.phone);
+  if(!tel){ toast('Essa cliente não tem um telefone válido. Corrija na ficha dela.','e'); return; }
+  var text = (document.getElementById('sm-prev').value || smMontarTexto(m, cl));
   var sp = gSP().find(function(s){ return s.id===spid; });
+  try { if (spid) localStorage.setItem(slpKey('slp_ultima_vendedora'), spid); } catch(e) {}
+  // Abre o WhatsApp primeiro (no mesmo clique, para o navegador não bloquear) e registra depois.
+  window.open('https://wa.me/55'+tel+'?text='+encodeURIComponent(text),'_blank');
+  closeSendModal();
+  var tipoLog = tipo && tipo!=='cashback' ? tipo : (SM_CAT_TIPO[m.cat] || m.cat || 'outro');
   var resLog = await _sb.from('sent_log').insert({
       store_id: CU.id, client_id: cid, client_name: cl.name,
-      message_id: mid||null, message_title: m.titulo||'',
-      message_type: m.cat||'outro', salesperson: sp?sp.name:null
+      message_id: (m.id && /^[0-9a-f-]{36}$/.test(m.id)) ? m.id : null, message_title: m.titulo||'',
+      message_type: tipoLog, salesperson: sp?sp.name:null
     }).select().single();
-  if (resLog.error) {
-    toast('Mensagem pronta, mas não foi possível registrar no histórico.', 'e');
-  } else if (resLog.data) {
-    _log.unshift(resLog.data);
-  }
-  closeSendModal();
-  if(cl.phone) {
-    window.open('https://wa.me/55'+(cl.phone||'').replace(/\D/g,'')+'?text='+encodeURIComponent(text),'_blank');
-  } else {
-    toast('Cliente sem telefone cadastrado.','e');
-  }
+  if (resLog.error) { toast('WhatsApp aberto, mas não foi possível registrar no histórico.', 'e'); return; }
+  _log.unshift(resLog.data);
+  updateBadges();
+  var R = {pos_venda:renderPostSale, aniversario:renderBirthdays, inativos:renderInactive, lembrete:renderReminders};
+  if (R[tipoLog]) { var pg=document.querySelector('.page.active'); if (pg && pg.id!=='page-client-detail') R[tipoLog](); }
 }
 
 // ── SALESPEOPLE ──
@@ -4569,7 +4602,8 @@ function enviarCaptacao() {
     p_phone: phone,
     p_birth_date: birth,
     p_city: city,
-    p_tags: _capTags
+    p_tags: _capTags,
+    p_obs: ((document.getElementById('pub-obs')||{}).value||'').trim() || null
   }).then(function(res) {
     btn.textContent = 'Enviar Cadastro';
     btn.disabled = false;
@@ -5052,6 +5086,12 @@ function abrirModalAtend(canal) {
   var lembreteChk = document.getElementById('atend-lembrete-chk');
   if (lembreteChk) lembreteChk.checked = false;
   _atendTipoCliente = null; _atendTipoManual = false;
+  var spSel = document.getElementById('atend-sp');
+  if (spSel) {
+    spSel.innerHTML = '<option value="">Nenhuma</option>' + gSP().map(function(s){ return '<option value="'+s.id+'">'+s.name+'</option>'; }).join('');
+    try { var ultSp = localStorage.getItem(slpKey('slp_ultima_vendedora')); if (ultSp && gSP().some(function(s){return s.id===ultSp;})) spSel.value = ultSp; } catch(e) {}
+    var spWrap = document.getElementById('atend-sp-wrap'); if (spWrap) spWrap.style.display = gSP().length ? 'block' : 'none';
+  }
   var cbChk = document.getElementById('atend-cb-usar-chk'); if (cbChk) cbChk.checked = false;
   var cbUsar = document.getElementById('atend-cb-usar'); if (cbUsar) cbUsar.value = '';
   setTimeout(atualizarExtrasVendaAtend, 0);
@@ -5310,6 +5350,10 @@ async function salvarAtendUnificado(btnEl) {
     var valor = document.getElementById('atend-valor').value;
     var descricao = (document.getElementById('atend-produto-compra').value||'').trim();
     var tipoCliente = _atendTipoCliente || null;
+    var spIdAtend = (document.getElementById('atend-sp')||{}).value || '';
+    var spAtend = gSP().find(function(x){ return x.id===spIdAtend; });
+    var spNome = spAtend ? spAtend.name : null;
+    try { if (spIdAtend) localStorage.setItem(slpKey('slp_ultima_vendedora'), spIdAtend); } catch(e) {}
     if (!tipoCliente && novoNome && !_atendClienteId) tipoCliente = 'primeira';
     // Venda sem cliente identificada: salva o valor mesmo assim, para o total
     // do dia bater com o caixa. Não gera pós-venda nem cashback.
@@ -5317,7 +5361,7 @@ async function salvarAtendUnificado(btnEl) {
       var resAvulsa = await _sb.from('purchases').insert({
           store_id: CU.id, client_id: null, date: date,
           description: descricao || null, amount: parseFloat(valor), valor_bruto: parseFloat(valor),
-          canal: _atendCanal, origem: 'fluxo', tipo_cliente: tipoCliente
+          canal: _atendCanal, origem: 'fluxo', tipo_cliente: tipoCliente, salesperson: spNome
         }).select().single();
       if (resAvulsa.error) toast('Atendimento registrado, mas o valor da venda não pôde ser salvo: '+resAvulsa.error.message, 'e');
       else toast('Venda salva sem cliente vinculada.');
@@ -5343,7 +5387,8 @@ async function salvarAtendUnificado(btnEl) {
           cashback_usado: cbUsar,
           tipo_cliente: tipoCliente,
           canal: _atendCanal,
-          origem: 'fluxo'
+          origem: 'fluxo',
+          salesperson: spNome
         }).select().single();
       if (resCompra.error || !resCompra.data) {
         toast('Atendimento registrado, mas a compra não pôde ser salva: '+(resCompra.error?resCompra.error.message:'erro desconhecido.'), 'e');
@@ -5810,12 +5855,13 @@ function renderCbPesquisa(){
     var prox=_cashback.filter(function(cb){return cb.client_id===cl.id&&cb.status==='disponivel'&&cb.validade;}).map(function(cb){return cb.validade;}).sort()[0];
     var diasV=prox?-diasDesde(prox):null;
     var bdg=diasV!==null&&diasV<=15?'cb-badge-venc':'cb-badge-disp';
-    return '<div class="cb-search-card" data-cid="'+cl.id+'" onclick="showDetail(this.dataset.cid)">'+
+    return '<div class="cb-search-card" data-cid="'+cl.id+'" onclick="abrirFichaRapidaOuDetalhe(this.dataset.cid)">'+
       '<div class="av-sm" style="background:'+avc(cl.name)+'18;color:'+avc(cl.name)+'">'+ini(cl.name)+'</div>'+
       '<div style="flex:1"><div style="font-weight:600;font-size:13px">'+cl.name+'</div>'+
       '<div style="font-size:11px;color:var(--text3)">'+(cl.phone||'Sem telefone')+(cl.tags&&cl.tags.length?' · '+cl.tags.slice(0,2).join(', '):'')+'</div></div>'+
       '<div style="text-align:right"><div class="'+bdg+'">R$ '+saldo.toFixed(2).replace('.',',')+'</div>'+
       (diasV!==null?'<div style="font-size:10px;color:var(--text3);margin-top:2px">Vence em '+diasV+'d</div>':'')+'</div>'+
+      '<button class="btn btn-g btn-sm" style="margin-left:8px;width:auto" onclick="event.stopPropagation();openSendModal(\''+cl.id+'\',\'cashback\')">Mensagem</button>'+
     '</div>';
   }).join('');
 }
@@ -5945,6 +5991,10 @@ document.addEventListener('DOMContentLoaded', () => {
     <div class="fg">
      <label class="fl">Produto(s) comprado(s)</label>
      <input type="text" id="atend-produto-compra" class="fi" placeholder="Ex: vestido floral + calça preta">
+    </div>
+    <div class="fg" id="atend-sp-wrap">
+     <label class="fl">Vendedora</label>
+     <select id="atend-sp" class="fi"><option value="">Nenhuma</option></select>
     </div>
    </div>
    <div id="atend-perda-wrap" style="display:none">
