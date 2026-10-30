@@ -28,8 +28,8 @@ function renderVendas() {
     '<div class="ph"><div><h1 class="pt">Vendas</h1><p class="ps">Todas as vendas registradas no sistema. Compare o total de cada dia com o fechamento do seu sistema de caixa.</p></div>' +
       '<button class="btn btn-p btn-sm" style="width:auto;flex-shrink:0" onclick="showPage(\'fluxo\')">+ Registrar no Fluxo</button></div>' +
     '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px">' +
-      ['dia', 'mes', 'lista'].map(function (v) {
-        var lbl = { dia: 'Por dia', mes: 'Por mês', lista: 'Lista de vendas' }[v];
+      ['dia', 'mes', 'vendedora', 'lista'].map(function (v) {
+        var lbl = { dia: 'Por dia', mes: 'Por mês', vendedora: 'Por vendedora', lista: 'Lista de vendas' }[v];
         var on = VND.vista === v;
         return '<button class="btn btn-sm ' + (on ? 'btn-p' : 'btn-g') + '" style="width:auto;flex-shrink:0;white-space:nowrap" onclick="VND.vista=\'' + v + '\';renderVendas()">' + lbl + '</button>';
       }).join('') +
@@ -73,6 +73,7 @@ async function vndCarregar() {
   vndRenderKpis();
   if (VND.vista === 'dia') vndRenderDia();
   else if (VND.vista === 'mes') vndRenderMes();
+  else if (VND.vista === 'vendedora') vndRenderVendedora();
   else vndRenderLista();
 }
 
@@ -179,6 +180,24 @@ function vndRenderMes() {
     '</table></div>';
 }
 
+function vndRenderVendedora() {
+  var el = document.getElementById('vnd-conteudo'); if (!el) return;
+  var g = vndAgrupar(VND.vendas, function (v) { return v.salesperson || '—'; });
+  var nomes = Object.keys(g).sort(function (a, b) { return g[b].total - g[a].total; });
+  if (!nomes.length) { el.innerHTML = '<div class="empty"><div class="empty-t">Nenhuma venda neste mês</div></div>'; return; }
+  var tot = VND.vendas.reduce(function (s, v) { return s + (parseFloat(v.amount) || 0); }, 0);
+  el.innerHTML = '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">' +
+    '<tr style="background:var(--bg3)"><th style="' + VND_TH + ';text-align:left">Vendedora</th><th style="' + VND_TH + '">Vendas</th><th style="' + VND_TH + '">Total</th><th style="' + VND_TH + '">% do mês</th><th style="' + VND_TH + '">Ticket</th><th style="' + VND_TH + '">Retornos</th></tr>' +
+    nomes.map(function (n) {
+      var x = g[n];
+      return '<tr><td style="' + VND_TD + ';text-align:left;font-weight:600">' + (n === '—' ? '<span style="color:var(--text3);font-weight:400">Sem vendedora marcada</span>' : vndEsc(n)) + '</td>' +
+        '<td style="' + VND_TD + '">' + x.qtd + '</td><td style="' + VND_TD + ';font-weight:700">' + vndMoeda(x.total) + '</td>' +
+        '<td style="' + VND_TD + '">' + (tot ? Math.round(x.total / tot * 100) + '%' : '—') + '</td>' +
+        '<td style="' + VND_TD + '">' + (x.comValor ? vndMoeda(x.total / x.comValor) : '—') + '</td><td style="' + VND_TD + '">' + (x.retorno || '—') + '</td></tr>';
+    }).join('') + '</table></div>' +
+    '<div style="padding:10px 14px;font-size:11px;color:var(--text3);border-top:1px solid var(--border)">A vendedora é marcada ao registrar a venda no Fluxo do Dia ou na ficha da cliente.</div>';
+}
+
 function vndRenderLista() {
   var el = document.getElementById('vnd-conteudo'); if (!el) return;
   var lista = VND.vendas;
@@ -193,6 +212,7 @@ function vndRenderLista() {
     var info = [fD(v.date)];
     if (v.canal) info.push(v.canal === 'online' ? 'Online' : 'Loja física');
     if (v.tipo_cliente) info.push((typeof TIPO_CLIENTE_LBL !== 'undefined' && TIPO_CLIENTE_LBL[v.tipo_cliente]) || v.tipo_cliente);
+    if (v.salesperson) info.push(v.salesperson);
     if (v.origem) info.push(origemLbl[v.origem] || v.origem);
     if (v.description) info.push(v.description);
     var cb = parseFloat(v.cashback_usado) || 0;
@@ -235,3 +255,58 @@ async function vndExcluir(pid) {
   if (typeof updateBadges === 'function') updateBadges();
   vndRenderKpis(); vndRenderLista();
 }
+
+
+// ══════════════════════════════════════════════
+// FICHA RÁPIDA (painel lateral)
+// Ao tocar no nome da cliente nas listas de oportunidade e no cashback, abre
+// um painel com o essencial — sem sair da lista e sem precisar voltar.
+// ══════════════════════════════════════════════
+function abrirFichaRapida(cid) {
+  var c = (_clients || []).find(function (x) { return x.id === cid; });
+  if (!c) { showDetail(cid); return; }
+  var pn = document.getElementById('ficha-rapida');
+  if (!pn) {
+    pn = document.createElement('div'); pn.id = 'ficha-rapida';
+    pn.innerHTML = '<div class="fr-fundo" onclick="fecharFichaRapida()"></div><div class="fr-painel"></div>';
+    document.body.appendChild(pn);
+    var st = document.createElement('style');
+    st.textContent = '#ficha-rapida{position:fixed;inset:0;z-index:900;display:none}#ficha-rapida.open{display:block}' +
+      '#ficha-rapida .fr-fundo{position:absolute;inset:0;background:rgba(0,0,0,.35)}' +
+      '#ficha-rapida .fr-painel{position:absolute;top:0;right:0;bottom:0;width:380px;max-width:100%;background:var(--bg2);box-shadow:var(--sh-lg);overflow-y:auto;padding:20px;animation:frIn .18s ease-out}' +
+      '@keyframes frIn{from{transform:translateX(30px);opacity:0}to{transform:none;opacity:1}}' +
+      '#ficha-rapida .fr-sec{font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--text3);margin:18px 0 8px}' +
+      '#ficha-rapida .fr-tag{display:inline-block;font-size:11px;padding:3px 9px;border-radius:20px;background:var(--bg3);margin:0 5px 5px 0}' +
+      '@media(max-width:768px){#ficha-rapida .fr-painel{top:auto;left:0;width:100%;max-height:85vh;border-radius:20px 20px 0 0}}';
+    document.head.appendChild(st);
+  }
+  var saldo = typeof getCbSaldo === 'function' ? getCbSaldo(c.id) : 0;
+  var prox = (_cashback || []).filter(function (cb) { return cb.client_id === c.id && cb.status === 'disponivel' && cb.validade; }).map(function (cb) { return cb.validade; }).sort()[0];
+  var compras = (c.purchases || []).slice().sort(function (a, b) { return (b.date || '') > (a.date || '') ? 1 : -1; });
+  var total = compras.reduce(function (s, p) { return s + (parseFloat(p.amount) || 0); }, 0);
+  var contatos = (_log || []).filter(function (l) { return l.client_id === c.id; });
+  var ultimo = contatos[0];
+  var tel = typeof telDigitos === 'function' ? telDigitos(c.phone) : '';
+  var esc = vndEsc;
+  pn.querySelector('.fr-painel').innerHTML =
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">' +
+      '<div><div style="font-size:18px;font-weight:700">' + esc(c.name) + '</div>' +
+      '<div style="font-size:13px;color:var(--text2);margin-top:3px">' + esc(c.phone || 'sem telefone') + (c.city ? ' · ' + esc(c.city) : '') + '</div></div>' +
+      '<button class="mc" onclick="fecharFichaRapida()" style="flex-shrink:0">×</button></div>' +
+    '<div style="display:flex;gap:6px;margin-top:14px;flex-wrap:wrap">' +
+      (tel ? '<a class="btn btn-p btn-sm" style="width:auto" href="https://wa.me/55' + tel + '" target="_blank">WhatsApp</a>' : '') +
+      '<button class="btn btn-g btn-sm" style="width:auto" onclick="fecharFichaRapida();openSendModal(\'' + c.id + '\',\'' + (saldo > 0 ? 'cashback' : '') + '\')">Mensagem pronta</button>' +
+      '<button class="btn btn-g btn-sm" style="width:auto" onclick="fecharFichaRapida();showDetail(\'' + c.id + '\')">Ficha completa</button></div>' +
+    (saldo > 0 ? '<div style="background:var(--gold-l);border-radius:var(--rs);padding:10px 12px;margin-top:16px;font-size:13px"><strong style="color:var(--gold-b)">Cashback: ' + vndMoeda(saldo) + '</strong>' + (prox ? '<span style="color:var(--text2)"> · vence em ' + fD(prox) + '</span>' : '') + '</div>' : '') +
+    '<div class="fr-sec">Interesses</div>' +
+    ((c.tags || []).length ? (c.tags || []).map(function (t) { return '<span class="fr-tag">' + esc(t) + '</span>'; }).join('') : '<div style="font-size:12px;color:var(--text3)">Nenhuma tag</div>') +
+    '<div class="fr-sec">Compras · ' + compras.length + (total ? ' · ' + vndMoeda(total) : '') + '</div>' +
+    (compras.length ? compras.slice(0, 3).map(function (p) {
+      return '<div style="display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-bottom:1px solid var(--border)"><span>' + fD(p.date) + (p.description ? ' · ' + esc(p.description) : '') + '</span><strong>' + (p.amount ? vndMoeda(p.amount) : '—') + '</strong></div>';
+    }).join('') : '<div style="font-size:12px;color:var(--text3)">Nenhuma compra registrada</div>') +
+    '<div class="fr-sec">Último contato</div>' +
+    (ultimo ? '<div style="font-size:13px">' + esc(ultimo.message_title || 'Contato') + '<div style="font-size:11px;color:var(--text3)">' + new Date(ultimo.sent_at).toLocaleDateString('pt-BR') + (ultimo.salesperson ? ' · ' + esc(ultimo.salesperson) : '') + '</div></div>' : '<div style="font-size:12px;color:var(--text3)">Nenhum contato registrado</div>') +
+    (c.reminder ? '<div class="fr-sec">Retorno agendado</div><div style="font-size:13px">' + fD(c.reminder) + '</div>' : '');
+  pn.classList.add('open');
+}
+function fecharFichaRapida() { var pn = document.getElementById('ficha-rapida'); if (pn) pn.classList.remove('open'); }
