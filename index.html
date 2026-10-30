@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Sistema Loja Previsivel — SLP v3.3</title>
+<title>Sistema Loja Previsivel — SLP v3.4</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -716,6 +716,8 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 .modal-check-remove{background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;line-height:1;padding:0;display:flex;margin-left:auto}
 .modal-check-remove:hover{color:var(--red)}
 
+.btn-voltar{display:inline-flex;align-items:center;gap:4px;background:none;border:none;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;padding:6px 8px 6px 2px;margin:0 0 10px -2px;border-radius:8px;font-family:inherit}
+.btn-voltar:hover{color:var(--green);background:var(--bg3)}
 </style>
 </head>
 <body>
@@ -818,7 +820,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   </div>
  <div class="sb-sec">📋 Operação diária</div>
   <div class="nav-i" data-page="fluxo" onclick="showPage('fluxo')">
-   <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+   <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg>
    Fluxo do Dia
   </div>
   <div class="nav-i" data-page="vendas" onclick="showPage('vendas')">
@@ -945,7 +947,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
  <!-- BOTTOM NAV mobile -->
  <div class="bottom-nav">
  <div class="bn-i active" onclick="showPage('dashboard')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Início</div>
- <div class="bn-i" onclick="showPage('fluxo')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="16" y1="11" x2="22" y2="11"/></svg>Fluxo</div>
+ <div class="bn-i" onclick="showPage('fluxo')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg>Fluxo</div>
  <div class="bn-i" onclick="showPage('postsale')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Oportun.</div>
  <div class="bn-i" onclick="showPage('clients')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Clientes</div>
  <div class="bn-i" onclick="showPage('vendas')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Vendas</div>
@@ -2130,6 +2132,7 @@ function showPage(p) {
   const bni=document.querySelectorAll('.bn-i');
   if (bnMap[p]!==undefined && bni[bnMap[p]]) bni[bnMap[p]].classList.add('active');
   closeSB();
+  _navRegistrar({p:p});
   const R={dashboard:renderDash,clients:renderClients,escritorio:renderEscritorio,fluxo:renderFluxo,captacao:renderCaptacao,birthdays:renderBirthdays,inactive:renderInactive,postsale:renderPostSale,reminders:renderReminders,filter:renderFilter,messages:renderMsgs,salespeople:renderSP,reports:renderReports,export:renderExport,'cashback-opp':function(){ carregarConfigCashback(); renderCbPesquisa(); },conferir:function(){ if(typeof renderConferir==='function') renderConferir(); },vendas:function(){ if(typeof renderVendas==='function') renderVendas(); }};
   if (R[p]) R[p]();
 }
@@ -2573,6 +2576,7 @@ function filterByTag(){
 var _detailReqId = 0;
 async function showDetail(id) {
   var reqId = ++_detailReqId;
+  _navRegistrar({cliente:id});
 
   // Feedback imediato: troca para a tela do cliente e mostra "carregando" já
   // no clique, em vez de só reagir depois que as 4 consultas terminarem.
@@ -2887,8 +2891,62 @@ async function salvarLembreteFicha(cid) {
   await criarOuAtualizarLembrete(cid, data, desc);
 }
 
-function goBack(){
-  var hf=document.getElementById('detail-header-fixed'); if(hf) hf.style.display='none';showPage('clients');}
+function goBack(){ voltarPagina(); }
+
+// ── NAVEGAÇÃO: botão Voltar em todas as telas + botão voltar do celular ──
+// Guarda o caminho que a lojista fez (telas e fichas de cliente). O botão
+// "Voltar" no topo de cada tela e o voltar do celular/navegador levam para a
+// tela anterior, em vez de ter que ir pelo menu.
+var _navHist = [], _navAtual = null, _navVoltando = false;
+var NAV_NOMES = {dashboard:'Início', clients:'Clientes', conferir:'Conferir cadastros', captacao:'Captação', fluxo:'Fluxo do Dia', vendas:'Vendas',
+  birthdays:'Aniversariantes', inactive:'Inativos', postsale:'Pós-venda', reminders:'Retornos', filter:'Campanha por interesse', 'cashback-opp':'Cashback',
+  messages:'Central de Atendimento', escritorio:'Escritório', reports:'Insights', export:'Exportar', salespeople:'Vendedoras'};
+function _navNome(d){
+  if (!d) return '';
+  if (d.cliente) { var c=(_clients||[]).find(function(x){return x.id===d.cliente;}); return c ? c.name : 'ficha da cliente'; }
+  return NAV_NOMES[d.p] || 'tela anterior';
+}
+function _navRegistrar(destino){
+  var igual = _navAtual && JSON.stringify(_navAtual) === JSON.stringify(destino);
+  if (_navAtual && !igual && !_navVoltando) {
+    _navHist.push(_navAtual);
+    if (_navHist.length > 40) _navHist.shift();
+    try { history.pushState({slp:_navHist.length}, ''); } catch(e) {}
+  }
+  _navAtual = destino; _navVoltando = false;
+  if (destino.p === 'dashboard') _navHist = []; // Início zera o caminho
+  setTimeout(renderBotaoVoltar, 0);
+}
+function voltarPagina(){
+  var hf=document.getElementById('detail-header-fixed'); if(hf) hf.style.display='none';
+  var ant = _navHist.pop();
+  _navVoltando = true;
+  if (!ant) { showPage('dashboard'); return; }
+  if (ant.cliente) showDetail(ant.cliente); else showPage(ant.p);
+}
+function clicarVoltar(){
+  // Usa o histórico do navegador para o botão do app e o do celular andarem juntos.
+  if (_navHist.length) { try { history.back(); return; } catch(e) {} }
+  voltarPagina();
+}
+window.addEventListener('popstate', function(){
+  // Com uma janela aberta, o voltar do celular fecha a janela em vez de trocar de tela.
+  var aberto = document.querySelector('.mo.open');
+  if (aberto) { aberto.classList.remove('open'); try { history.pushState({slp:_navHist.length}, ''); } catch(e) {} return; }
+  if (_navHist.length) voltarPagina();
+});
+function renderBotaoVoltar(){
+  document.querySelectorAll('.btn-voltar').forEach(function(b){ b.remove(); });
+  if (!_navAtual || _navAtual.p === 'dashboard') return;
+  var pg = document.querySelector('.page.active'); if (!pg) return;
+  var ant = _navHist[_navHist.length-1];
+  var b = document.createElement('button');
+  b.className = 'btn-voltar';
+  b.type = 'button';
+  b.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 18l-6-6 6-6"/></svg>' + (ant ? 'Voltar para ' + _navNome(ant) : 'Início');
+  b.onclick = clicarVoltar;
+  pg.insertBefore(b, pg.firstChild);
+}
 function showObsForm(id){document.getElementById('obs-f-'+id).style.display='block';document.getElementById('obs-t-'+id).focus();}
 function hideObsForm(id){document.getElementById('obs-f-'+id).style.display='none';}
 async function saveObs(cid){
