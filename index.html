@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Sistema Loja Previsivel — SLP v3.4</title>
+<title>Sistema Loja Previsivel — SLP v3.5</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -1974,7 +1974,58 @@ function slpGet(base, fallback) {
   return fallback;
 }
 function slpSet(base, value) {
-  localStorage.setItem(slpKey(base), JSON.stringify(value));
+  try { localStorage.setItem(slpKey(base), JSON.stringify(value)); } catch (e) {}
+  if (SLP_SYNC_KEYS.indexOf(base) !== -1) slpAgendarSync(base, value);
+}
+
+// ── Sincronização com o banco (store_data) ──
+// Mensagens, roteiros e objeções da Central de Atendimento, tarefas e
+// automações de WhatsApp ficavam só no navegador: trocando de celular/
+// computador ou limpando o navegador, sumiam. Agora cada gravação também vai
+// para o banco (tabela store_data), e ao entrar no sistema os dados do banco
+// são carregados. Se o banco ainda não tem nada e este navegador tem, sobe o
+// que está no navegador (migração automática, sem a aluna fazer nada).
+var SLP_SYNC_KEYS = ['slp_ca_msgs','slp_ca_roteiros','slp_ca_objecoes','slp_ca_com','slp_ca_favs','slp_ca_migrated','slp_tarefas','slp_wpp_auto'];
+var _slpSyncTimers = {};
+function slpAgendarSync(base, value) {
+  if (!CU || !CU.id || typeof _sb === 'undefined') return;
+  clearTimeout(_slpSyncTimers[base]);
+  _slpSyncTimers[base] = setTimeout(async function () {
+    var res = await _sb.from('store_data').upsert({ store_id: CU.id, key: base, value: value, updated_at: new Date().toISOString() }, { onConflict: 'store_id,key' });
+    if (res && res.error) toast('Não foi possível salvar no servidor (' + base.replace('slp_', '') + '): ' + res.error.message, 'e');
+  }, 600);
+}
+async function slpCarregarDoServidor() {
+  if (!CU || !CU.id) return;
+  var res = await _sb.from('store_data').select('key, value').eq('store_id', CU.id).in('key', SLP_SYNC_KEYS);
+  if (res.error) { toast('Não foi possível carregar suas mensagens e roteiros do servidor. Usando o que está neste aparelho.', 'e'); return; }
+  var noServidor = {};
+  (res.data || []).forEach(function (r) { noServidor[r.key] = r.value; });
+  SLP_SYNC_KEYS.forEach(function (k) {
+    if (Object.prototype.hasOwnProperty.call(noServidor, k)) {
+      var srv = noServidor[k];
+      // Primeira vez deste aparelho depois da sincronização: junta o que só
+      // existe aqui com o que já está no servidor (para não perder mensagens
+      // criadas em aparelhos diferentes antes desta versão). Depois disso, o
+      // servidor manda.
+      var flag = 'slp_sync_ok_' + k;
+      var jaJuntou = false; try { jaJuntou = localStorage.getItem(slpKey(flag)) === '1'; } catch (e) {}
+      if (!jaJuntou && Array.isArray(srv)) {
+        var loc = slpGet(k, []);
+        if (Array.isArray(loc) && loc.length) {
+          var ids = {}; srv.forEach(function (x) { if (x && x.id) ids[x.id] = true; });
+          var extras = loc.filter(function (x) { return x && x.id && !ids[x.id]; });
+          if (extras.length) { srv = srv.concat(extras); slpAgendarSync(k, srv); }
+        }
+      }
+      try { localStorage.setItem(slpKey(k), JSON.stringify(srv)); localStorage.setItem(slpKey(flag), '1'); } catch (e) {}
+    } else {
+      try { localStorage.setItem(slpKey('slp_sync_ok_' + k), '1'); } catch (e) {}
+      var local = slpGet(k, null);
+      var temAlgo = local && (Array.isArray(local) ? local.length : (typeof local === 'object' ? Object.keys(local).length : true));
+      if (temAlgo) slpAgendarSync(k, local);
+    }
+  });
 }
 let _clients=[], _sp=[], _msgs=[], _log=[];
 
@@ -2080,6 +2131,7 @@ async function initDefaultMsgs() {
 // planejamento mensal) nao mora mais aqui — mora no Supabase e e carregado
 // por carregarEscritorioDigital(), definida em escritorio-digital.js.
 async function carregarDadosLocaisDaLoja() {
+  await slpCarregarDoServidor();
   _caMsgs = slpGet('slp_ca_msgs', []);
   _caRoteiros = slpGet('slp_ca_roteiros', []);
   _caObjecoes = slpGet('slp_ca_objecoes', []);
