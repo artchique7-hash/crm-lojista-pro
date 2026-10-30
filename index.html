@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Sistema Loja Previsivel — SLP v3.2</title>
+<title>Sistema Loja Previsivel — SLP v3.3</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -796,7 +796,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
  <button class="tb-btn" onclick="toggleSB()">
  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
  </button>
- <div class="tb-logo" id="tb-store">Lojista Pro</div>
+ <div class="tb-logo" id="tb-store">Loja Previsível</div>
  <button class="tb-btn" onclick="logout()">
  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
  </button>
@@ -811,11 +811,56 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
  <div><div class="sb-logo-text" id="sb-store">Minha Loja</div><div class="sb-logo-sub">SLP — Loja Previsivel</div></div>
  </div>
  <div class="sb-nav">
- <div class="sb-sec">🏠 Início</div>
+ <div class="sb-sec">🏠 Hoje</div>
   <div class="nav-i" data-page="dashboard" onclick="showPage('dashboard')">
    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
    Dashboard
   </div>
+ <div class="sb-sec">📋 Operação diária</div>
+  <div class="nav-i" data-page="fluxo" onclick="showPage('fluxo')">
+   <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+   Fluxo do Dia
+  </div>
+  <div class="nav-i" data-page="vendas" onclick="showPage('vendas')">
+   <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+   Vendas
+  </div>
+ <div class="sb-sec">🎯 Oportunidades de venda</div>
+ <div class="nav-group" id="ng-oportunidades">
+  <div class="nav-group-header" onclick="toggleNavGroup('oportunidades')">
+   <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+   Oportunidades
+   <span class="ng-chevron">▾</span>
+  </div>
+  <div class="nav-sub" style="position:relative">
+   <div class="nav-sub-line"></div>
+   <div class="nav-i" data-page="postsale" onclick="showPage('postsale')">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+    Pós-venda <span class="nb" id="sb-pv" style="display:none">0</span>
+   </div>
+   <div class="nav-i" data-page="reminders" onclick="showPage('reminders')">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+    Retornos Pendentes <span class="nb red" id="sb-rem" style="display:none">0</span>
+   </div>
+   <div class="nav-i" data-page="cashback-opp" onclick="showPage('cashback-opp')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+    <span>Cashback a Vencer</span>
+    <span class="nb gold" id="sb-cb" style="display:none">0</span>
+   </div>
+      <div class="nav-i" data-page="birthdays" onclick="showPage('birthdays')">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Aniversariantes <span class="nb " id="sb-bd" style="display:none">0</span>
+   </div>
+   <div class="nav-i" data-page="inactive" onclick="showPage('inactive')">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    Inativos <span class="nb gold" id="sb-in" style="display:none">0</span>
+   </div>
+   <div class="nav-i" data-page="filter" onclick="showPage('filter')">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+    Campanha por Interesse
+   </div>
+  </div>
+ </div>
  <div class="sb-sec">👥 Clientes</div>
  <div class="nav-group" id="ng-clientes">
   <div class="nav-group-header" onclick="toggleNavGroup('clientes')">
@@ -825,60 +870,21 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   </div>
   <div class="nav-sub" style="position:relative">
    <div class="nav-sub-line"></div>
-     <div class="nav-i" data-page="clients" onclick="showPage('clients')">
-   <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-   Cadastro de Clientes <span class="nb" id="sb-c2" style="display:none">0</span>
-  </div>
-  <div class="nav-i" data-page="conferir" onclick="showPage('conferir')">
-   <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-   Conferir Cadastros <span class="nb red" id="sb-conf" style="display:none">0</span>
-  </div>
-  </div>
- </div>
-  <div class="nav-i" data-page="captacao" onclick="showPage('captacao')">
-   <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
-   Captação de Clientes
-  </div>
- <div class="sb-sec">📋 Operação</div>
-  <div class="nav-i" data-page="fluxo" onclick="showPage('fluxo')">
-   <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-   Fluxo do Dia
-  </div>
- <div class="nav-group" id="ng-oportunidades">
-  <div class="nav-group-header" onclick="toggleNavGroup('oportunidades')">
-   <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-   Oportunidades
-   <span class="ng-chevron">▾</span>
-  </div>
-  <div class="nav-sub" style="position:relative">
-   <div class="nav-sub-line"></div>
-     <div class="nav-i" data-page="birthdays" onclick="showPage('birthdays')">
-   <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-   Aniversariantes <span class="nb " id="sb-bd" style="display:none">0</span>
-  </div>
-  <div class="nav-i" data-page="inactive" onclick="showPage('inactive')">
-   <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-   Inativos <span class="nb gold" id="sb-in" style="display:none">0</span>
-  </div>
-  <div class="nav-i" data-page="postsale" onclick="showPage('postsale')">
-   <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-   Pós-venda <span class="nb" id="sb-pv" style="display:none">0</span>
-  </div>
-  <div class="nav-i" data-page="reminders" onclick="showPage('reminders')">
-   <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-   Retornos Pendentes <span class="nb red" id="sb-rem" style="display:none">0</span>
-  </div>
-  <div class="nav-i" data-page="filter" onclick="showPage('filter')">
-   <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-   Buscar por Interesse
-  </div>
+      <div class="nav-i" data-page="clients" onclick="showPage('clients')">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+    Base de Clientes <span class="nb" id="sb-c2" style="display:none">0</span>
+   </div>
+   <div class="nav-i" data-page="conferir" onclick="showPage('conferir')">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    Conferir Cadastros <span class="nb red" id="sb-conf" style="display:none">0</span>
+   </div>
+   <div class="nav-i" data-page="captacao" onclick="showPage('captacao')">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+    Captação de Clientes
+   </div>
   </div>
  </div>
-  <div class="nav-i" data-page="cashback-opp" onclick="showPage('cashback-opp')">
-   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-   <span>Cashback</span>
-   <span class="bn-i" id="sb-cb" style="display:none">0</span>
-  </div>
+ <div class="sb-sec">💬 Atendimento</div>
   <div class="nav-i" data-page="messages" onclick="showPage('messages')">
    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
    Central de Atendimento
@@ -922,7 +928,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
  <div class="sb-sec">⚙️ Configurações</div>
   <div class="nav-i" data-page="salespeople" onclick="showPage('salespeople')">
    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-   Cadastro de Vendedoras
+   Vendedoras
   </div>
 </div>
  <div class="sb-bot">
@@ -939,10 +945,10 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
  <!-- BOTTOM NAV mobile -->
  <div class="bottom-nav">
  <div class="bn-i active" onclick="showPage('dashboard')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Início</div>
- <div class="bn-i" onclick="showPage('clients')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Clientes</div>
  <div class="bn-i" onclick="showPage('fluxo')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="16" y1="11" x2="22" y2="11"/></svg>Fluxo</div>
- <div class="bn-i" onclick="showPage('messages')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Msgs</div>
- <div class="bn-i" onclick="showPage('reports')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Dados</div>
+ <div class="bn-i" onclick="showPage('postsale')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Oportun.</div>
+ <div class="bn-i" onclick="showPage('clients')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Clientes</div>
+ <div class="bn-i" onclick="showPage('vendas')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Vendas</div>
  </div>
 
  <main class="main">
@@ -1017,6 +1023,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
  <div class="ph"><div><h1 class="pt">Clientes Inativas</h1><p class="ps">Compraram mas não voltaram em 60+ dias</p></div></div>
  <div class="card" style="padding:0;overflow:hidden" id="inactive-list"></div>
  </div>
+ <div id="page-vendas" class="page"><div id="vendas-root"></div></div>
  <div id="page-conferir" class="page">
  <div class="ph"><div><h1 class="pt">Conferir cadastros</h1><p class="ps">Telefones repetidos ou errados e fichas duplicadas. Corrija ou junte as fichas para não perder oportunidade.</p></div></div>
  <div id="conferir-conteudo"></div>
@@ -1322,6 +1329,9 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
  <!-- CONFIGURAÇÃO -->
  <div class="card" style="padding:18px;margin-bottom:20px">
   <div style="font-size:13px;font-weight:700;margin-bottom:14px;font-family:Syne,sans-serif">⚙️ Configuração</div>
+  <label style="display:flex;align-items:center;gap:10px;background:var(--bg3);border-radius:var(--rs);padding:10px 12px;margin-bottom:14px;cursor:pointer;font-size:13px">
+   <input type="checkbox" id="cb-ativo"> <span><strong>Minha loja usa cashback</strong><br><span style="font-size:11px;color:var(--text3)">Desligado: as vendas não geram cashback novo. Saldos que as clientes já têm continuam valendo até vencer.</span></span>
+  </label>
   <div class="fgrid">
    <div class="fg">
     <label class="fl">Percentual de cashback (%)</label>
@@ -1661,7 +1671,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
  <div class="fg"><label class="fl">Vendedora</label><select id="p-sp" class="fi"><option value="">Nenhuma</option></select></div>
  <div id="p-cb-wrap" class="fg" style="display:none;background:var(--gold-l);border-radius:var(--rs);padding:10px 12px">
   <div style="font-size:12px;color:var(--gold-b);font-weight:600;margin-bottom:6px">Cliente tem <span id="p-cb-saldo"></span> de cashback disponível</div>
-  <label class="fl">Usar cashback nesta venda (R$, opcional)</label>
+  <label class="fl">Usar cashback nesta venda (R$, opcional) — é abatido do valor e o novo cashback é calculado sobre o que a cliente pagou</label>
   <input type="number" id="p-cb-usar" class="fi" placeholder="0,00" step="0.01" min="0">
  </div>
  <div class="fg"><label class="fl">Observações</label><textarea id="p-obs" class="fta" placeholder="Cliente amou, quer voltar em breve..."></textarea></div>
@@ -2116,11 +2126,11 @@ function showPage(p) {
   document.querySelectorAll('.bn-i').forEach(x=>x.classList.remove('active'));
   const el=document.getElementById('page-'+p); if(el) el.classList.add('active');
   document.querySelectorAll('.nav-i[data-page="'+p+'"]').forEach(x=>x.classList.add('active'));
-  const bnMap={dashboard:0,clients:1,birthdays:2,inactive:2,postsale:2,reminders:2,filter:2,messages:3,reports:4};
+  const bnMap={dashboard:0,fluxo:1,birthdays:2,inactive:2,postsale:2,reminders:2,filter:2,'cashback-opp':2,clients:3,conferir:3,captacao:3,vendas:4};
   const bni=document.querySelectorAll('.bn-i');
   if (bnMap[p]!==undefined && bni[bnMap[p]]) bni[bnMap[p]].classList.add('active');
   closeSB();
-  const R={dashboard:renderDash,clients:renderClients,escritorio:renderEscritorio,fluxo:renderFluxo,captacao:renderCaptacao,birthdays:renderBirthdays,inactive:renderInactive,postsale:renderPostSale,reminders:renderReminders,filter:renderFilter,messages:renderMsgs,salespeople:renderSP,reports:renderReports,export:renderExport,'cashback-opp':function(){ carregarConfigCashback(); renderCbPesquisa(); },conferir:function(){ if(typeof renderConferir==='function') renderConferir(); }};
+  const R={dashboard:renderDash,clients:renderClients,escritorio:renderEscritorio,fluxo:renderFluxo,captacao:renderCaptacao,birthdays:renderBirthdays,inactive:renderInactive,postsale:renderPostSale,reminders:renderReminders,filter:renderFilter,messages:renderMsgs,salespeople:renderSP,reports:renderReports,export:renderExport,'cashback-opp':function(){ carregarConfigCashback(); renderCbPesquisa(); },conferir:function(){ if(typeof renderConferir==='function') renderConferir(); },vendas:function(){ if(typeof renderVendas==='function') renderVendas(); }};
   if (R[p]) R[p]();
 }
 function toggleSB() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sb-overlay').classList.toggle('open'); }
@@ -2795,7 +2805,7 @@ function buildCfCompras(c,sortPurch) {
         var cbUsadoNestaCompra = (_cashback||[]).filter(function(cb){ return cb.usado_em_purchase_id===p.id; }).reduce(function(s,cb){ return s+parseFloat(cb.utilizado_valor||0); }, 0);
         var cbBadge = cbUsadoNestaCompra>0 ? '<div style="font-size:10px;color:var(--gold-b);font-weight:600;margin-top:2px">💰 R$ '+cbUsadoNestaCompra.toFixed(2).replace('.',',')+' de cashback usado</div>' : '';
         var cbBtn = (cbUsadoNestaCompra===0 && saldoCbCliente>0) ? '<button data-cid="'+c.id+'" data-pid="'+p.id+'" onclick="abrirModalUsarCashback(this.dataset.cid,this.dataset.pid)" style="background:none;border:none;cursor:pointer;color:var(--gold-b);font-size:11px;padding:2px 4px;border-radius:4px;margin-left:2px" title="Usar cashback nesta venda">💰</button>' : '';
-        return '<div class="pi"><div class="pi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/></svg></div><div style="flex:1"><div style="font-size:13px;font-weight:500">'+(p.description||'Compra')+'</div><div style="font-size:11px;color:var(--text3)">'+fD(p.date)+(p.salesperson?' - '+p.salesperson:'')+'</div>'+cbBadge+'</div>'+(p.amount?'<div class="pa">R$ '+parseFloat(p.amount).toFixed(2).replace('.',',')+'</div>':'')+cbBtn+'<button data-pid="'+p.id+'" data-cid="'+c.id+'" onclick="excluirCompra(this.dataset.pid,this.dataset.cid)" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:11px;padding:2px 4px;border-radius:4px;margin-left:4px" title="Excluir">×</button></div>';
+        return '<div class="pi"><div class="pi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/></svg></div><div style="flex:1"><div style="font-size:13px;font-weight:500">'+(p.description||'Compra')+'</div><div style="font-size:11px;color:var(--text3)">'+fD(p.date)+(p.salesperson?' - '+p.salesperson:'')+(p.canal?' · '+(p.canal==='online'?'Online':'Loja física'):'')+(p.tipo_cliente&&typeof TIPO_CLIENTE_LBL!=='undefined'?' · '+(TIPO_CLIENTE_LBL[p.tipo_cliente]||p.tipo_cliente):'')+'</div>'+cbBadge+'</div>'+(p.amount?'<div class="pa">R$ '+parseFloat(p.amount).toFixed(2).replace('.',',')+'</div>':'')+cbBtn+'<button data-pid="'+p.id+'" data-cid="'+c.id+'" onclick="excluirCompra(this.dataset.pid,this.dataset.cid)" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:11px;padding:2px 4px;border-radius:4px;margin-left:4px" title="Excluir">×</button></div>';
       }).join(''))
     +'</div>';
 }
@@ -4059,7 +4069,13 @@ async function savePurch(){
   const sp=gSP().find(s=>s.id===spid);
   const amt=document.getElementById('p-amt').value;
 
-  const resPurch = await _sb.from('purchases').insert({store_id:CU.id,client_id:cid,date,origem:'ficha',description:document.getElementById('p-desc').value.trim()||null,amount:amt?parseFloat(amt):null,observations:document.getElementById('p-obs').value.trim()||null,salesperson:sp?.name||null}).select().single();
+  const _bruto = amt ? parseFloat(amt) : null;
+  const _cbPrev = Math.min(parseFloat(document.getElementById('p-cb-usar').value) || 0, getCbSaldo(cid), _bruto !== null ? _bruto : Infinity);
+  const _cbUsado = Math.round(Math.max(0, _cbPrev) * 100) / 100;
+  const _pago = _bruto !== null ? Math.round((_bruto - _cbUsado) * 100) / 100 : null;
+  const _clAnt = _clients.find(function(x){ return x.id===cid; });
+  const _tipo = (_clAnt && _clAnt.purchases && _clAnt.purchases.length) ? 'retorno' : 'primeira';
+  const resPurch = await _sb.from('purchases').insert({store_id:CU.id,client_id:cid,date,origem:'ficha',description:document.getElementById('p-desc').value.trim()||null,amount:_pago,valor_bruto:_bruto,cashback_usado:_cbUsado,tipo_cliente:_tipo,observations:document.getElementById('p-obs').value.trim()||null,salesperson:sp?.name||null}).select().single();
   if (resPurch.error || !resPurch.data) {
     toast('Não foi possível registrar a compra: '+(resPurch.error?resPurch.error.message:'erro desconhecido.'), 'e');
     return;
@@ -4068,7 +4084,7 @@ async function savePurch(){
 
   // Se a cliente tiver saldo e a lojista informou um valor a usar, consome via FIFO,
   // ligado a esta venda especifica (usado_em_purchase_id).
-  const cbUsarVal = parseFloat(document.getElementById('p-cb-usar').value);
+  const cbUsarVal = _cbUsado;
   if (cbUsarVal && cbUsarVal > 0) {
     var rCb = await consumirCashbackFIFO(cid, cbUsarVal, purchaseId);
     if (!rCb.ok) { toast('Compra salva, mas o cashback não pôde ser usado: '+rCb.erro, 'e'); }
@@ -4085,7 +4101,7 @@ async function savePurch(){
   var cl = _clients.find(function(x){ return x.id===cid; });
   if (cl) { cl.purchases = resP.data || []; cl.status = 'comprou'; }
   closePurchModal(); toast('Compra registrada!');
-  if (amt) { await gerarCashbackVenda(cid, parseFloat(amt), purchaseId); }
+  if (_pago) { await gerarCashbackVenda(cid, _pago, purchaseId); }
   updateBadges();
   if (window._detailClient && window._detailClient.id===cid) {
     window._detailClient.purchases = resP.data || [];
@@ -4618,6 +4634,7 @@ function loadFluxoFromDB() {
 </script>
 <script src="escritorio-digital.js"></script>
 <script src="clientes-importacao.js"></script>
+<script src="vendas.js"></script>
 <script>
 
 // ── MENU EXPANSÍVEL ──
@@ -4636,13 +4653,15 @@ function openNavGroup(id) {
 var _navGroupMap = {
   clients:    'clientes',
   conferir:   'clientes',
-  captacao:   null,
+  captacao:   'clientes',
   fluxo:      null,
+  vendas:     null,
   birthdays:  'oportunidades',
   inactive:   'oportunidades',
   postsale:   'oportunidades',
   reminders:  'oportunidades',
   filter:     'oportunidades',
+  'cashback-opp': 'oportunidades',
   messages:   null,
   escritorio: 'escritorio',
   reports:    null,
@@ -4922,6 +4941,10 @@ function abrirModalAtend(canal) {
   ids.forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
   var lembreteChk = document.getElementById('atend-lembrete-chk');
   if (lembreteChk) lembreteChk.checked = false;
+  _atendTipoCliente = null; _atendTipoManual = false;
+  var cbChk = document.getElementById('atend-cb-usar-chk'); if (cbChk) cbChk.checked = false;
+  var cbUsar = document.getElementById('atend-cb-usar'); if (cbUsar) cbUsar.value = '';
+  setTimeout(atualizarExtrasVendaAtend, 0);
   var lembreteCampos = document.getElementById('atend-lembrete-campos');
   if (lembreteCampos) lembreteCampos.style.display = 'none';
 
@@ -5018,6 +5041,8 @@ function selecionarClienteAtend(id, nome) {
   if (sel) sel.style.display = 'flex';
   if (nomeEl) nomeEl.textContent = nome;
   document.getElementById('atend-novo-cliente').style.display = 'none';
+  _atendTipoManual = false;
+  atualizarExtrasVendaAtend();
 }
 
 function limparClienteAtend() {
@@ -5026,11 +5051,72 @@ function limparClienteAtend() {
   var sel = document.getElementById('atend-cliente-sel');
   if (busca) { busca.style.display = 'block'; busca.value = ''; busca.focus(); }
   if (sel) sel.style.display = 'none';
+  _atendTipoManual = false;
+  atualizarExtrasVendaAtend();
 }
 
 function abrirCadastroRapidoAtend() {
   var wrap = document.getElementById('atend-novo-cliente');
   if (wrap) wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
+  _atendTipoManual = false;
+  atualizarExtrasVendaAtend();
+}
+
+// ── Extras da venda no Fluxo: tipo de cliente e uso de cashback ──
+var _atendTipoCliente = null, _atendTipoManual = false;
+var TIPO_CLIENTE_LBL = {primeira:'Primeira compra', retorno_fisico:'Retorno — loja física', retorno_online:'Retorno — online', retorno:'Retorno'};
+function setTipoClienteAtend(tipo, auto) {
+  _atendTipoCliente = (_atendTipoCliente === tipo && !auto) ? null : tipo;
+  if (!auto) _atendTipoManual = true;
+  document.querySelectorAll('#atend-tipo-btns button').forEach(function(b){
+    var on = b.getAttribute('data-tipo') === _atendTipoCliente;
+    b.style.background = on ? 'var(--green)' : ''; b.style.color = on ? '#fff' : ''; b.style.borderColor = on ? 'var(--green)' : '';
+  });
+}
+function atualizarExtrasVendaAtend() {
+  var cid = _atendClienteId;
+  var novoAberto = (document.getElementById('atend-novo-cliente')||{}).style && document.getElementById('atend-novo-cliente').style.display === 'block';
+  var dica = document.getElementById('atend-tipo-dica');
+  if (!_atendTipoManual) {
+    if (cid) {
+      var cl = gC().find(function(x){ return x.id===cid; });
+      var compras = cl && cl.purchases ? cl.purchases.length : 0;
+      setTipoClienteAtend(compras ? (_atendCanal === 'online' ? 'retorno_online' : 'retorno_fisico') : 'primeira', true);
+      if (dica) dica.textContent = compras ? 'Sugestão: ela já tem '+compras+' compra'+(compras>1?'s':'')+' registrada'+(compras>1?'s':'')+'. Corrija se precisar.' : 'Sugestão: nenhuma compra anterior registrada.';
+    } else if (novoAberto) {
+      setTipoClienteAtend('primeira', true);
+      if (dica) dica.textContent = 'Cliente nova: marcada como primeira compra.';
+    } else {
+      setTipoClienteAtend(null, true); _atendTipoCliente = null;
+      if (dica) dica.textContent = '';
+    }
+  }
+  atualizarCbAtend();
+}
+function atualizarCbAtend(toggle) {
+  var box = document.getElementById('atend-cb-box'); if (!box) return;
+  var cid = _atendClienteId;
+  var saldo = cid ? getCbSaldo(cid) : 0;
+  if (!cid || saldo <= 0) { box.style.display = 'none'; return; }
+  box.style.display = 'block';
+  var prox = _cashback.filter(function(cb){ return cb.client_id===cid && cb.status==='disponivel' && cb.validade; }).map(function(cb){ return cb.validade; }).sort()[0];
+  var diasV = prox ? -diasDesde(prox) : null;
+  document.getElementById('atend-cb-saldo').textContent = 'Saldo de cashback: R$ '+saldo.toFixed(2).replace('.',',')+(diasV!==null ? ' — vence em '+diasV+' dia'+(diasV===1?'':'s') : '');
+  var chk = document.getElementById('atend-cb-usar-chk');
+  var campos = document.getElementById('atend-cb-campos');
+  var inp = document.getElementById('atend-cb-usar');
+  var valor = parseFloat(document.getElementById('atend-valor').value) || 0;
+  campos.style.display = chk.checked ? 'block' : 'none';
+  if (!chk.checked) return;
+  if (toggle || !inp.value) inp.value = (valor ? Math.min(saldo, valor) : saldo).toFixed(2);
+  var usar = Math.min(parseFloat(inp.value) || 0, saldo);
+  var resumo = document.getElementById('atend-cb-resumo');
+  if (valor > 0) {
+    var pago = Math.max(0, valor - usar);
+    resumo.innerHTML = 'Valor da compra: R$ '+valor.toFixed(2).replace('.',',')+'<br>Cashback: − R$ '+usar.toFixed(2).replace('.',',')+'<br><strong>Cliente paga: R$ '+pago.toFixed(2).replace('.',',')+'</strong>';
+  } else {
+    resumo.textContent = 'Informe o valor da compra para ver quanto a cliente paga.';
+  }
 }
 
 var _salvandoAtend = false;
@@ -5113,25 +5199,39 @@ async function salvarAtendUnificado(btnEl) {
 
     var valor = document.getElementById('atend-valor').value;
     var descricao = (document.getElementById('atend-produto-compra').value||'').trim();
+    var tipoCliente = _atendTipoCliente || null;
+    if (!tipoCliente && novoNome && !_atendClienteId) tipoCliente = 'primeira';
     // Venda sem cliente identificada: salva o valor mesmo assim, para o total
     // do dia bater com o caixa. Não gera pós-venda nem cashback.
     if (!clienteId && valor && parseFloat(valor) > 0) {
       var resAvulsa = await _sb.from('purchases').insert({
           store_id: CU.id, client_id: null, date: date,
-          description: descricao || null, amount: parseFloat(valor),
-          canal: _atendCanal, origem: 'fluxo'
+          description: descricao || null, amount: parseFloat(valor), valor_bruto: parseFloat(valor),
+          canal: _atendCanal, origem: 'fluxo', tipo_cliente: tipoCliente
         }).select().single();
       if (resAvulsa.error) toast('Atendimento registrado, mas o valor da venda não pôde ser salvo: '+resAvulsa.error.message, 'e');
       else toast('Venda salva sem cliente vinculada.');
     }
     // Registrar compra no cliente
     if (clienteId) {
+      var valorBruto = valor ? parseFloat(valor) : null;
+      var cbUsar = 0;
+      var cbChkEl = document.getElementById('atend-cb-usar-chk');
+      if (cbChkEl && cbChkEl.checked && clienteId === _atendClienteId) {
+        cbUsar = Math.min(parseFloat(document.getElementById('atend-cb-usar').value) || 0, getCbSaldo(clienteId));
+        if (valorBruto !== null) cbUsar = Math.min(cbUsar, valorBruto);
+        cbUsar = Math.round(cbUsar * 100) / 100;
+      }
+      var valorPago = valorBruto !== null ? Math.round((valorBruto - cbUsar) * 100) / 100 : null;
       var resCompra = await _sb.from('purchases').insert({
           store_id: CU.id,
           client_id: clienteId,
           date: date,
           description: descricao || null,
-          amount: valor ? parseFloat(valor) : null,
+          amount: valorPago,
+          valor_bruto: valorBruto,
+          cashback_usado: cbUsar,
+          tipo_cliente: tipoCliente,
           canal: _atendCanal,
           origem: 'fluxo'
         }).select().single();
@@ -5144,7 +5244,12 @@ async function salvarAtendUnificado(btnEl) {
         var cl = _clients.find(function(x){ return x.id===clienteId; });
         if (cl) cl.status = 'comprou';
         toast('Compra registrada no histórico!');
-        if (valor) { await gerarCashbackVenda(clienteId, parseFloat(valor), resCompra.data.id); }
+        if (cbUsar > 0) {
+          var rUso = await consumirCashbackFIFO(clienteId, cbUsar, resCompra.data.id);
+          if (!rUso.ok) toast('Venda salva, mas o cashback não pôde ser abatido: '+rUso.erro, 'e');
+          else toast('R$ '+cbUsar.toFixed(2).replace('.',',')+' de cashback usado.');
+        }
+        if (valorPago) { await gerarCashbackVenda(clienteId, valorPago, resCompra.data.id); }
       }
     }
   }
@@ -5333,7 +5438,7 @@ function formatTel(digits) {
 
 // (Importação de clientes: ver clientes-importacao.js)
 // MÓDULO CASHBACK
-var _CB_CONFIG_PADRAO = {"percentual":5,"validade":60,"minimo":0,"msg30":"Oi {nome}! Você tem R$ {valor} de cashback até {data}.","msg15":"{nome}, seu cashback de R$ {valor} vence em 15 dias!","msg5":"Últimos dias! Cashback de R$ {valor} expira em {data}, {nome}."};
+var _CB_CONFIG_PADRAO = {"ativo":true,"percentual":5,"validade":60,"minimo":0,"msg30":"Oi {nome}! Você tem R$ {valor} de cashback até {data}.","msg15":"{nome}, seu cashback de R$ {valor} vence em 15 dias!","msg5":"Últimos dias! Cashback de R$ {valor} expira em {data}, {nome}."};
 function mesclarConfigCashback(salvo) {
   var r = Object.assign({}, _CB_CONFIG_PADRAO);
   if (!salvo) return r;
@@ -5366,6 +5471,7 @@ function getCbSaldo(cid){return _cashback.filter(function(cb){return cb.client_i
 function getCbUtilizado(cid){return _cashback.filter(function(cb){return cb.client_id===cid&&cb.status==='utilizado';}).reduce(function(s,cb){return s+parseFloat(cb.utilizado_valor||cb.valor||0);},0);}
 async function gerarCashbackVenda(clientId,valorVenda,purchaseId){
   if(!CU||!clientId||!valorVenda||parseFloat(valorVenda)<=0)return;
+  if(_cbConfig.ativo===false)return; // loja não usa cashback
   var perc=_cbConfig.percentual||5;
   var minimo=_cbConfig.minimo||0;
   if(minimo>0&&parseFloat(valorVenda)<minimo)return;
@@ -5542,6 +5648,7 @@ function renderCashbackCliente(cid){
     )+'</div>';
 }
 function carregarConfigCashback(){
+  var at=document.getElementById('cb-ativo');if(at)at.checked=_cbConfig.ativo!==false;
   var p=document.getElementById('cb-percentual');if(p)p.value=_cbConfig.percentual||5;
   var v=document.getElementById('cb-validade');if(v)v.value=_cbConfig.validade||60;
   var m=document.getElementById('cb-minimo');if(m)m.value=_cbConfig.minimo||'';
@@ -5554,6 +5661,7 @@ async function salvarConfigCashback(){
   var v=document.getElementById('cb-validade');
   var m=document.getElementById('cb-minimo');
   var novoConfig = Object.assign({}, _cbConfig);
+  var at=document.getElementById('cb-ativo'); if(at) novoConfig.ativo=at.checked;
   novoConfig.percentual=parseFloat((p&&p.value)||5);
   novoConfig.validade=parseInt((v&&v.value)||60);
   novoConfig.minimo=parseFloat((m&&m.value)||0);
@@ -5700,9 +5808,29 @@ document.addEventListener('DOMContentLoaded', () => {
      <div class="fg"><input type="text" id="atend-novo-nome" class="fi" placeholder="Nome *"></div>
      <div class="fg"><input type="text" id="atend-novo-tel" class="fi" placeholder="Telefone (com DDD)"></div>
     </div>
+    <div id="atend-tipo-wrap" class="fg" style="margin-top:10px">
+     <label class="fl">Essa cliente é</label>
+     <div style="display:flex;gap:6px;flex-wrap:wrap" id="atend-tipo-btns">
+      <button type="button" class="btn btn-g btn-sm" data-tipo="primeira" onclick="setTipoClienteAtend('primeira')">Primeira compra</button>
+      <button type="button" class="btn btn-g btn-sm" data-tipo="retorno_fisico" onclick="setTipoClienteAtend('retorno_fisico')">Voltou na loja</button>
+      <button type="button" class="btn btn-g btn-sm" data-tipo="retorno_online" onclick="setTipoClienteAtend('retorno_online')">Voltou pelo online</button>
+     </div>
+     <div id="atend-tipo-dica" style="font-size:11px;color:var(--text3);margin-top:4px"></div>
+    </div>
     <div class="fg" style="margin-top:8px">
      <label class="fl">Valor da compra (opcional)</label>
-     <input type="number" id="atend-valor" class="fi" placeholder="0,00" step="0.01">
+     <input type="number" id="atend-valor" class="fi" placeholder="0,00" step="0.01" oninput="atualizarCbAtend()">
+    </div>
+    <div id="atend-cb-box" style="display:none;background:var(--gold-l);border-radius:var(--rs);padding:10px 12px;margin-bottom:12px">
+     <div style="font-size:12px;font-weight:700;color:var(--gold-b)" id="atend-cb-saldo"></div>
+     <label style="display:flex;align-items:center;gap:8px;font-size:13px;margin-top:8px;cursor:pointer">
+      <input type="checkbox" id="atend-cb-usar-chk" onchange="atualizarCbAtend(true)"> Usar cashback nesta venda
+     </label>
+     <div id="atend-cb-campos" style="display:none;margin-top:8px">
+      <label class="fl">Valor do cashback usado (R$)</label>
+      <input type="number" id="atend-cb-usar" class="fi" step="0.01" min="0" oninput="atualizarCbAtend()">
+      <div id="atend-cb-resumo" style="font-size:12px;color:var(--text2);margin-top:6px;line-height:1.6"></div>
+     </div>
     </div>
     <div class="fg">
      <label class="fl">Produto(s) comprado(s)</label>
