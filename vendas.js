@@ -26,7 +26,7 @@ function renderVendas() {
   var anos = []; for (var a = parseInt(hoje.slice(0, 4), 10); a >= 2024; a--) anos.push(a);
   root.innerHTML =
     '<div class="ph"><div><h1 class="pt">Vendas</h1><p class="ps">Todas as vendas registradas no sistema. Compare o total de cada dia com o fechamento do seu sistema de caixa.</p></div>' +
-      '<button class="btn btn-p btn-sm" style="width:auto;flex-shrink:0" onclick="showPage(\'fluxo\')">+ Registrar no Fluxo</button></div>' +
+      '<span style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn btn-g btn-sm" style="width:auto;flex-shrink:0" onclick="abrirImportarVendas()">Importar vendas</button><button class="btn btn-p btn-sm" style="width:auto;flex-shrink:0" onclick="showPage(\'fluxo\')">+ Registrar no Fluxo</button></span></div>' +
     '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px">' +
       ['dia', 'mes', 'vendedora', 'lista'].map(function (v) {
         var lbl = { dia: 'Por dia', mes: 'Por mês', vendedora: 'Por vendedora', lista: 'Lista de vendas' }[v];
