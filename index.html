@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Sistema Loja Previsivel — SLP v3.6</title>
+<title>Sistema Loja Previsivel — SLP v3.7</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -933,6 +933,10 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
    Vendedoras
   </div>
+  <div class="nav-i" data-page="tags" onclick="showPage('tags')">
+   <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+   Tags e Filtros
+  </div>
 </div>
  <div class="sb-bot">
  <div class="uc">
@@ -1027,6 +1031,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
  <div class="card" style="padding:0;overflow:hidden" id="inactive-list"></div>
  </div>
  <div id="page-vendas" class="page"><div id="vendas-root"></div></div>
+ <div id="page-tags" class="page"><div id="tags-root"></div></div>
  <div id="page-conferir" class="page">
  <div class="ph"><div><h1 class="pt">Conferir cadastros</h1><p class="ps">Telefones repetidos ou errados e fichas duplicadas. Corrija ou junte as fichas para não perder oportunidade.</p></div></div>
  <div id="conferir-conteudo"></div>
@@ -1987,7 +1992,7 @@ function slpSet(base, value) {
 // para o banco (tabela store_data), e ao entrar no sistema os dados do banco
 // são carregados. Se o banco ainda não tem nada e este navegador tem, sobe o
 // que está no navegador (migração automática, sem a aluna fazer nada).
-var SLP_SYNC_KEYS = ['slp_ca_msgs','slp_ca_roteiros','slp_ca_objecoes','slp_ca_com','slp_ca_favs','slp_ca_migrated','slp_tarefas','slp_wpp_auto'];
+var SLP_SYNC_KEYS = ['slp_tag_catalogo','slp_ca_msgs','slp_ca_roteiros','slp_ca_objecoes','slp_ca_com','slp_ca_favs','slp_ca_migrated','slp_tarefas','slp_wpp_auto'];
 var _slpSyncTimers = {};
 function slpAgendarSync(base, value) {
   if (!CU || !CU.id || typeof _sb === 'undefined') return;
@@ -2187,7 +2192,7 @@ function showPage(p) {
   if (bnMap[p]!==undefined && bni[bnMap[p]]) bni[bnMap[p]].classList.add('active');
   closeSB();
   _navRegistrar({p:p});
-  const R={dashboard:renderDash,clients:renderClients,escritorio:renderEscritorio,fluxo:renderFluxo,captacao:renderCaptacao,birthdays:renderBirthdays,inactive:renderInactive,postsale:renderPostSale,reminders:renderReminders,filter:renderFilter,messages:renderMsgs,salespeople:renderSP,reports:renderReports,export:renderExport,'cashback-opp':function(){ carregarConfigCashback(); renderCbPesquisa(); },conferir:function(){ if(typeof renderConferir==='function') renderConferir(); },vendas:function(){ if(typeof renderVendas==='function') renderVendas(); }};
+  const R={dashboard:renderDash,clients:renderClients,escritorio:renderEscritorio,fluxo:renderFluxo,captacao:renderCaptacao,birthdays:renderBirthdays,inactive:renderInactive,postsale:renderPostSale,reminders:renderReminders,filter:renderFilter,messages:renderMsgs,salespeople:renderSP,reports:renderReports,export:renderExport,'cashback-opp':function(){ carregarConfigCashback(); renderCbPesquisa(); },conferir:function(){ if(typeof renderConferir==='function') renderConferir(); },vendas:function(){ if(typeof renderVendas==='function') renderVendas(); },tags:function(){ if(typeof renderTagsConfig==='function') renderTagsConfig(); }};
   if (R[p]) R[p]();
 }
 function toggleSB() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sb-overlay').classList.toggle('open'); }
@@ -2954,7 +2959,7 @@ function goBack(){ voltarPagina(); }
 var _navHist = [], _navAtual = null, _navVoltando = false;
 var NAV_NOMES = {dashboard:'Início', clients:'Clientes', conferir:'Conferir cadastros', captacao:'Captação', fluxo:'Fluxo do Dia', vendas:'Vendas',
   birthdays:'Aniversariantes', inactive:'Inativos', postsale:'Pós-venda', reminders:'Retornos', filter:'Campanha por interesse', 'cashback-opp':'Cashback',
-  messages:'Central de Atendimento', escritorio:'Escritório', reports:'Insights', export:'Exportar', salespeople:'Vendedoras'};
+  messages:'Central de Atendimento', escritorio:'Escritório', reports:'Insights', export:'Exportar', salespeople:'Vendedoras', tags:'Tags e filtros'};
 function _navNome(d){
   if (!d) return '';
   if (d.cliente) { var c=(_clients||[]).find(function(x){return x.id===d.cliente;}); return c ? c.name : 'ficha da cliente'; }
@@ -4779,6 +4784,7 @@ function loadFluxoFromDB() {
 <script src="escritorio-digital.js"></script>
 <script src="clientes-importacao.js"></script>
 <script src="vendas.js"></script>
+<script src="tags.js"></script>
 <script>
 
 // ── MENU EXPANSÍVEL ──
@@ -4811,6 +4817,7 @@ var _navGroupMap = {
   reports:    null,
   export:     null,
   salespeople:null,
+  tags:       null,
   dashboard:  null
 };
 
@@ -5094,6 +5101,7 @@ function abrirModalAtend(canal) {
   }
   var cbChk = document.getElementById('atend-cb-usar-chk'); if (cbChk) cbChk.checked = false;
   var cbUsar = document.getElementById('atend-cb-usar'); if (cbUsar) cbUsar.value = '';
+  if (typeof tagsAtendReset==='function') tagsAtendReset();
   setTimeout(atualizarExtrasVendaAtend, 0);
   var lembreteCampos = document.getElementById('atend-lembrete-campos');
   if (lembreteCampos) lembreteCampos.style.display = 'none';
@@ -5224,6 +5232,7 @@ function setTipoClienteAtend(tipo, auto) {
   });
 }
 function atualizarExtrasVendaAtend() {
+  if (typeof tagsAtendAtualizar==='function') tagsAtendAtualizar();
   var cid = _atendClienteId;
   var novoAberto = (document.getElementById('atend-novo-cliente')||{}).style && document.getElementById('atend-novo-cliente').style.display === 'block';
   var dica = document.getElementById('atend-tipo-dica');
@@ -5409,6 +5418,8 @@ async function salvarAtendUnificado(btnEl) {
     }
   }
 
+  if (_atendResultado === 'comprou' && clienteId && typeof aplicarTagsAtend==='function') await aplicarTagsAtend(clienteId);
+
   // SE NÃO COMPROU
   if (_atendResultado === 'nao_comprou') {
     // Verificar se tem novo cliente para cadastrar
@@ -5435,6 +5446,8 @@ async function salvarAtendUnificado(btnEl) {
       client_id: perdaClienteId || null,
       ts: new Date().toISOString()
     });
+
+    if (perdaClienteId && typeof aplicarTagsAtend==='function') await aplicarTagsAtend(perdaClienteId);
 
     // Lembrete de contato (manual, distinto do pós-venda automático de compra).
     var lembreteChkEl = document.getElementById('atend-lembrete-chk');
@@ -5502,6 +5515,7 @@ function selecionarClientePerdaAtend(id, nome) {
   if (lista) lista.style.display = 'none';
   if (sel) sel.style.display = 'flex';
   if (nomeEl) nomeEl.textContent = nome;
+  if (typeof tagsAtendAtualizar==='function') tagsAtendAtualizar();
 }
 
 function limparClientePerdaAtend() {
@@ -5510,11 +5524,13 @@ function limparClientePerdaAtend() {
   var sel = document.getElementById('atend-perda-cliente-sel');
   if (busca) { busca.style.display = 'block'; busca.value = ''; busca.focus(); }
   if (sel) sel.style.display = 'none';
+  if (typeof tagsAtendAtualizar==='function') tagsAtendAtualizar();
 }
 
 function abrirCadastroRapidoPerdaAtend() {
   var wrap = document.getElementById('atend-perda-novo-cliente');
   if (wrap) wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
+  if (typeof tagsAtendAtualizar==='function') tagsAtendAtualizar();
 }
 
 async function excluirCliente(id) {
@@ -5964,6 +5980,7 @@ document.addEventListener('DOMContentLoaded', () => {
      <div class="fg"><input type="text" id="atend-novo-nome" class="fi" placeholder="Nome *"></div>
      <div class="fg"><input type="text" id="atend-novo-tel" class="fi" placeholder="Telefone (com DDD)"></div>
     </div>
+    <div id="atend-tags-wrap-comprou" style="display:none;margin-top:10px"><label class="fl">Interesses da cliente (opcional)</label><div id="atend-tag-picker-comprou"></div></div>
     <div id="atend-tipo-wrap" class="fg" style="margin-top:10px">
      <label class="fl">Essa cliente é</label>
      <div style="display:flex;gap:6px;flex-wrap:wrap" id="atend-tipo-btns">
@@ -6024,6 +6041,7 @@ document.addEventListener('DOMContentLoaded', () => {
      <div class="fg"><input type="text" id="atend-perda-novo-nome" class="fi" placeholder="Nome *"></div>
      <div class="fg"><input type="text" id="atend-perda-novo-tel" class="fi" placeholder="Telefone (com DDD)"></div>
     </div>
+    <div id="atend-tags-wrap-perda" style="display:none;margin-top:10px"><label class="fl">Interesses da cliente (opcional)</label><div id="atend-tag-picker-perda"></div></div>
     <div class="fg" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:600">
       <input type="checkbox" id="atend-lembrete-chk" onchange="document.getElementById('atend-lembrete-campos').style.display=this.checked?'block':'none'">
