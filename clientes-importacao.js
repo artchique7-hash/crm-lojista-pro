@@ -70,7 +70,7 @@ function impPasso1(msgErro) {
     '<div class="import-drop" id="imp-drop" onclick="document.getElementById(\'imp-file\').click()" ' +
       'ondragover="event.preventDefault();this.classList.add(\'drag\')" ondragleave="this.classList.remove(\'drag\')" ' +
       'ondrop="event.preventDefault();this.classList.remove(\'drag\');impLerArquivo(event.dataTransfer.files[0])">' +
-      '<div class="import-drop-icon">📂</div>' +
+      '<div class="import-drop-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>' +
       '<div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px">Clique ou arraste o arquivo aqui</div>' +
       '<div style="font-size:12px;color:var(--text3)">Excel, CSV ou PDF</div>' +
       '<input type="file" id="imp-file" accept=".xlsx,.xls,.csv,.txt,.pdf" style="display:none" onchange="impLerArquivo(this.files[0])">' +
@@ -78,7 +78,7 @@ function impPasso1(msgErro) {
 }
 
 function impCarregando(txt) {
-  impCorpo('<div style="text-align:center;padding:36px 0"><div style="font-size:24px;margin-bottom:8px">⏳</div>' +
+  impCorpo('<div style="text-align:center;padding:36px 0"><div style="margin-bottom:8px;display:flex;justify-content:center;color:var(--text3)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg></div>' +
     '<div style="font-size:13px;color:var(--text2)">' + impEsc(txt) + '</div></div>');
 }
 
