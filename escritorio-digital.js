@@ -871,7 +871,7 @@ function renderRotinas() {
 
   if (!_rotinas.length) {
     grid.innerHTML = '<div class="dash-vazio">' +
-      '<div style="font-size:28px;margin-bottom:8px">📋</div>' +
+      '<div style="margin-bottom:8px;display:flex;justify-content:center;color:var(--text3)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg></div>' +
       '<div style="font-weight:600;margin-bottom:4px">Nenhuma rotina criada</div>' +
       '<div style="font-size:12px;margin-bottom:14px">Crie rotinas fixas para organizar os processos da sua equipe</div>' +
       '<button class="btn btn-g btn-sm" onclick="abrirModalRotina()">+ Criar primeira rotina</button>' +
@@ -897,8 +897,8 @@ function renderRotinas() {
         '<div style="flex:1;min-width:0">' +
           '<div style="font-weight:700;font-size:14px">' + rot.nome + '</div>' +
           '<div style="display:flex;align-items:center;gap:10px;margin-top:3px;flex-wrap:wrap">' +
-            (rot.hora ? '<span style="font-size:11px;color:var(--text3)">⏰ ' + rot.hora + '</span>' : '') +
-            (rot.resp ? '<span style="font-size:11px;color:var(--text3)">👤 ' + rot.resp + '</span>' : '') +
+            (rot.hora ? '<span style="font-size:11px;color:var(--text3)">' + rot.hora + '</span>' : '') +
+            (rot.resp ? '<span style="font-size:11px;color:var(--text3)">' + rot.resp + '</span>' : '') +
             (totalCheck > 0 ? '<span style="font-size:11px;color:' + (pct===100?'var(--green)':'var(--text3)') + '">' + doneCount + '/' + totalCheck + ' itens</span>' : '') +
           '</div>' +
         '</div>' +
@@ -1071,10 +1071,10 @@ function renderAtividades() {
         '<div style="flex:1;min-width:0">' +
           '<div style="font-weight:700;font-size:14px;margin-bottom:4px' + (at.status==='concluida'?';text-decoration:line-through;color:var(--text3)':'') + '">' + at.titulo + '</div>' +
           '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
-            '<span class="prio-badge prio-' + at.prio + '">' + (at.prio==='urgente'?'🔴 Urgente':at.prio==='alta'?'🟡 Alta':'Normal') + '</span>' +
+            '<span class="prio-badge prio-' + at.prio + '">' + (at.prio==='urgente'?'Urgente':at.prio==='alta'?'Alta':'Normal') + '</span>' +
             '<span class="status-badge status-' + at.status + '">' + (at.status==='concluida'?'Concluida':at.status==='andamento'?'Em andamento':'Pendente') + '</span>' +
-            (at.data ? '<span style="font-size:11px;color:' + (vencida?'var(--red)':'var(--text3)') + '">' + (vencida?'⚠️ ':'') + at.data.split('-').reverse().join('/') + '</span>' : '') +
-            (at.resp ? '<span style="font-size:11px;color:var(--text3)">👤 ' + at.resp + '</span>' : '') +
+            (at.data ? '<span style="font-size:11px;color:' + (vencida?'var(--red)':'var(--text3)') + '">' + (vencida?'':'') + at.data.split('-').reverse().join('/') + '</span>' : '') +
+            (at.resp ? '<span style="font-size:11px;color:var(--text3)">' + at.resp + '</span>' : '') +
           '</div>' +
         '</div>' +
         '<div style="display:flex;gap:5px;flex-shrink:0" onclick="event.stopPropagation()">' +
@@ -1107,11 +1107,11 @@ function salvarTarefa() { salvarAtividade(); }
 // FUNIS COMERCIAIS v2
 // ══════════════════════════════════════════════════
 var FUNIL_TIPOS = [
-  {id:'aquisicao', label:'Funil de Aquisicao', icon:'🎯', desc:'Captacao e conversao de novos clientes', cor:'var(--blue)', corL:'var(--blue-l)'},
-  {id:'live', label:'Funil de Live', icon:'📱', desc:'Planejamento e execucao de lives', cor:'var(--purple)', corL:'var(--purple-l)'},
-  {id:'whatsapp', label:'Funil de Grupo de WhatsApp', icon:'💬', desc:'Estrategia via grupo de WhatsApp', cor:'var(--green)', corL:'var(--green-l)'},
-  {id:'venda_direta', label:'Funil de Venda Direta', icon:'🛍️', desc:'Abordagem e fechamento direto', cor:'var(--gold)', corL:'var(--gold-l)'},
-  {id:'personalizado', label:'Funil Personalizado', icon:'⚙️', desc:'Crie sua propria estrutura', cor:'var(--text2)', corL:'var(--bg4)'}
+  {id:'aquisicao', label:'Funil de Aquisicao', icon:'', desc:'Captacao e conversao de novos clientes', cor:'var(--blue)', corL:'var(--blue-l)'},
+  {id:'live', label:'Funil de Live', icon:'', desc:'Planejamento e execucao de lives', cor:'var(--purple)', corL:'var(--purple-l)'},
+  {id:'whatsapp', label:'Funil de Grupo de WhatsApp', icon:'', desc:'Estrategia via grupo de WhatsApp', cor:'var(--green)', corL:'var(--green-l)'},
+  {id:'venda_direta', label:'Funil de Venda Direta', icon:'', desc:'Abordagem e fechamento direto', cor:'var(--gold)', corL:'var(--gold-l)'},
+  {id:'personalizado', label:'Funil Personalizado', icon:'', desc:'Crie sua propria estrutura', cor:'var(--text2)', corL:'var(--bg4)'}
 ];
 
 var FUNIL_STATUS = [
@@ -1152,7 +1152,7 @@ function renderFunis() {
   var el = document.getElementById('funis-list');
   if (!el) return;
   if (!_funis.length) {
-    el.innerHTML = '<div class="funil-empty"><div class="funil-empty-icon">🎯</div><div style="font-size:14px;font-weight:600;margin-bottom:6px">Nenhum funil criado ainda</div><div style="font-size:12px">Crie seu primeiro funil para comecar a organizar suas campanhas</div></div>';
+    el.innerHTML = '<div class="funil-empty"><div class="funil-empty-icon"></div><div style="font-size:14px;font-weight:600;margin-bottom:6px">Nenhum funil criado ainda</div><div style="font-size:12px">Crie seu primeiro funil para comecar a organizar suas campanhas</div></div>';
     return;
   }
   el.innerHTML = _funis.map(function(f) {
@@ -1171,8 +1171,8 @@ function renderFunis() {
           '</div>' +
           '<div class="funil-item-title">' + f.nome + '</div>' +
           '<div class="funil-item-meta">' +
-            (f.inicio ? '<span>📅 ' + f.inicio.split('-').reverse().join('/') + (f.fim ? ' → ' + f.fim.split('-').reverse().join('/') : '') + '</span>' : '') +
-            (f.responsavel ? '<span>👤 ' + f.responsavel + '</span>' : '') +
+            (f.inicio ? '<span>' + f.inicio.split('-').reverse().join('/') + (f.fim ? ' → ' + f.fim.split('-').reverse().join('/') : '') + '</span>' : '') +
+            (f.responsavel ? '<span>' + f.responsavel + '</span>' : '') +
             (checks.length ? '<span>✓ ' + done + '/' + checks.length + ' etapas</span>' : '') +
           '</div>' +
           (checks.length ? '<div style="margin-top:8px"><div class="funil-progress-bar"><div class="funil-progress-fill" style="width:' + pct + '%"></div></div><div style="font-size:10px;color:var(--text3);margin-top:2px">' + pct + '% concluido</div></div>' : '') +
@@ -1283,7 +1283,7 @@ function renderFunilResultados(f) {
   if (mVinc) {
     var pct = mVinc.alvo > 0 ? Math.min(100, Math.round((mVinc.atual/mVinc.alvo)*100)) : 0;
     metaDestaque = '<div style="background:var(--green-l);border:1px solid var(--green);border-radius:var(--rs);padding:14px;margin-bottom:18px;display:flex;align-items:center;gap:14px">' +
-      '<div style="font-size:24px">🎯</div>' +
+      '<div style="color:var(--text3)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg></div>' +
       '<div style="flex:1">' +
         '<div style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">Meta vinculada</div>' +
         '<div style="font-size:14px;font-weight:700;color:var(--text)">' + mVinc.titulo + '</div>' +
@@ -1297,11 +1297,11 @@ function renderFunilResultados(f) {
   '<div class="funil-section-label">Resultados da Campanha</div>' +
   '<div style="font-size:12px;color:var(--text3);margin-bottom:12px">Preencha os resultados ao encerrar a campanha e clique em Salvar.</div>' +
   '<div class="funil-resultado-grid" id="fres-grid-' + f.id + '">' +
-    funilResCard('Novos clientes', r.novos_clientes||'', '👥', f.id, 'novos_clientes') +
-    funilResCard('Novos seguidores', r.novos_seguidores||'', '📲', f.id, 'novos_seguidores') +
-    funilResCard('Participantes', r.participantes||'', '🙋', f.id, 'participantes') +
-    funilResCard('Qtd de vendas', r.qtd_vendas||'', '🛍️', f.id, 'qtd_vendas') +
-    funilResCard('Faturamento (R$)', r.faturamento||'', '💰', f.id, 'faturamento') +
+    funilResCard('Novos clientes', r.novos_clientes||'', '', f.id, 'novos_clientes') +
+    funilResCard('Novos seguidores', r.novos_seguidores||'', '', f.id, 'novos_seguidores') +
+    funilResCard('Participantes', r.participantes||'', '', f.id, 'participantes') +
+    funilResCard('Qtd de vendas', r.qtd_vendas||'', '', f.id, 'qtd_vendas') +
+    funilResCard('Faturamento (R$)', r.faturamento||'', '', f.id, 'faturamento') +
   '</div>' +
   '<div class="funil-section-label" style="margin-top:18px">Observacoes Finais</div>' +
   '<textarea id="fres-obs-' + f.id + '" class="fval" style="width:100%;box-sizing:border-box;font-family:inherit;font-size:13px;margin-bottom:14px" rows="3" placeholder="Aprendizados, pontos de melhoria...">' + (r.obs_final||'') + '</textarea>' +
