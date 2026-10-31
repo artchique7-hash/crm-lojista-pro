@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Sistema Loja Previsivel — SLP v3.7</title>
+<title>Sistema Loja Previsivel — SLP v3.8</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -718,6 +718,12 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 
 .btn-voltar{display:inline-flex;align-items:center;gap:4px;background:none;border:none;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;padding:6px 8px 6px 2px;margin:0 0 10px -2px;border-radius:8px;font-family:inherit}
 .btn-voltar:hover{color:var(--green);background:var(--bg3)}
+.e-grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+.e-grid-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.e-card-acao{transition:box-shadow .15s,transform .15s}.e-card-acao:hover{box-shadow:var(--sh-md);transform:translateY(-1px)}
+.e-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border)}
+@media(max-width:900px){.e-grid2{grid-template-columns:1fr}}
+@media(max-width:600px){.e-kpis{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
@@ -814,12 +820,12 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
  <div><div class="sb-logo-text" id="sb-store">Minha Loja</div><div class="sb-logo-sub">SLP — Loja Previsivel</div></div>
  </div>
  <div class="sb-nav">
- <div class="sb-sec">🏠 Hoje</div>
+ <div class="sb-sec">Hoje</div>
   <div class="nav-i" data-page="dashboard" onclick="showPage('dashboard')">
    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
    Dashboard
   </div>
- <div class="sb-sec">📋 Operação diária</div>
+ <div class="sb-sec">Operação diária</div>
   <div class="nav-i" data-page="fluxo" onclick="showPage('fluxo')">
    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg>
    Fluxo do Dia
@@ -828,7 +834,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
    Vendas
   </div>
- <div class="sb-sec">🎯 Oportunidades de venda</div>
+ <div class="sb-sec">Oportunidades de venda</div>
  <div class="nav-group" id="ng-oportunidades">
   <div class="nav-group-header" onclick="toggleNavGroup('oportunidades')">
    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
@@ -864,7 +870,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
    </div>
   </div>
  </div>
- <div class="sb-sec">👥 Clientes</div>
+ <div class="sb-sec">Clientes</div>
  <div class="nav-group" id="ng-clientes">
   <div class="nav-group-header" onclick="toggleNavGroup('clientes')">
    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
@@ -887,12 +893,12 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
    </div>
   </div>
  </div>
- <div class="sb-sec">💬 Atendimento</div>
+ <div class="sb-sec">Atendimento</div>
   <div class="nav-i" data-page="messages" onclick="showPage('messages')">
    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
    Central de Atendimento
   </div>
- <div class="sb-sec">🧠 Escritório da Loja</div>
+ <div class="sb-sec">Escritório da Loja</div>
  <div class="nav-group" id="ng-escritorio">
   <div class="nav-group-header" onclick="toggleNavGroup('escritorio')">
    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
@@ -901,25 +907,25 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   </div>
   <div class="nav-sub" style="position:relative">
    <div class="nav-sub-line"></div>
-   <div class="nav-i" data-page="escritorio" data-esc-tab="objetivos" onclick="showPage('escritorio');setTimeout(function(){switchEscrit('objetivos',document.querySelector('.escrit-tab'))},100)">
-    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-    Objetivos
-   </div>
-   <div class="nav-i" data-page="escritorio" data-esc-tab="calendario" onclick="showPage('escritorio');setTimeout(function(){switchEscrit('calendario',document.querySelectorAll('.escrit-tab')[1])},100)">
+   <div class="nav-i" data-page="escritorio" data-esc-tab="plano" onclick="abrirEscritorio('plano')">
     <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-    Planejamento Mensal
+    Plano do Mês
    </div>
-   <div class="nav-i" data-page="escritorio" data-esc-tab="rotina" onclick="showPage('escritorio');setTimeout(function(){switchEscrit('rotina',document.querySelectorAll('.escrit-tab')[2])},100)">
-    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-    Rotina Comercial
+   <div class="nav-i" data-page="escritorio" data-esc-tab="acoes" onclick="abrirEscritorio('acoes')">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
+    Planejamento de Ações
    </div>
-   <div class="nav-i" data-page="escritorio" data-esc-tab="funis" onclick="showPage('escritorio');setTimeout(function(){switchEscrit('funis',document.querySelectorAll('.escrit-tab')[3])},100)">
-    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-    Funis
+   <div class="nav-i" data-page="escritorio" data-esc-tab="rotina" onclick="abrirEscritorio('rotina')">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+    Rotina e Tarefas
+   </div>
+   <div class="nav-i" data-page="escritorio" data-esc-tab="calendario" onclick="abrirEscritorio('calendario')">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+    Conteúdo
    </div>
   </div>
  </div>
- <div class="sb-sec">📊 Gestão</div>
+ <div class="sb-sec">Gestão</div>
   <div class="nav-i" data-page="reports" onclick="showPage('reports')">
    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
    Insights
@@ -928,7 +934,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
    Exportar
   </div>
- <div class="sb-sec">⚙️ Configurações</div>
+ <div class="sb-sec">Configurações</div>
   <div class="nav-i" data-page="salespeople" onclick="showPage('salespeople')">
    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
    Vendedoras
@@ -1071,11 +1077,11 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 
  <!-- TABS -->
  <div class="escrit-tabs" style="margin-bottom:20px">
-  <button class="escrit-tab active" onclick="switchCA('msgs',this)">💬 Mensagens</button>
-  <button class="escrit-tab" onclick="switchCA('roteiros',this)">📋 Roteiros</button>
-  <button class="escrit-tab" onclick="switchCA('objecoes',this)">🛡️ Objeções</button>
-  <button class="escrit-tab" onclick="switchCA('comunicacao',this)">🎨 Comunicação</button>
-  <button class="escrit-tab" onclick="switchCA('favoritos',this)">⭐ Favoritos</button>
+  <button class="escrit-tab active" onclick="switchCA('msgs',this)">Mensagens</button>
+  <button class="escrit-tab" onclick="switchCA('roteiros',this)">Roteiros</button>
+  <button class="escrit-tab" onclick="switchCA('objecoes',this)">Objeções</button>
+  <button class="escrit-tab" onclick="switchCA('comunicacao',this)">Comunicação</button>
+  <button class="escrit-tab" onclick="switchCA('favoritos',this)">Favoritos</button>
  </div>
 
  <!-- ABA: MENSAGENS -->
@@ -1330,13 +1336,13 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
  
 <div id="page-cashback-opp" class="page">
  <div class="ph">
-  <div><h1 class="pt">💰 Cashback</h1><p class="ps">Gerencie o programa de cashback da loja</p></div>
+  <div><h1 class="pt">Cashback</h1><p class="ps">Gerencie o programa de cashback da loja</p></div>
   <button class="btn btn-p btn-sm" onclick="salvarConfigCashback()">Salvar configurações</button>
  </div>
 
  <!-- CONFIGURAÇÃO -->
  <div class="card" style="padding:18px;margin-bottom:20px">
-  <div style="font-size:13px;font-weight:700;margin-bottom:14px;font-family:Syne,sans-serif">⚙️ Configuração</div>
+  <div style="font-size:13px;font-weight:700;margin-bottom:14px;font-family:Syne,sans-serif">Configuração</div>
   <label style="display:flex;align-items:center;gap:10px;background:var(--bg3);border-radius:var(--rs);padding:10px 12px;margin-bottom:14px;cursor:pointer;font-size:13px">
    <input type="checkbox" id="cb-ativo"> <span><strong>Minha loja usa cashback</strong><br><span style="font-size:11px;color:var(--text3)">Desligado: as vendas não geram cashback novo. Saldos que as clientes já têm continuam valendo até vencer.</span></span>
   </label>
@@ -1368,7 +1374,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 
  <!-- PESQUISA -->
  <div class="card" style="padding:18px">
-  <div style="font-size:13px;font-weight:700;margin-bottom:14px;font-family:Syne,sans-serif">🔍 Clientes com Cashback</div>
+  <div style="font-size:13px;font-weight:700;margin-bottom:14px;font-family:Syne,sans-serif">Clientes com Cashback</div>
   <div class="fgrid">
    <div class="fg">
     <label class="fl">Filtrar</label>
@@ -1391,43 +1397,17 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 <div id="page-escritorio" class="page">
   <div class="ph">
    <div>
-    <h1 class="pt">Escritorio da Loja</h1>
-    <p class="ps">Planejamento, metas e organizacao da sua operacao</p>
+    <h1 class="pt">Escritório da Loja</h1>
+    <p class="ps">O planejamento do mês num lugar só: meta, ações, tarefas e conteúdo.</p>
    </div>
   </div>
-
-  <!-- TABS -->
   <div class="escrit-tabs">
-   <button class="escrit-tab active" onclick="switchEscrit('objetivos',this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Objetivos</button>
-   <button class="escrit-tab" onclick="switchEscrit('funis',this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg> Funis</button>
-   <button class="escrit-tab" onclick="switchEscrit('rotina',this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> Rotina Comercial</button>
-   <button class="escrit-tab" onclick="switchEscrit('calendario',this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Conteúdo</button>
+   <button class="escrit-tab active" data-aba="plano" onclick="switchEscrit('plano')">Plano do Mês</button>
+   <button class="escrit-tab" data-aba="acoes" onclick="switchEscrit('acoes')">Planejamento de Ações</button>
+   <button class="escrit-tab" data-aba="rotina" onclick="switchEscrit('rotina')">Rotina e Tarefas</button>
+   <button class="escrit-tab" data-aba="calendario" onclick="switchEscrit('calendario')">Conteúdo</button>
   </div>
-
-  <!-- OBJETIVOS -->
-  <div id="escrit-objetivos" class="escrit-section active">
-   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
-    <div>
-     <h2 style="font-size:16px;font-weight:700;font-family:'Syne',sans-serif">Metas da Loja</h2>
-     <p style="font-size:12px;color:var(--text3);margin-top:2px">Acompanhe o progresso dos seus objetivos</p>
-    </div>
-    <button class="btn btn-p btn-sm" onclick="abrirModalMeta()">+ Nova Meta</button>
-   </div>
-   <!-- Resumo rápido -->
-   <div id="metas-resumo" style="display:none;margin-bottom:16px"></div>
-
-   <!-- Filtros -->
-   <div class="meta-filtros" id="meta-filtros">
-    <button class="meta-filtro-btn active" data-filtro="" onclick="filtrarMetas(this)">Todas</button>
-    <button class="meta-filtro-btn" data-filtro="Em andamento" onclick="filtrarMetas(this)">Em andamento</button>
-    <button class="meta-filtro-btn" data-filtro="Concluida" onclick="filtrarMetas(this)">Concluídas</button>
-    <button class="meta-filtro-btn" data-filtro="Atrasada" onclick="filtrarMetas(this)">Atrasadas</button>
-   </div>
-
-   <!-- Grid de metas dinâmico -->
-   <div class="meta-grid" id="metas-grid"></div>
-  </div>
-
+  <div id="escrit-plano" class="escrit-section active"><div id="plano-root"></div></div>
   <!-- CALENDARIO / PLANEJAMENTO MENSAL -->
   <div id="escrit-calendario" class="escrit-section">
 
@@ -1520,73 +1500,26 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 
   </div>
 
-  <!-- ROTINA COMERCIAL -->
+  <!-- ROTINA E TAREFAS -->
   <div id="escrit-rotina" class="escrit-section">
-
-   <!-- HEADER -->
-   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
-    <div>
-     <h2 style="font-size:16px;font-weight:700;font-family:'Syne',sans-serif">Rotina Comercial</h2>
-     <p style="font-size:12px;color:var(--text3);margin-top:2px">Organize os processos fixos e atividades da sua equipe</p>
-    </div>
-    <div style="display:flex;gap:8px">
-     <button class="btn btn-g btn-sm" onclick="abrirModalRotina()">+ Rotina Recorrente</button>
-     <button class="btn btn-p btn-sm" onclick="abrirModalAtividade()">+ Atividade Pontual</button>
-    </div>
-   </div>
-
-   <!-- ACOES DE FUNIS -->
-   <div style="margin-bottom:28px">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
-     <div style="width:3px;height:16px;background:var(--purple);border-radius:2px"></div>
-     <h3 style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px">Acoes de Funis (proximos 7 dias)</h3>
-     <span class="badge bg-b" id="funil-acoes-count">0</span>
-    </div>
-    <div id="funil-acoes-grid"></div>
-   </div>
-
+   <div id="tarefas-root" style="margin-bottom:28px"></div>
    <!-- ROTINAS RECORRENTES -->
    <div style="margin-bottom:28px">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
      <div style="width:3px;height:16px;background:var(--green);border-radius:2px"></div>
-     <h3 style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px">Rotinas Recorrentes</h3>
+     <h3 style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px">Rotina fixa da semana</h3>
      <span class="badge bg-g" id="rotinas-count">0</span>
     </div>
     <div id="rotinas-grid"></div>
    </div>
-
-   <!-- ATIVIDADES PONTUAIS -->
-   <div>
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
-     <div style="width:3px;height:16px;background:var(--blue);border-radius:2px"></div>
-     <h3 style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px">Atividades Pontuais</h3>
-     <span class="badge bg-b" id="atividades-count">0</span>
-    </div>
-    <!-- Filtro de status -->
-    <div style="display:flex;gap:6px;margin-bottom:14px" id="ativ-filtro">
-     <button class="btn btn-sm" id="af-todas" onclick="filtrarAtividades('todas')" style="padding:5px 12px;font-size:12px">Todas</button>
-     <button class="btn btn-sm" id="af-pendente" onclick="filtrarAtividades('pendente')" style="padding:5px 12px;font-size:12px">Pendentes</button>
-     <button class="btn btn-sm" id="af-andamento" onclick="filtrarAtividades('andamento')" style="padding:5px 12px;font-size:12px">Em andamento</button>
-     <button class="btn btn-sm" id="af-concluida" onclick="filtrarAtividades('concluida')" style="padding:5px 12px;font-size:12px">Concluidas</button>
-    </div>
-    <div id="atividades-lista"></div>
-   </div>
-
   </div>
 
-  <!-- FUNIS -->
-  <div id="escrit-funis" class="escrit-section">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-   <div>
-    <h2 style="font-size:16px;font-weight:700;font-family:Syne,sans-serif">Funis Comerciais</h2>
-    <p style="font-size:12px;color:var(--text3);margin-top:2px">Planeje, execute e acompanhe suas campanhas</p>
-   </div>
-   <button class="btn btn-p btn-sm" onclick="abrirEscolhaTipoFunil()">+ Novo Funil</button>
-  </div>
-  <div id="funis-list" class="funil-list"></div>
+  <!-- PLANEJAMENTO DE AÇÕES -->
+  <div id="escrit-acoes" class="escrit-section">
+  <div id="acoes-root" style="margin-bottom:28px"></div>
   <div class="wpp-divider">
    <div style="display:flex;align-items:center;gap:10px">
-    <div style="width:32px;height:32px;border-radius:9px;background:#e8f9f0;display:flex;align-items:center;justify-content:center;font-size:17px">📱</div>
+    <div style="width:32px;height:32px;border-radius:9px;background:#e8f9f0;display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1e8449" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
     <div><div style="font-size:14px;font-weight:700;font-family:Syne,sans-serif">WhatsApp Automático</div>
     <div style="font-size:11px;color:var(--text3)">Envio automático de produtos para seu grupo</div></div>
    </div>
@@ -1598,7 +1531,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
  </div>
  <!-- FIM ESCRITORIO -->
 
- <div id="page-client-detail" class="page"><div id="detail-header-fixed" style="display:none;margin-bottom:0"><button class="btn btn-p btn-sm" onclick="editarClienteAtual()" style="position:fixed;bottom:24px;right:24px;z-index:200;box-shadow:0 4px 16px rgba(0,0,0,.2);border-radius:50px;padding:12px 24px;font-size:14px">✏️ Editar Cliente</button></div><div id="detail-content"></div></div>
+ <div id="page-client-detail" class="page"><div id="detail-header-fixed" style="display:none;margin-bottom:0"><button class="btn btn-p btn-sm" onclick="editarClienteAtual()" style="position:fixed;bottom:24px;right:24px;z-index:200;box-shadow:0 4px 16px rgba(0,0,0,.2);border-radius:50px;padding:12px 24px;font-size:14px">Editar Cliente</button></div><div id="detail-content"></div></div>
  </main>
 </div>
 
@@ -1663,7 +1596,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
  </div>
  <div class="fsec"><div class="fsec-t">Observação inicial</div><textarea id="c-obs" class="fta" placeholder="Ex: Gosta de calças escuras, tem filhos pequenos..."></textarea></div>
  </div>
- <div class="mf" style="justify-content:space-between;align-items:center"><button class="btn btn-d btn-sm" id="btn-excluir-cliente" style="display:none" onclick="excluirClienteDoModal()">🗑 Excluir</button><div style="display:flex;gap:10px"><button class="btn btn-g" onclick="closeClientModal()">Cancelar</button><button class="btn btn-p" style="width:auto" onclick="saveClient()">Salvar Cliente</button></div></div>
+ <div class="mf" style="justify-content:space-between;align-items:center"><button class="btn btn-d btn-sm" id="btn-excluir-cliente" style="display:none" onclick="excluirClienteDoModal()">Excluir</button><div style="display:flex;gap:10px"><button class="btn btn-g" onclick="closeClientModal()">Cancelar</button><button class="btn btn-p" style="width:auto" onclick="saveClient()">Salvar Cliente</button></div></div>
  </div>
 </div>
 
@@ -2261,7 +2194,7 @@ function renderDash() {
   var nomeLoja = CU ? (CU.store || CU.name || '') : '';
   var el_sau = document.getElementById('dash-saudacao');
   var el_dat = document.getElementById('dash-data');
-  if (el_sau) el_sau.textContent = saudacao + (nomeLoja ? ', ' + nomeLoja : '') + ' 👋';
+  if (el_sau) el_sau.textContent = saudacao + (nomeLoja ? ', ' + nomeLoja : '') ;
   if (el_dat) {
     var dn = new Date();
     var dias = ['domingo','segunda-feira','terca-feira','quarta-feira','quinta-feira','sexta-feira','sabado'];
@@ -2308,7 +2241,7 @@ function renderDash() {
 
     if (semRegistro) {
       resumoEl.innerHTML = '<div class="dash-vazio">' +
-        '<div style="font-size:28px;margin-bottom:8px">📋</div>' +
+        '<div style="margin-bottom:8px;display:flex;justify-content:center;color:var(--text3)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg></div>' +
         '<div style="font-weight:600;margin-bottom:4px">Nenhum atendimento registrado hoje</div>' +
         '<div style="font-size:12px;margin-bottom:14px">Registre o fluxo do dia para ver seus indicadores aqui.</div>' +
         '<button class="btn btn-p btn-sm" onclick="showPage(\'fluxo\')">Registrar Fluxo do Dia</button>' +
@@ -2327,27 +2260,8 @@ function renderDash() {
 
   // ── META PRINCIPAL ──
   var metaEl = document.getElementById('dash-meta');
-  if (metaEl) {
-    var metaPrincipal = (_metas||[]).find(function(m){ return m.no_dashboard; });
-    if (!metaPrincipal) {
-      metaEl.innerHTML = '';
-    } else {
-      var pct = metaPrincipal.alvo>0 ? Math.min(100, Math.round((metaPrincipal.atual/metaPrincipal.alvo)*100)) : 0;
-      var corMeta = pct>=100 ? 'var(--green)' : pct>=60 ? 'var(--gold)' : 'var(--purple)';
-      metaEl.innerHTML = '<div class="card" style="padding:16px 18px;cursor:pointer" onclick="showPage(\'escritorio\');setTimeout(function(){switchEscrit(\'objetivos\',document.querySelector(\'.escrit-tab\'))},100)">'
-        +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'
-        +'<div style="font-size:13px;font-weight:700">🎯 '+metaPrincipal.titulo+'</div>'
-        +'<div style="font-size:12px;color:var(--text3)">'+(metaPrincipal.unidade==='valor'?'R$ '+metaPrincipal.atual.toFixed(2).replace('.',',')+' / R$ '+metaPrincipal.alvo.toFixed(2).replace('.',','):metaPrincipal.atual+' / '+metaPrincipal.alvo)+'</div>'
-        +'</div>'
-        +'<div style="height:8px;background:var(--bg4);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+corMeta+';border-radius:4px"></div></div>'
-        +'<div style="font-size:11px;color:var(--text3);margin-top:6px">'+pct+'% da meta</div>'
-        +'</div>';
-    }
-  }
+  if (metaEl && typeof renderMetaDashboard==='function') renderMetaDashboard(metaEl);
 
-  // ── ROTINA E PROXIMAS ACOES ──
-  // Junta a rotina comercial de hoje (recorrente) com as atividades pontuais
-  // pendentes, ambas cadastradas no Escritorio da Loja > Rotina Comercial.
   var proxEl = document.getElementById('dash-proximas');
   if (proxEl) {
     var DIA_SEMANA_MAP = ['domingo','segunda','terca','quarta','quinta','sexta','sabado'];
@@ -2380,7 +2294,7 @@ function renderDash() {
 
     if (!todosItens.length) {
       proxEl.innerHTML = '<div class="dash-vazio">' +
-        '<div style="font-size:24px;margin-bottom:6px">📋</div>' +
+        '<div style="margin-bottom:6px;display:flex;justify-content:center;color:var(--text3)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg></div>' +
         '<div style="font-weight:600;margin-bottom:3px">Nenhuma rotina ou atividade para hoje</div>' +
         '<div style="font-size:12px;margin-bottom:12px">Use o Escritorio da Loja para planejar sua rotina comercial.</div>' +
         '<button class="btn btn-g btn-sm" onclick="showPage(\'escritorio\')">Abrir Escritorio</button>' +
@@ -2770,12 +2684,12 @@ function montarFichaCliente(c) {
   // Oportunidades reais desta cliente (mesma lógica de negócio das listas gerais,
   // aplicada a uma única cliente — nada inventado)
   var opps=[];
-  if (saldoCb>0) opps.push({icon:'💰',label:'Cashback disponível',sub:'R$ '+saldoCb.toFixed(2).replace('.',','),tab:'cashback'});
-  if (remVal) opps.push({icon:'⏰',label:remDue?'Retorno vencido':'Retorno agendado',sub:fD(remVal),tab:'lembretes'});
+  if (saldoCb>0) opps.push({icon:'',label:'Cashback disponível',sub:'R$ '+saldoCb.toFixed(2).replace('.',','),tab:'cashback'});
+  if (remVal) opps.push({icon:'',label:remDue?'Retorno vencido':'Retorno agendado',sub:fD(remVal),tab:'lembretes'});
   if (ultimaCompra) {
     var diasUlt=Math.floor((new Date()-new Date(ultimaCompra))/86400000);
-    if (diasUlt>=7&&diasUlt<=60) opps.push({icon:'📞',label:'Pós-venda pendente',sub:diasUlt+' dias sem contato',tab:'compras'});
-    else if (diasUlt>60) opps.push({icon:'⚠️',label:'Cliente inativa',sub:diasUlt+' dias sem comprar',tab:'compras'});
+    if (diasUlt>=7&&diasUlt<=60) opps.push({icon:'',label:'Pós-venda pendente',sub:diasUlt+' dias sem contato',tab:'compras'});
+    else if (diasUlt>60) opps.push({icon:'',label:'Cliente inativa',sub:diasUlt+' dias sem comprar',tab:'compras'});
   }
 
   var html='';
@@ -2866,8 +2780,8 @@ function buildCfCompras(c,sortPurch) {
     +(!sortPurch.length?'<div class="empty" style="padding:18px"><div class="empty-d">Nenhuma compra registrada</div></div>':
       sortPurch.map(function(p){
         var cbUsadoNestaCompra = (_cashback||[]).filter(function(cb){ return cb.usado_em_purchase_id===p.id; }).reduce(function(s,cb){ return s+parseFloat(cb.utilizado_valor||0); }, 0);
-        var cbBadge = cbUsadoNestaCompra>0 ? '<div style="font-size:10px;color:var(--gold-b);font-weight:600;margin-top:2px">💰 R$ '+cbUsadoNestaCompra.toFixed(2).replace('.',',')+' de cashback usado</div>' : '';
-        var cbBtn = (cbUsadoNestaCompra===0 && saldoCbCliente>0) ? '<button data-cid="'+c.id+'" data-pid="'+p.id+'" onclick="abrirModalUsarCashback(this.dataset.cid,this.dataset.pid)" style="background:none;border:none;cursor:pointer;color:var(--gold-b);font-size:11px;padding:2px 4px;border-radius:4px;margin-left:2px" title="Usar cashback nesta venda">💰</button>' : '';
+        var cbBadge = cbUsadoNestaCompra>0 ? '<div style="font-size:10px;color:var(--gold-b);font-weight:600;margin-top:2px">R$ '+cbUsadoNestaCompra.toFixed(2).replace('.',',')+' de cashback usado</div>' : '';
+        var cbBtn = (cbUsadoNestaCompra===0 && saldoCbCliente>0) ? '<button data-cid="'+c.id+'" data-pid="'+p.id+'" onclick="abrirModalUsarCashback(this.dataset.cid,this.dataset.pid)" style="background:none;border:none;cursor:pointer;color:var(--gold-b);font-size:11px;padding:2px 4px;border-radius:4px;margin-left:2px" title="Usar cashback nesta venda"></button>' : '';
         return '<div class="pi"><div class="pi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/></svg></div><div style="flex:1"><div style="font-size:13px;font-weight:500">'+(p.description||'Compra')+'</div><div style="font-size:11px;color:var(--text3)">'+fD(p.date)+(p.salesperson?' - '+p.salesperson:'')+(p.canal?' · '+(p.canal==='online'?'Online':'Loja física'):'')+(p.tipo_cliente&&typeof TIPO_CLIENTE_LBL!=='undefined'?' · '+(TIPO_CLIENTE_LBL[p.tipo_cliente]||p.tipo_cliente):'')+'</div>'+cbBadge+'</div>'+(p.amount?'<div class="pa">R$ '+parseFloat(p.amount).toFixed(2).replace('.',',')+'</div>':'')+cbBtn+'<button data-pid="'+p.id+'" data-cid="'+c.id+'" onclick="excluirCompra(this.dataset.pid,this.dataset.cid)" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:11px;padding:2px 4px;border-radius:4px;margin-left:4px" title="Excluir">×</button></div>';
       }).join(''))
     +'</div>';
@@ -3178,7 +3092,7 @@ function renderCAMsgs() {
   
   var lista = catFiltro ? todos.filter(function(m){ return m.cat===catFiltro; }) : todos;
   if (!lista.length) {
-    el.innerHTML = '<div class="ca-empty"><div style="font-size:32px;margin-bottom:10px">💬</div><div style="font-weight:600;margin-bottom:4px">Nenhuma mensagem' + (catFiltro?' nesta categoria':'') + '</div><div style="font-size:12px">Clique em "+ Nova Mensagem" para adicionar</div></div>';
+    el.innerHTML = '<div class="ca-empty"><div style="margin-bottom:10px;display:flex;justify-content:center;color:var(--text3)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg></div><div style="font-weight:600;margin-bottom:4px">Nenhuma mensagem' + (catFiltro?' nesta categoria':'') + '</div><div style="font-size:12px">Clique em "+ Nova Mensagem" para adicionar</div></div>';
     return;
   }
   
@@ -3215,15 +3129,15 @@ function renderCAMsgCard(m) {
         '<div class="ca-preview">' + (m.corpo||'') + '</div>' +
       '</div>' +
       '<div class="ca-actions">' +
-        '<button class="ca-fav-btn" title="Favoritar" data-tipo="msg" data-id="' + m.id + '" onclick="event.stopPropagation();toggleFav(this.dataset.tipo,this.dataset.id)">' + (fav?'⭐':'☆') + '</button>' +
+        '<button class="ca-fav-btn" title="Favoritar" data-tipo="msg" data-id="' + m.id + '" onclick="event.stopPropagation();toggleFav(this.dataset.tipo,this.dataset.id)">' + (fav?'':'☆') + '</button>' +
         '<span style="color:var(--text3);font-size:14px">▾</span>' +
       '</div>' +
     '</div>' +
     '<div class="ca-card-body">' +
       '<div class="ca-body-text" id="ca-body-msg-' + m.id + '">' + (m.corpo||'') + '</div>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
-        '<button class="btn btn-g btn-xs" data-id="' + m.id + '" onclick="copiarCAMsg(this.dataset.id)">📋 Copiar</button>' +
-        '<button class="btn btn-g btn-xs" data-id="' + m.id + '" onclick="editarCAMsg(this.dataset.id)">✏️ Editar</button>' +
+        '<button class="btn btn-g btn-xs" data-id="' + m.id + '" onclick="copiarCAMsg(this.dataset.id)">Copiar</button>' +
+        '<button class="btn btn-g btn-xs" data-id="' + m.id + '" onclick="editarCAMsg(this.dataset.id)">Editar</button>' +
         '<button class="btn btn-d btn-xs" data-id="' + m.id + '" onclick="excluirCAMsg(this.dataset.id)">×</button>' +
       '</div>' +
     '</div>' +
@@ -3310,7 +3224,7 @@ function renderCARoteiros() {
   var el = document.getElementById('ca-roteiros-list');
   if (!el) return;
   if (!_caRoteiros.length) {
-    el.innerHTML = '<div class="ca-empty"><div style="font-size:32px;margin-bottom:10px">📋</div><div style="font-weight:600;margin-bottom:4px">Nenhum roteiro cadastrado</div><div style="font-size:12px">Crie roteiros de atendimento para sua equipe</div></div>';
+    el.innerHTML = '<div class="ca-empty"><div style="margin-bottom:10px;display:flex;justify-content:center;color:var(--text3)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg></div><div style="font-weight:600;margin-bottom:4px">Nenhum roteiro cadastrado</div><div style="font-size:12px">Crie roteiros de atendimento para sua equipe</div></div>';
     return;
   }
   el.innerHTML = _caRoteiros.map(function(r){ return renderCARoteiroCard(r); }).join('');
@@ -3326,7 +3240,7 @@ function renderCARoteiroCard(r) {
         (r.objetivo ? '<div class="ca-preview">' + r.objetivo + '</div>' : '') +
       '</div>' +
       '<div class="ca-actions">' +
-        '<button class="ca-fav-btn" data-tipo="rot" data-id="' + r.id + '" onclick="event.stopPropagation();toggleFav(this.dataset.tipo,this.dataset.id)">' + (fav?'⭐':'☆') + '</button>' +
+        '<button class="ca-fav-btn" data-tipo="rot" data-id="' + r.id + '" onclick="event.stopPropagation();toggleFav(this.dataset.tipo,this.dataset.id)">' + (fav?'':'☆') + '</button>' +
         '<span style="color:var(--text3);font-size:14px">▾</span>' +
       '</div>' +
     '</div>' +
@@ -3336,7 +3250,7 @@ function renderCARoteiroCard(r) {
         passos.map(function(p,i){ return '<div class="ca-step"><div class="ca-step-num">' + (i+1) + '</div><div style="font-size:13px;color:var(--text2);padding-top:3px">' + p + '</div></div>'; }).join('') : '') +
       (r.obs ? '<div style="font-size:12px;color:var(--text3);margin-top:12px;padding-top:10px;border-top:1px solid var(--border)"><strong>Obs:</strong> ' + r.obs + '</div>' : '') +
       '<div style="display:flex;gap:8px;margin-top:14px">' +
-        '<button class="btn btn-g btn-xs" data-id="' + r.id + '" onclick="editarCARoteiro(this.dataset.id)">✏️ Editar</button>' +
+        '<button class="btn btn-g btn-xs" data-id="' + r.id + '" onclick="editarCARoteiro(this.dataset.id)">Editar</button>' +
         '<button class="btn btn-d btn-xs" data-id="' + r.id + '" onclick="excluirCARoteiro(this.dataset.id)">×</button>' +
       '</div>' +
     '</div>' +
@@ -3398,7 +3312,7 @@ function renderCAObjecoes() {
   var el = document.getElementById('ca-obj-list');
   if (!el) return;
   if (!_caObjecoes.length) {
-    el.innerHTML = '<div class="ca-empty"><div style="font-size:32px;margin-bottom:10px">🛡️</div><div style="font-weight:600;margin-bottom:4px">Nenhuma objeção cadastrada</div><div style="font-size:12px">Registre as objeções mais comuns e as respostas ideais</div></div>';
+    el.innerHTML = '<div class="ca-empty"><div style="margin-bottom:10px;display:flex;justify-content:center;color:var(--text3)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg></div><div style="font-weight:600;margin-bottom:4px">Nenhuma objeção cadastrada</div><div style="font-size:12px">Registre as objeções mais comuns e as respostas ideais</div></div>';
     return;
   }
   el.innerHTML = _caObjecoes.map(function(o){ return renderCAObjCard(o); }).join('');
@@ -3413,7 +3327,7 @@ function renderCAObjCard(o) {
         '<div class="ca-preview">' + (o.resposta||'') + '</div>' +
       '</div>' +
       '<div class="ca-actions">' +
-        '<button class="ca-fav-btn" data-tipo="obj" data-id="' + o.id + '" onclick="event.stopPropagation();toggleFav(this.dataset.tipo,this.dataset.id)">' + (fav?'⭐':'☆') + '</button>' +
+        '<button class="ca-fav-btn" data-tipo="obj" data-id="' + o.id + '" onclick="event.stopPropagation();toggleFav(this.dataset.tipo,this.dataset.id)">' + (fav?'':'☆') + '</button>' +
         '<span style="color:var(--text3);font-size:14px">▾</span>' +
       '</div>' +
     '</div>' +
@@ -3422,8 +3336,8 @@ function renderCAObjCard(o) {
       '<div class="ca-body-text">' + (o.resposta||'') + '</div>' +
       (o.obs ? '<div style="font-size:12px;color:var(--text3);margin-top:10px"><strong>Obs:</strong> ' + o.obs + '</div>' : '') +
       '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">' +
-        '<button class="btn btn-g btn-xs" data-id="' + o.id + '" onclick="copiarCAObj(this.dataset.id)">📋 Copiar resposta</button>' +
-        '<button class="btn btn-g btn-xs" data-id="' + o.id + '" onclick="editarCAObj(this.dataset.id)">✏️ Editar</button>' +
+        '<button class="btn btn-g btn-xs" data-id="' + o.id + '" onclick="copiarCAObj(this.dataset.id)">Copiar resposta</button>' +
+        '<button class="btn btn-g btn-xs" data-id="' + o.id + '" onclick="editarCAObj(this.dataset.id)">Editar</button>' +
         '<button class="btn btn-d btn-xs" data-id="' + o.id + '" onclick="excluirCAObj(this.dataset.id)">×</button>' +
       '</div>' +
     '</div>' +
@@ -3509,20 +3423,20 @@ function renderCAFavoritos() {
   var el = document.getElementById('ca-fav-list');
   if (!el) return;
   if (!_caFavs.length) {
-    el.innerHTML = '<div class="ca-empty"><div style="font-size:32px;margin-bottom:10px">⭐</div><div style="font-weight:600;margin-bottom:4px">Nenhum favorito ainda</div><div style="font-size:12px">Clique em ☆ em qualquer mensagem, roteiro ou objeção para favoritar</div></div>';
+    el.innerHTML = '<div class="ca-empty"><div style="margin-bottom:10px;display:flex;justify-content:center;color:var(--text3)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg></div><div style="font-weight:600;margin-bottom:4px">Nenhum favorito ainda</div><div style="font-size:12px">Clique em ☆ em qualquer mensagem, roteiro ou objeção para favoritar</div></div>';
     return;
   }
   var html = '';
   _caFavs.forEach(function(fav){
     if (fav.tipo === 'msg') {
       var m = _caMsgs.find(function(x){ return x.id===fav.id; });
-      if (m) html += '<div style="margin-bottom:8px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text3);margin-bottom:5px">💬 Mensagem</div>' + renderCAMsgCard(m) + '</div>';
+      if (m) html += '<div style="margin-bottom:8px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text3);margin-bottom:5px">Mensagem</div>' + renderCAMsgCard(m) + '</div>';
     } else if (fav.tipo === 'rot') {
       var r = _caRoteiros.find(function(x){ return x.id===fav.id; });
-      if (r) html += '<div style="margin-bottom:8px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text3);margin-bottom:5px">📋 Roteiro</div>' + renderCARoteiroCard(r) + '</div>';
+      if (r) html += '<div style="margin-bottom:8px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text3);margin-bottom:5px">Roteiro</div>' + renderCARoteiroCard(r) + '</div>';
     } else if (fav.tipo === 'obj') {
       var o = _caObjecoes.find(function(x){ return x.id===fav.id; });
-      if (o) html += '<div style="margin-bottom:8px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text3);margin-bottom:5px">🛡️ Objeção</div>' + renderCAObjCard(o) + '</div>';
+      if (o) html += '<div style="margin-bottom:8px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text3);margin-bottom:5px">Objeção</div>' + renderCAObjCard(o) + '</div>';
     }
   });
   el.innerHTML = html || '<div class="ca-empty">Nenhum favorito encontrado.</div>';
@@ -4785,6 +4699,7 @@ function loadFluxoFromDB() {
 <script src="clientes-importacao.js"></script>
 <script src="vendas.js"></script>
 <script src="tags.js"></script>
+<script src="escritorio-plano.js"></script>
 <script>
 
 // ── MENU EXPANSÍVEL ──
@@ -4838,10 +4753,10 @@ function editarClienteAtual() {
 var _wppAuto = [];
 var WPP_DIAS_LBL = ['Dom','Seg','Ter','Qua','Qui','Sex','Sab'];
 var WPP_FONTES = [
-  {id:'gopage',label:'Gopage',icon:'🛍️',desc:'Integração via API da sua loja Gopage'},
-  {id:'ecommerce',label:'Outra plataforma',icon:'🔗',desc:'Nuvemshop, Tray, Shopify e outras'},
-  {id:'whatsapp_catalog',label:'Catálogo do WhatsApp Business',icon:'📦',desc:'Produtos do catálogo no WhatsApp'},
-  {id:'manual',label:'Cadastro manual',icon:'✏️',desc:'Cadastre os produtos diretamente aqui'}
+  {id:'gopage',label:'Gopage',icon:'',desc:'Integração via API da sua loja Gopage'},
+  {id:'ecommerce',label:'Outra plataforma',icon:'',desc:'Nuvemshop, Tray, Shopify e outras'},
+  {id:'whatsapp_catalog',label:'Catálogo do WhatsApp Business',icon:'',desc:'Produtos do catálogo no WhatsApp'},
+  {id:'manual',label:'Cadastro manual',icon:'',desc:'Cadastre os produtos diretamente aqui'}
 ];
 
 function saveWppAuto(){ slpSet('slp_wpp_auto', _wppAuto); }
@@ -4851,7 +4766,7 @@ function renderWppAuto(){
   var el=document.getElementById('wpp-automacoes-list');
   if(!el) return;
   if(!_wppAuto.length){
-    el.innerHTML='<div class="wpp-empty"><div style="font-size:32px;margin-bottom:10px">📱</div>'+
+    el.innerHTML='<div class="wpp-empty"><div style="margin-bottom:10px;display:flex;justify-content:center;color:var(--text3)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg></div>'+
       '<div style="font-weight:600;font-size:13px;margin-bottom:4px;color:var(--text2)">Nenhuma automação configurada</div>'+
       '<div style="font-size:12px">Crie sua primeira automação para manter o grupo ativo todos os dias</div></div>';
     return;
@@ -4888,10 +4803,10 @@ function renderWppAuto(){
 
 function wppBodyTabs(a){
   return '<div class="wpp-tabs">'+
-    '<div class="wpp-tab active" data-wid="'+a.id+'" data-tab="config" onclick="switchWppTab(this.dataset.wid,this.dataset.tab,this)">⚙️ Configuração</div>'+
-    '<div class="wpp-tab" data-wid="'+a.id+'" data-tab="numero" onclick="switchWppTab(this.dataset.wid,this.dataset.tab,this)">📱 Número</div>'+
-    '<div class="wpp-tab" data-wid="'+a.id+'" data-tab="catalogo" onclick="switchWppTab(this.dataset.wid,this.dataset.tab,this)">🛍️ Catálogo</div>'+
-    '<div class="wpp-tab" data-wid="'+a.id+'" data-tab="preview" onclick="switchWppTab(this.dataset.wid,this.dataset.tab,this)">👁️ Preview</div>'+
+    '<div class="wpp-tab active" data-wid="'+a.id+'" data-tab="config" onclick="switchWppTab(this.dataset.wid,this.dataset.tab,this)">Configuração</div>'+
+    '<div class="wpp-tab" data-wid="'+a.id+'" data-tab="numero" onclick="switchWppTab(this.dataset.wid,this.dataset.tab,this)">Número</div>'+
+    '<div class="wpp-tab" data-wid="'+a.id+'" data-tab="catalogo" onclick="switchWppTab(this.dataset.wid,this.dataset.tab,this)">Catálogo</div>'+
+    '<div class="wpp-tab" data-wid="'+a.id+'" data-tab="preview" onclick="switchWppTab(this.dataset.wid,this.dataset.tab,this)">Preview</div>'+
   '</div>'+
   '<div id="wtab-config-'+a.id+'" class="wpp-panel active">'+wppTabConfig(a)+'</div>'+
   '<div id="wtab-numero-'+a.id+'" class="wpp-panel">'+wppTabNumero(a)+'</div>'+
@@ -4930,15 +4845,15 @@ function wppTabNumero(a){
     '</div>';
   }
   return '<div style="background:#fdf6e8;border:1px solid var(--gold-b);border-radius:var(--rs);padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--gold)">'+
-    '⚠️ Use um número secundário, nunca o número principal da loja.'+
+    'Use um número secundário, nunca o número principal da loja.'+
   '</div>'+
   '<div class="wpp-field"><label>Número (com código do país)</label>'+
   '<input class="input" type="text" value="'+(a.numero||'')+'" placeholder="5551999999999" data-wid="'+a.id+'" data-campo="numero" onblur="salvarCampoWpp(this.dataset.wid,this.dataset.campo,this.value)"></div>'+
   '<div class="wpp-conectar-box">'+
-    '<div class="wpp-qr-placeholder"><div style="text-align:center"><div style="font-size:28px;margin-bottom:6px">📱</div><div>QR Code aparece<br>após configurar<br>a Evolution API</div></div></div>'+
+    '<div class="wpp-qr-placeholder"><div style="text-align:center"><div style="margin-bottom:6px;display:flex;justify-content:center;color:var(--text3)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg></div><div>QR Code aparece<br>após configurar<br>a Evolution API</div></div></div>'+
     '<div style="font-size:13px;font-weight:600;margin-bottom:4px">Conectar via QR Code</div>'+
     '<div style="font-size:12px;color:var(--text3);margin-bottom:12px">WhatsApp → Dispositivos conectados → Conectar dispositivo</div>'+
-    '<button class="btn btn-p btn-sm" style="opacity:.5;cursor:not-allowed" disabled>⏳ Aguardando Evolution API</button>'+
+    '<button class="btn btn-p btn-sm" style="opacity:.5;cursor:not-allowed" disabled>Aguardando Evolution API</button>'+
   '</div>';
 }
 
@@ -4952,14 +4867,14 @@ function wppTabCatalogo(a){
   var configExtra='';
   if(a.fonte==='gopage'||a.fonte==='ecommerce'){
     var prods=a.produtos&&a.produtos.length?
-      a.produtos.slice(0,3).map(function(p){return '<div class="wpp-produto-card"><div class="wpp-produto-img">🛍️</div><div><div class="wpp-produto-nome">'+p.nome+'</div><div class="wpp-produto-preco">R$ '+(p.preco||'—')+'</div></div></div>';}).join('')
+      a.produtos.slice(0,3).map(function(p){return '<div class="wpp-produto-card"><div class="wpp-produto-img"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></div><div><div class="wpp-produto-nome">'+p.nome+'</div><div class="wpp-produto-preco">R$ '+(p.preco||'—')+'</div></div></div>';}).join('')
       :'<div style="font-size:12px;color:var(--text3)">Conecte a API para importar</div>';
     configExtra='<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">'+
       '<div class="wpp-section-label">URL da API</div>'+
       '<div class="wpp-field"><input class="input" type="url" value="'+(a.catalogo_url||'')+'" placeholder="https://suagopage.com.br/api/products" data-wid="'+a.id+'" data-campo="catalogo_url" onblur="salvarCampoWpp(this.dataset.wid,this.dataset.campo,this.value)"></div>'+
       '<div class="wpp-field"><label>Token (se necessário)</label><input class="input" type="password" value="'+(a.catalogo_token||'')+'" placeholder="Bearer token ou API key" data-wid="'+a.id+'" data-campo="catalogo_token" onblur="salvarCampoWpp(this.dataset.wid,this.dataset.campo,this.value)"></div>'+
       '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">'+
-        '<button class="btn btn-g btn-sm" data-wid="'+a.id+'" onclick="testarConexaoWpp(this.dataset.wid)">🔌 Testar conexão</button>'+
+        '<button class="btn btn-g btn-sm" data-wid="'+a.id+'" onclick="testarConexaoWpp(this.dataset.wid)">Testar conexão</button>'+
         '<span id="wpp-teste-'+a.id+'" style="font-size:12px;color:var(--text3)"></span>'+
       '</div>'+
       '<div class="wpp-section-label">Produtos importados</div>'+prods+
@@ -4968,11 +4883,11 @@ function wppTabCatalogo(a){
     configExtra='<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">'+
       '<div style="background:#e8f2fa;border:1px solid var(--blue);border-radius:var(--rs);padding:12px;margin-bottom:12px;font-size:12px;color:var(--blue)">Você precisará autorizar o acesso no Gerenciador de Comércio da Meta.</div>'+
       '<div class="wpp-field"><label>ID do catálogo</label><input class="input" type="text" value="'+(a.wpp_catalog_id||'')+'" placeholder="123456789" data-wid="'+a.id+'" data-campo="wpp_catalog_id" onblur="salvarCampoWpp(this.dataset.wid,this.dataset.campo,this.value)"></div>'+
-      '<button class="btn btn-g btn-sm" style="opacity:.5;cursor:not-allowed" disabled>🔗 Autorizar via Meta (em breve)</button>'+
+      '<button class="btn btn-g btn-sm" style="opacity:.5;cursor:not-allowed" disabled>Autorizar via Meta (em breve)</button>'+
     '</div>';
   } else if(a.fonte==='manual'){
     var prods2=(a.produtos&&a.produtos.length)?
-      a.produtos.map(function(p,i){return '<div class="wpp-produto-card"><div class="wpp-produto-img">🛍️</div><div style="flex:1"><div class="wpp-produto-nome">'+p.nome+'</div><div class="wpp-produto-preco">R$ '+(p.preco||'—')+'</div></div><button class="btn btn-d btn-xs" data-wid="'+a.id+'" data-idx="'+i+'" onclick="removerProdutoWpp(this.dataset.wid,this.dataset.idx)">×</button></div>';}).join('')
+      a.produtos.map(function(p,i){return '<div class="wpp-produto-card"><div class="wpp-produto-img"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></div><div style="flex:1"><div class="wpp-produto-nome">'+p.nome+'</div><div class="wpp-produto-preco">R$ '+(p.preco||'—')+'</div></div><button class="btn btn-d btn-xs" data-wid="'+a.id+'" data-idx="'+i+'" onclick="removerProdutoWpp(this.dataset.wid,this.dataset.idx)">×</button></div>';}).join('')
       :'<div style="font-size:12px;color:var(--text3);margin-bottom:8px">Nenhum produto cadastrado</div>';
     configExtra='<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">'+
       '<div class="wpp-section-label">Produtos</div>'+prods2+
@@ -4985,20 +4900,20 @@ function wppTabCatalogo(a){
 function wppTabPreview(a){
   var dias=(a.dias||[]).map(function(d){return WPP_DIAS_LBL[d];}).join(', ')||'—';
   var prod=a.produtos&&a.produtos.length?a.produtos[0]:{nome:'Vestido Floral Midi',preco:'189,90'};
-  var legBase=a.legenda||'Produto exclusivo para membros do grupo ✨\n\n{produto}\nR$ {preco}\n\nGaranta o seu hoje!';
+  var legBase=a.legenda||'Produto exclusivo para membros do grupo \n\n{produto}\nR$ {preco}\n\nGaranta o seu hoje!';
   var leg=legBase.replace('{produto}',prod.nome||'—').replace('{preco}',prod.preco||'—').replace('{link}','link-da-loja.com');
   var legHtml=leg.split('\n').join('<br>');
   return '<div class="wpp-section-label">Simulação da mensagem</div>'+
     '<div style="background:var(--bg3);border-radius:var(--rs);padding:16px;border:1px solid var(--border)">'+
-      '<div class="wpp-produto-card" style="margin-bottom:10px"><div class="wpp-produto-img">🛍️</div>'+
+      '<div class="wpp-produto-card" style="margin-bottom:10px"><div class="wpp-produto-img"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></div>'+
         '<div><div class="wpp-produto-nome">'+(prod.nome||'Produto')+'</div><div class="wpp-produto-preco">R$ '+(prod.preco||'—')+'</div></div>'+
       '</div>'+
       '<div class="wpp-preview-msg">'+legHtml+'</div>'+
     '</div>'+
     '<div style="margin-top:12px;font-size:12px;color:var(--text3);display:flex;flex-direction:column;gap:3px">'+
-      '<div>📅 Envio: <strong style="color:var(--text)">'+dias+'</strong> às <strong style="color:var(--text)">'+(a.horario||'19:00')+'</strong></div>'+
-      '<div>👥 Grupo: <strong style="color:var(--text)">'+(a.grupo||'—')+'</strong></div>'+
-      '<div>📦 Fonte: <strong style="color:var(--text)">'+(WPP_FONTES.find(function(f){return f.id===a.fonte;})||{label:'Não definida'}).label+'</strong></div>'+
+      '<div>Envio: <strong style="color:var(--text)">'+dias+'</strong> às <strong style="color:var(--text)">'+(a.horario||'19:00')+'</strong></div>'+
+      '<div>Grupo: <strong style="color:var(--text)">'+(a.grupo||'—')+'</strong></div>'+
+      '<div>Fonte: <strong style="color:var(--text)">'+(WPP_FONTES.find(function(f){return f.id===a.fonte;})||{label:'Não definida'}).label+'</strong></div>'+
     '</div>';
 }
 
@@ -5035,7 +4950,7 @@ function novaAutomacaoWpp(){
 function testarConexaoWpp(wid){
   var a=getWpp(wid);if(!a||!a.catalogo_url){toast('Informe a URL da API.','e');return;}
   var el=document.getElementById('wpp-teste-'+wid);if(el)el.textContent='Testando...';
-  setTimeout(function(){if(el){el.textContent='⏳ Evolution API não configurada ainda';el.style.color='var(--gold)';}},1200);
+  setTimeout(function(){if(el){el.textContent='Evolution API não configurada ainda';el.style.color='var(--gold)';}},1200);
 }
 function desconectarNumeroWpp(wid){
   if(!confirm('Desconectar o número?'))return;
@@ -5657,7 +5572,7 @@ async function gerarCashbackVenda(clientId,valorVenda,purchaseId){
     }
     return;
   }
-  if(res.data){_cashback.unshift(res.data);toast('💰 Cashback de R$ '+valorCb.toFixed(2).replace('.',',')+' gerado!');}
+  if(res.data){_cashback.unshift(res.data);toast('Cashback de R$ '+valorCb.toFixed(2).replace('.',',')+' gerado!');}
 }
 function abrirModalCashbackManual(cid){
   var mo=document.getElementById('mo-cb-manual');
@@ -5679,7 +5594,7 @@ async function salvarCbManual(){
   if(res.error){toast('Erro ao adicionar.','e');return;}
   _cashback.unshift(res.data);
   document.getElementById('mo-cb-manual').classList.remove('open');
-  toast('💰 Cashback de R$ '+valor.toFixed(2).replace('.',',')+' adicionado!');
+  toast('Cashback de R$ '+valor.toFixed(2).replace('.',',')+' adicionado!');
   renderCashbackCliente(cid);
 }
 function abrirModalUsarCashback(cid, purchaseId){
@@ -5740,7 +5655,7 @@ async function confirmarUsarCashback(){
   var r = await consumirCashbackFIFO(cid, valorUsar, pid);
   if (!r.ok) { toast(r.erro, 'e'); return; }
   document.getElementById('mo-cb-usar').classList.remove('open');
-  toast('✅ R$ '+valorUsar.toFixed(2).replace('.',',')+' de cashback utilizado!');
+  toast('R$ '+valorUsar.toFixed(2).replace('.',',')+' de cashback utilizado!');
   if (window._detailClient && window._detailClient.id===cid) {
     // Recarrega o saldo/lotes do cliente em memoria antes de re-renderizar
     var freshCb = await _sb.from('cashback').select('*').eq('client_id', cid);
@@ -5781,7 +5696,7 @@ function renderCashbackCliente(cid){
   el.style.display='block';
   el.innerHTML='<div class="card card-sm">'+
     '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'+
-    '<div style="font-weight:700;font-size:15px;font-family:Syne,sans-serif">💰 Cashback</div>'+
+    '<div style="font-weight:700;font-size:15px;font-family:Syne,sans-serif">Cashback</div>'+
     '<div style="display:flex;gap:6px">'+
     '<button class="btn btn-g btn-xs" data-cid="'+cid+'" onclick="abrirModalCashbackManual(this.dataset.cid)">+ Manual</button>'+
     (saldo>0?'<button class="btn btn-p btn-xs" data-cid="'+cid+'" onclick="abrirModalUsarCashback(this.dataset.cid)">Utilizar</button>':'')+
@@ -5789,7 +5704,7 @@ function renderCashbackCliente(cid){
     '<div class="cb-saldo-box">'+
     '<div class="cb-saldo-label">Saldo disponível</div>'+
     '<div class="cb-saldo-valor">R$ '+saldo.toFixed(2).replace('.',',')+'</div>'+
-    (venc.length?'<div class="cb-saldo-sub">⚠ '+venc.length+' lançamento(s) vencem em 30 dias</div>':'')+
+    (venc.length?'<div class="cb-saldo-sub">'+venc.length+' lançamento(s) vencem em 30 dias</div>':'')+
     '</div>'+
     '<div class="cb-stats">'+
     '<div class="cb-stat"><div class="cb-stat-val" style="color:var(--green)">R$ '+saldo.toFixed(2).replace('.',',')+'</div><div class="cb-stat-lbl">Disponível</div></div>'+
@@ -5800,7 +5715,7 @@ function renderCashbackCliente(cid){
       '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text3);margin-bottom:8px">Movimentações</div>'+
       '<div class="cb-mov">'+movs.map(function(cb){
         var isP=cb.status!=='utilizado';
-        var icon=cb.status==='disponivel'?'💰':cb.status==='utilizado'?'✓':'⏰';
+        var icon=cb.status==='disponivel'?'R$':cb.status==='utilizado'?'✓':'—';
         var cls=isP?'cb-mov-plus':'cb-mov-minus';
         var val=(isP?'+ R$ ':'- R$ ')+parseFloat(cb.valor||0).toFixed(2).replace('.',',');
         var desc=cb.origem==='compra'?'Cashback de compra':cb.motivo||'Adição manual';
@@ -5811,7 +5726,7 @@ function renderCashbackCliente(cid){
           '<div style="flex:1"><div class="cb-mov-val" style="color:'+(isP?'var(--green)':'var(--text3)')+'">'+val+'</div>'+
           '<div class="cb-mov-desc">'+desc+(cb.created_at?' · '+cb.created_at.slice(0,10).split('-').reverse().join('/'):'')+'</div>'+
           (cb.percentual?'<div class="cb-mov-desc">Regra: '+cb.percentual+'%</div>':'')+
-          (dias!==null&&dias<=15?'<div class="cb-venc-alert">⚠ Expira em '+dias+' dias</div>':'')+
+          (dias!==null&&dias<=15?'<div class="cb-venc-alert">Expira em '+dias+' dias</div>':'')+
           (cb.validade&&cb.status==='disponivel'?'<div class="cb-mov-desc">Válido até '+cb.validade.split('-').reverse().join('/')+'</div>':'')+
           '</div></div>';
       }).join('')+'</div>'
