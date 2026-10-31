@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Sistema Loja Previsivel — SLP v3.8</title>
+<title>Sistema Loja Previsivel — SLP v3.9</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -943,6 +943,11 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
    Tags e Filtros
   </div>
+ <div class="sb-sec">Ajuda</div>
+  <div class="nav-i" data-page="ajuda" onclick="showPage('ajuda')">
+   <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+   Como usar
+  </div>
 </div>
  <div class="sb-bot">
  <div class="uc">
@@ -1037,6 +1042,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
  <div class="card" style="padding:0;overflow:hidden" id="inactive-list"></div>
  </div>
  <div id="page-vendas" class="page"><div id="vendas-root"></div></div>
+ <div id="page-ajuda" class="page"><div id="ajuda-root"></div></div>
  <div id="page-tags" class="page"><div id="tags-root"></div></div>
  <div id="page-conferir" class="page">
  <div class="ph"><div><h1 class="pt">Conferir cadastros</h1><p class="ps">Telefones repetidos ou errados e fichas duplicadas. Corrija ou junte as fichas para não perder oportunidade.</p></div></div>
@@ -2125,7 +2131,7 @@ function showPage(p) {
   if (bnMap[p]!==undefined && bni[bnMap[p]]) bni[bnMap[p]].classList.add('active');
   closeSB();
   _navRegistrar({p:p});
-  const R={dashboard:renderDash,clients:renderClients,escritorio:renderEscritorio,fluxo:renderFluxo,captacao:renderCaptacao,birthdays:renderBirthdays,inactive:renderInactive,postsale:renderPostSale,reminders:renderReminders,filter:renderFilter,messages:renderMsgs,salespeople:renderSP,reports:renderReports,export:renderExport,'cashback-opp':function(){ carregarConfigCashback(); renderCbPesquisa(); },conferir:function(){ if(typeof renderConferir==='function') renderConferir(); },vendas:function(){ if(typeof renderVendas==='function') renderVendas(); },tags:function(){ if(typeof renderTagsConfig==='function') renderTagsConfig(); }};
+  const R={dashboard:renderDash,clients:renderClients,escritorio:renderEscritorio,fluxo:renderFluxo,captacao:renderCaptacao,birthdays:renderBirthdays,inactive:renderInactive,postsale:renderPostSale,reminders:renderReminders,filter:renderFilter,messages:renderMsgs,salespeople:renderSP,reports:renderReports,export:renderExport,'cashback-opp':function(){ carregarConfigCashback(); renderCbPesquisa(); },conferir:function(){ if(typeof renderConferir==='function') renderConferir(); },vendas:function(){ if(typeof renderVendas==='function') renderVendas(); },tags:function(){ if(typeof renderTagsConfig==='function') renderTagsConfig(); },ajuda:function(){ if(typeof renderAjuda==='function') renderAjuda(); }};
   if (R[p]) R[p]();
 }
 function toggleSB() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sb-overlay').classList.toggle('open'); }
@@ -2873,7 +2879,7 @@ function goBack(){ voltarPagina(); }
 var _navHist = [], _navAtual = null, _navVoltando = false;
 var NAV_NOMES = {dashboard:'Início', clients:'Clientes', conferir:'Conferir cadastros', captacao:'Captação', fluxo:'Fluxo do Dia', vendas:'Vendas',
   birthdays:'Aniversariantes', inactive:'Inativos', postsale:'Pós-venda', reminders:'Retornos', filter:'Campanha por interesse', 'cashback-opp':'Cashback',
-  messages:'Central de Atendimento', escritorio:'Escritório', reports:'Insights', export:'Exportar', salespeople:'Vendedoras', tags:'Tags e filtros'};
+  messages:'Central de Atendimento', escritorio:'Escritório', reports:'Insights', export:'Exportar', salespeople:'Vendedoras', tags:'Tags e filtros', ajuda:'Como usar'};
 function _navNome(d){
   if (!d) return '';
   if (d.cliente) { var c=(_clients||[]).find(function(x){return x.id===d.cliente;}); return c ? c.name : 'ficha da cliente'; }
@@ -4698,8 +4704,10 @@ function loadFluxoFromDB() {
 <script src="escritorio-digital.js"></script>
 <script src="clientes-importacao.js"></script>
 <script src="vendas.js"></script>
+<script src="vendas-importacao.js"></script>
 <script src="tags.js"></script>
 <script src="escritorio-plano.js"></script>
+<script src="ajuda.js"></script>
 <script>
 
 // ── MENU EXPANSÍVEL ──
@@ -4733,6 +4741,7 @@ var _navGroupMap = {
   export:     null,
   salespeople:null,
   tags:       null,
+  ajuda:      null,
   dashboard:  null
 };
 
